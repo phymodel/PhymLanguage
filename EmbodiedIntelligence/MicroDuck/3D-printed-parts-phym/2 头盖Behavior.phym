@@ -1,0 +1,23 @@
+// MicroDuck · 3D 打印件 ②：头盖的可动演示
+//
+// 头盖只是一个壳，装配里没有自由度 —— 这里给它一个「点名报尺寸」的交互，
+// 方便在场景里逐个零件核对：点一下 → 弹一下 + 报出实测尺寸与材料。
+
+Behavior()
+.name("tapHeadCover")
+.trigger{
+    Tap(){
+        objects: ["HeadCover"]
+    }
+}
+.actions{
+    Emphasize(1){
+        objects: ["HeadCover"],
+        motionType: .pop,
+        duration: 0.4
+    }
+    Speak(2){
+        object: "HeadCover",
+        text: "头盖，外形 91.8 × 122.7 × 46.3 毫米，拱形顶棚：底面全开、两侧各一个大拱窗、顶脊五条通风槽、两侧各三条水平通槽，侧壁 1.7 毫米、顶板 1.2 毫米，躯体部分，PLA。"
+    }
+}

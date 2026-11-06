@@ -1,0 +1,26 @@
+// MicroDuck · 3D 打印件 ①：滑轮的可动演示
+//
+// 滑轮在装配里是**绕自己的轴转**的：几何的轴 = Z（轮廓在 XY 平面、沿 Z 挤出），
+// 所以这里用 `axis: .roll`（Spin 的 `.roll` = Z 轴）。点一下转三圈。
+
+Behavior()
+.name("tapPulleySpin")
+.trigger{
+    Tap(){
+        objects: ["Pulley"]
+    }
+}
+.actions{
+    Emphasize(1){
+        objects: ["Pulley"],
+        motionType: .pop,
+        duration: 0.3
+    }
+    Spin(2){
+        objects: ["Pulley"],
+        axis: .roll,
+        iterations: 3,
+        clockwise: true,
+        duration: 6
+    }
+}
