@@ -1,0 +1,146 @@
+Behavior()
+.name("tap_PulseTextRun")
+.trigger{
+    Tap(){
+        objects: ["PulseTextRun"]
+    }
+}
+.actions{
+
+    Hide(0){
+        objects: ["PulseTextRun"]
+        motionType: .scale
+        duration: 0.5
+    }
+    // ---------- id=1：播放前瞬时复位（并行） ----------
+    //   范围选择 + index：等价于原来的 9 个逐球 Transform，公式与成员 .position(...) 同源
+    //   （duration=0 时 translation 是绝对位姿，故必须与声明位置保持一致）
+    Transform(1){
+        objects: ["PulseSphere[0..8]"],
+        translation: [-0.5 + index * 0.1/pi, 1.5, 0.0],
+        duration: 0
+    }
+    Transform(1){
+        objects: ["PulseCircle[0..7]"],
+        translation: [-0.5 + index * 0.1/pi, 1.5, 0.0],
+        duration: 0
+    }
+
+    // ---------- id=2：动画（并行） ----------
+    Orbit(2){
+        objects: ["PulseSphere1, PulseCircle1"],
+        center: "PulseSphere0",
+        angle: 90,
+        alignPath: false,
+        clockwise: true,
+        revolutions: 1,
+        duration: 12
+    }
+    Orbit(2){
+        objects: ["PulseSphere2, PulseCircle2"],
+        center: "PulseSphere1",
+        angle: 90,
+        alignPath: false,
+        clockwise: true,
+        revolutions: 2,
+        duration: 12
+    }
+    Orbit(2){
+        objects: ["PulseSphere3, PulseCircle3"],
+        center: "PulseSphere2",
+        angle: 90,
+        alignPath: false,
+        clockwise: true,
+        revolutions: 3,
+        duration: 12
+    }
+    Orbit(2){
+        objects: ["PulseSphere4, PulseCircle4"],
+        center: "PulseSphere3",
+        angle: 90,
+        alignPath: false,
+        clockwise: true,
+        revolutions: 4,
+        duration: 12
+    }
+    Orbit(2){
+        objects: ["PulseSphere5, PulseCircle5"],
+        center: "PulseSphere4",
+        angle: 90,
+        alignPath: false,
+        clockwise: true,
+        revolutions: 5,
+        duration: 12
+    }
+    Orbit(2){
+        objects: ["PulseSphere6, PulseCircle6"],
+        center: "PulseSphere5",
+        angle: 90,
+        alignPath: false,
+        clockwise: true,
+        revolutions: 6,
+        duration: 12
+    }
+    Orbit(2){
+        objects: ["PulseSphere7, PulseCircle7"],
+        center: "PulseSphere6",
+        angle: 90,
+        alignPath: false,
+        clockwise: true,
+        revolutions: 7,
+        duration: 12
+    }
+    Orbit(2){
+        objects: ["PulseSphere8"],
+        center: "PulseSphere7",
+        angle: 90,
+        alignPath: false,
+        clockwise: true,
+        revolutions: 8,
+        duration: 12
+    }
+    MoveAlong(2){
+        objects: ["PulseSpherePen"],
+        path: "PulseSineY",
+        tStart: 2*pi,
+        tEnd: 0.0,
+        alignPath: false,
+        clockwise: false,
+        iterations: 1,
+        duration: 12.0
+    }
+    EntityMesh(2){
+        objects: "PulseSineWave",
+        y: "(10/pi)*(sin(t+phase)+sin(2*(t+phase))+sin(3*(t+phase))+sin(4*(t+phase))+sin(5*(t+phase))+sin(6*(t+phase))+sin(7*(t+phase))+sin(8*(t+phase)))",
+        phase: "[2*pi, 0]",
+        duration: 12.0
+    }
+    Show(3){
+        objects: ["PulseTextRun"]
+        motionType: .pop
+        duration: 0.5
+    }
+}
+
+Behavior()
+.name("tap_PulseTextBack")
+.trigger{
+    Tap(){
+        objects: ["PulseTextBack"]
+    }
+}
+.actions{
+    Emphasize(1){
+        objects: ["PulseTextBack"]
+        motionType: .pop
+        duration: 0.4
+    }
+    Speak(2){
+        object: "PulseTextBack"
+        text: "返回傅立叶级数。"
+    }
+    OpenScene(3){
+        scene: "1 傅立叶级数.md"
+        duration: 0
+    }
+}

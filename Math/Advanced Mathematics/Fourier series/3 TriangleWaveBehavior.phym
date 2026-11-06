@@ -1,0 +1,111 @@
+
+Behavior()
+.name("tap_TriangleTextRun")
+.trigger{
+    Tap(){
+        objects: ["TriangleTextRun"]
+    }
+}
+.actions{
+
+    Hide(0){
+        objects: ["TriangleTextRun"]
+        motionType: .scale
+        duration: 0.5
+    }
+    // ---------- id=1：播放前瞬时复位（并行） ----------
+    //   范围选择 + index：等价于原来的 9 个逐球 Transform，公式与成员 .position(...) 同源
+    //   （duration=0 时 translation 是绝对位姿，故必须与声明位置保持一致）
+    Transform(1){
+        objects: ["TriangleSphere[0..4]"],
+        translation: [-0.5 + 0.4/pi * ((index >= 1 ? 1 : 0) + (index >= 2 ? -1/9 : 0) + (index >= 3 ? 1/25 : 0) + (index >= 4 ? -1/49 : 0)), 1.5, 0.0],
+        duration: 0
+    }
+    Transform(1){
+        objects: ["TriangleCircle[0..3]"],
+        translation: [-0.5 + 0.4/pi * ((index >= 1 ? 1 : 0) + (index >= 2 ? -1/9 : 0) + (index >= 3 ? 1/25 : 0) + (index >= 4 ? -1/49 : 0)), 1.5, 0.0],
+        duration: 0
+    }
+
+    // ---------- id=2：动画（并行） ----------
+    Orbit(2){
+        objects: ["TriangleSphere1, TriangleCircle1"],
+        center: "TriangleSphere0",
+        angle: 90,
+        alignPath: false,
+        clockwise: true,
+        revolutions: 1,
+        duration: 12
+    }
+    Orbit(2){
+        objects: ["TriangleSphere2, TriangleCircle2"],
+        center: "TriangleSphere1",
+        angle: 90,
+        alignPath: false,
+        clockwise: false,
+        revolutions: 3,
+        duration: 12
+    }
+    Orbit(2){
+        objects: ["TriangleSphere3, TriangleCircle3"],
+        center: "TriangleSphere2",
+        angle: 90,
+        alignPath: false,
+        clockwise: true,
+        revolutions: 5,
+        duration: 12
+    }
+    Orbit(2){
+        objects: ["TriangleSphere4"],
+        center: "TriangleSphere3",
+        angle: 90,
+        alignPath: false,
+        clockwise: false,
+        revolutions: 7,
+        duration: 12
+    }
+    MoveAlong(2){
+        objects: ["TriangleSphereSine"],
+        path: "TriangleSineY",
+        tStart: 2*pi,
+        tEnd: 0.0,
+        alignPath: false,
+        clockwise: false,
+        iterations: 1,
+        duration: 12.0
+    }
+    EntityMesh(2){
+        objects: "TriangleSineWave",
+        y: "(128/(pi*pi))*(sin(t+phase)-sin(3*(t+phase))/9+sin(5*(t+phase))/25-sin(7*(t+phase))/49)",
+        phase: "[2*pi, 0]",
+        duration: 12.0
+    }
+    Show(3){
+        objects: ["TriangleTextRun"]
+        motionType: .pop
+        duration: 0.5
+    }
+}
+
+Behavior()
+.name("tap_TriangleTextBack")
+.trigger{
+    Tap(){
+        objects: ["TriangleTextBack"]
+    }
+}
+.actions{
+    Emphasize(1){
+        objects: ["TriangleTextBack"]
+        motionType: .pop
+        duration: 0.4
+    }
+    Speak(2){
+        object: "TriangleTextBack"
+        text: "返回傅立叶级数。"
+    }
+    OpenScene(3){
+        scene: "1 傅立叶级数.md"
+        duration: 0
+    }
+}

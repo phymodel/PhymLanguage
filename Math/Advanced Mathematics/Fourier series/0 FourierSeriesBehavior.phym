@@ -1,0 +1,91 @@
+Behavior()
+.name("goSawtooth")
+.trigger{
+    Tap(){
+        objects: ["Sawtooth"]
+    }
+}
+.actions{
+    Emphasize(1){
+        objects: ["Sawtooth"],
+        motionType: .pop,
+        duration: 0.4
+    }
+    Speak(2){
+        object: "Sawtooth",
+        text: "锯齿波的傅立叶级数展开。"
+    }
+    OpenScene(3){
+        scene: "2 锯齿波.md",
+        duration: 0
+    }
+}
+
+Behavior()
+.name("goSquare")
+.trigger{
+    Tap(){
+        objects: ["Square"]
+    }
+}
+.actions{
+    Emphasize(1){
+        objects: ["Square"],
+        motionType: .pop,
+        duration: 0.4
+    }
+    Speak(2){
+        object: "Square",
+        text: "方波的傅立叶级数展开。"
+    }
+    OpenScene(3){
+        scene: "3 方波.md",
+        duration: 0
+    }
+}
+
+Behavior()
+.name("goTriangle")
+.trigger{
+    Tap(){
+        objects: ["Triangle"]
+    }
+}
+.actions{
+    Emphasize(1){
+        objects: ["Triangle"],
+        motionType: .pop,
+        duration: 0.4
+    }
+    Speak(2){
+        object: "Triangle",
+        text: "三角波的傅立叶级数展开。"
+    }
+    OpenScene(3){
+        scene: "4 三角波.md",
+        duration: 0
+    }
+}
+
+Behavior()
+.name("goPulse")
+.trigger{
+    Tap(){
+        objects: ["Pulse"]
+    }
+}
+.actions{
+    Emphasize(1){
+        objects: ["Pulse"],
+        motionType: .pop,
+        duration: 0.4
+    }
+    Speak(2){
+        object: "Pulse",
+        text: "脉冲波的傅立叶级数展开。"
+    }
+    OpenScene(3){
+        scene: "5 脉冲波.md",
+        duration: 0
+    }
+}

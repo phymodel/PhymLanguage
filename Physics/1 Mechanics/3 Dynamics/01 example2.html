@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The F–a graph lines of objects P and Q (same table, different coefficients of kinetic friction)</title>
+<style>
+  /* Figure-frame conventions: the same set as `01 example1.html`, `11 example1-1.html` and
+     `1 Kinematics/07 example1.html`.
+     · The page **carries no background colour** — iOS / visionOS use a glass theme, so the figure must let the window material show through; painting a
+       solid plate inside the page makes the Markdown side recognise that "the author drew a plate" and stop injecting the canvas (MarkdownHtmlFigure.swift
+       `declaresOwnPageBackground`), and the two plates then fight each other.
+     · **Size comes from the aspect ratio** — the figure frame reads the aspect ratio of this file's viewBox, and it must stay within 0.2–5.
+       This figure's viewBox = 1600 × 380 → ratio ≈ 4.21 (the same wide-ish format as `11 example1-1.html` and
+       `1 Kinematics/07 example1.html`). The artwork itself spans only x = 432 → 882, y = 40 → 355 (horizontal centre 657), so the
+       empty space on both sides comes entirely from widening the viewBox: this version takes x = −143 → 1457, leaving 575 units of blank
+       on each side (the previous version was 1200 × 380 with 377 on each side, which made the figure fill the whole frame width in the document, so 198 more units were added on each side).
+       To make the figure smaller, keep widening symmetrically — touch only the viewBox x and width (keeping x₀ + width/2 = 657),
+       never any artwork coordinate; and do not exceed the ratio limit of 5 (about viewBox width 1900 for this figure).
+     · Colours:
+         axes / axis labels F, a / origin O .......... #ffb900
+         F–a graph lines and the letters P / Q ......... #00eaff
+       Both lines sharing one colour is deliberate: the reading point here is "different slopes, same intercept", told apart by the slopes and by the P / Q letters at the right ends,
+       not by colour; this figure has no helper dashed line, so the "graph line and dashed line in the same colour" problem cannot arise.
+     · Fonts: F, a, O are mathematical symbols and use Georgia italic; P and Q are the object names given by the problem (not variables),
+       so they also use Georgia italic. */
+  body {
+    background-color: transparent;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    overflow: hidden;
+  }
+  svg {
+    height: 100%;
+    width: auto;
+    max-width: 100%;
+  }
+  /* Axes: one step thinner, so they weigh the same as in the other coordinate-system figures in this folder */
+  .axis {
+    fill: none;
+    stroke: #ffb900;
+    stroke-width: 2.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  /* F–a graph lines: the two straight lines of P and Q */
+  .curve {
+    fill: none;
+    stroke: #00eaff;
+    stroke-width: 3.2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  /* Axis labels F / a and origin O: physical quantities are set in italic */
+  .axis-name {
+    fill: #ffb900;
+    font-family: Georgia, "Times New Roman", serif;
+    font-style: italic;
+    font-size: 26px;
+  }
+  /* P / Q: the object names given by the problem — Georgia italic, like the axis labels */
+  .body-label {
+    fill: #00eaff;
+    font-family: Georgia, "Times New Roman", serif;
+    font-style: italic;
+    font-size: 30px;
+  }
+</style>
+</head>
+<body>
+
+<!-- Pairs with "Example 2" of `01 NewtonsSecondLaw.md` (2023 National Paper A, Q 2-19):
+     objects P and Q start from rest on the same horizontal table and are pulled straight by a horizontal force; the force–acceleration graph lines are as shown, asking for the relation between their masses and
+     their coefficients of kinetic friction.
+
+     Why the graph lines are drawn this way (every reading point of this problem lives in the geometry):
+       · for each object: F − μmg = ma ⇒ F = ma + μmg, a linear function of a.
+         slope = m (the mass), vertical-axis intercept = μmg (the kinetic friction), horizontal-axis crossing = −μg (the negative half-axis is not drawn).
+       · the two lines have **the same vertical intercept** — the kinetic friction on P equals that on Q;
+       · P's **slope is larger** — mP > mQ;
+       · equal intercepts with mP > mQ ⇒ in μP·mP·g = μQ·mQ·g we get μP < μQ.
+       So both lines must start from **the same point** on the F axis, with P steeper — drop the "same starting point" and D would be misjudged as correct.
+
+     Geometry (1 unit ≈ 1 layout point, content area x = 430→880, y = 40→355):
+       · origin O      (470, 330); the F axis runs up to y = 40 (arrow) and the a axis out to x = 880 (arrow)
+       · common intercept point (470, 268) — on the positive F axis, about 21% of the vertical-axis full scale (290 units);
+                       the intercept is drawn low in the original figure too, leaving room for the two different slopes
+       · P             (470, 268) → (845, 112), slope ≈ 0.42 layout units
+       · Q             (470, 268) → (845, 181), slope ≈ 0.23 layout units — about 0.55 of P's,
+                       matching the original figure's "P steep, Q shallow" impression; the two lines share only the start point, not the end point
+       · letters P / Q (852, 118) / (852, 187) — each just outside the right end of its own line, not on the line and not overlapping
+       · no tick marks on the axes: the problem only asks about the relation between slopes and intercepts, and any numeric scale would be information the source does not have. -->
+<svg viewBox="-143 10 1600 380" xmlns="http://www.w3.org/2000/svg" role="img"
+     aria-label="Graph of the pulling force against the acceleration: the vertical axis is the pulling force F and the horizontal axis is the acceleration a. The two graph lines of P and Q both start from the same point on the positive vertical axis, which shows that the kinetic friction on the two objects is equal in magnitude; the line of P is steeper with a larger slope, which shows that the mass of P is greater than that of Q; and since the friction is equal while the mass of P is greater, the coefficient of kinetic friction of P is smaller than that of Q.">
+
+  <defs>
+    <!-- Axis arrows: same convention as the existing figures in this folder (7×7, scaled by strokeWidth) -->
+    <marker id="arrow" markerWidth="7" markerHeight="7" refX="5.5" refY="3.5"
+            orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L6,3.5 L0,7" fill="none" stroke="#ffb900" stroke-width="1.2"/>
+    </marker>
+  </defs>
+
+  <!-- ───────── Axes ───────── -->
+  <path class="axis" d="M470 330 V40" marker-end="url(#arrow)"/>
+  <path class="axis" d="M470 330 H880" marker-end="url(#arrow)"/>
+
+  <!-- ───────── The two F–a graph lines: same intercept, different slopes ───────── -->
+  <!-- P: the larger slope (mP > mQ) -->
+  <path class="curve" d="M470 298 L845 112"/>
+  <!-- Q: the smaller slope, but starting from the same intercept point -->
+  <path class="curve" d="M470 298 L845 190"/>
+
+  <!-- ───────── Axis labels and object names ───────── -->
+  <text class="axis-name" x="456" y="58" text-anchor="end">F</text>
+  <text class="axis-name" x="874" y="316" text-anchor="end">a</text>
+  <text class="axis-name" x="452" y="354" text-anchor="end">O</text>
+
+  <text class="body-label" x="852" y="118">P</text>
+  <text class="body-label" x="852" y="195">Q</text>
+
+</svg>
+
+</body>
+</html>

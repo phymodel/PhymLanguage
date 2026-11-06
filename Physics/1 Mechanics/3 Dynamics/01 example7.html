@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The braking process: reaction phase (constant velocity) + braking phase (uniform deceleration), and the x–v curve of the braking phase</title>
+<style>
+  /* Figure-frame conventions: the same set as `01 example1.html`–`01 example6-2.html` and `1 Kinematics/04 example6.html`.
+     · The page **carries no background colour** — iOS / visionOS use a glass theme, so the figure must let the window material show through; painting a
+       solid plate inside the page makes the Markdown side recognise that "the author drew a plate" and stop injecting the canvas (MarkdownHtmlFigure.swift
+       `declaresOwnPageBackground`), and the two plates then fight each other. The original figure is gold curves and blue lines on black; **do not copy that
+       background**, only the line artwork is carried over into this repository's palette.
+     · **Size comes from the aspect ratio** — the figure frame reads the aspect ratio of this file's viewBox (which must stay within 0.2–5).
+       This figure sets "one apparatus (A: a straight road + three instants of the car)" beside "one coordinate system (B: the x–v curve)" and
+       is naturally very wide: the measured bbox of the artwork is x = 20 → 995.8, y = 130.1 → 475.9 (browser getBBox).
+       The canvas is **deliberately wider than the artwork**: viewBox = 1400 × 465 (ratio ≈ 3.011, x from −200 to 1200,
+       y from 70 to 535), leaving 220 / 204.2 units of blank on each side — the artwork takes only
+       975.8 / 1400 ≈ 70%, so the figure is displayed at 0.70 and does not fill the glass panel; about 60 / 59 are left above and below,
+       still vertically centred on the artwork. To make the figure smaller, keep widening the viewBox (write the padding only in the viewBox,
+       never touch any artwork coordinate), but do not exceed the ratio limit of 5 — with height 465 the viewBox width tops out at 2325.
+     · Colours (a division of labour among three colours — do not add a fourth):
+         road front edge / road hatching / dimension lines and their end lines / axes / axis labels and tick digits /
+         the A/B panels and the "reaction" / "braking" labels ... #ffb900 (the "fixed apparatus + geometric annotation" convention of `01 example4.html`)
+         the three car positions with their windows and wheels .......... #075bff (the "moving parts" convention of example1)
+         the three car-state labels (spots the sign / starts braking / car stops) ... #075bff (a symbol shares the colour of its artwork:
+                                                          these names say what state the car is in,
+                                                          so they follow the car, not the ruler)
+         the x–v curve ....................... #00eaff (the same cyan as the a–m graph lines of example1 and s₁–s₅ of example5:
+                                                      it is used only for "results obtained by measurement or analysis")
+       Gold = the ruler (road, dimension lines, axes), dark blue = the car, cyan = the graph line. The reading point of this problem is exactly
+       "read one number (25 m) off the curve", so cyan lifts it out of the gold lines and the reader sees at once that the curve is given, not the coordinate.
+     · Fonts: x and v are physical quantities and use Georgia italic; 25, 72 and the units /m, /(km/h) are always upright (Times New Roman);
+       "reaction", "braking" and the panel letters are device and phase names (not variables), set upright in the serif stack —
+       so they never follow the italic of the symbols (as with `.device-rigid` in `01 example4.html`). */
+
+  body {
+    background-color: transparent;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    overflow: hidden;
+  }
+  svg {
+    height: 100%;
+    width: auto;
+    max-width: 100%;
+  }
+  /* The road front edge: one thick flat line, with all three cars resting on it */
+  .rigid {
+    fill: none;
+    stroke: #ffb900;
+    stroke-width: 5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  /* Road hatching: the rough-surface mark, one step thinner so it does not compete with the front edge */
+  .hatch {
+    fill: none;
+    stroke: #ffb900;
+    stroke-width: 2.4;
+    stroke-linecap: round;
+  }
+  /* The car: body outline and wheels, in the moving-parts dark blue, as hollow line artwork (the same convention as block P in example1) */
+  .car {
+    fill: none;
+    stroke: #075bff;
+    stroke-width: 3.2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  /* Side window: solid dark blue — the body is a single outline, so one solid window keeps the car from reading as "a box on two wheels" */
+  .glass {
+    fill: #075bff;
+    stroke: none;
+  }
+  /* The dimension lines (reaction / braking) and their end lines: ruler marks, gold and thin */
+  .dim {
+    fill: none;
+    stroke: #ffb900;
+    stroke-width: 2.6;
+    stroke-linecap: round;
+  }
+  .dim-tick {
+    fill: none;
+    stroke: #ffb900;
+    stroke-width: 2.2;
+    stroke-linecap: round;
+  }
+  /* The axes and the tick marks on them */
+  .axis {
+    fill: none;
+    stroke: #ffb900;
+    stroke-width: 2.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .axis-tick {
+    fill: none;
+    stroke: #ffb900;
+    stroke-width: 2.4;
+    stroke-linecap: round;
+  }
+  /* The x–v curve of the braking phase */
+  .curve {
+    fill: none;
+    stroke: #00eaff;
+    stroke-width: 3.2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  /* Axis labels x/m, v/(km/h) and the origin O: physical quantities are italic */
+  .axis-name {
+    fill: #ffb900;
+    font-family: Georgia, "Times New Roman", serif;
+    font-style: italic;
+    font-size: 26px;
+  }
+  /* Units and digit runs: always upright (Times New Roman lining figures) */
+  .up {
+    font-style: normal;
+  }
+  /* The tick digits 25 / 72 on the axes: upright */
+  .tick-num {
+    fill: #ffb900;
+    font-family: "Times New Roman", Georgia, serif;
+    font-style: normal;
+    font-size: 24px;
+  }
+  /* Car-state labels (spots the sign / starts braking / car stops): upright, they follow the car → dark blue */
+  .car-state {
+    fill: #075bff;
+    font-family: Georgia, "Times New Roman", serif;
+    font-style: normal;
+    font-size: 24px;
+    text-anchor: middle;
+  }
+  /* Dimension-line names (reaction / braking): upright, they follow the ruler → gold */
+  .proc {
+    fill: #ffb900;
+    font-family: Georgia, "Times New Roman", serif;
+    font-style: normal;
+    font-size: 26px;
+    text-anchor: middle;
+  }
+  /* Panel letters A / B */
+  .panel {
+    fill: #ffb900;
+    font-family: Georgia, "Times New Roman", serif;
+    font-style: normal;
+    font-size: 34px;
+    text-anchor: middle;
+  }
+</style>
+</head>
+<body>
+
+<!-- Pairs with "Example 7" of `01 NewtonsSecondLaw.md` (2014 Shandong Province, Q 23): a volunteer drives after drinking, at a constant
+     velocity v₀ = 72 km/h, and travels L = 39 m in all from "spotting the sign" to "the car stops"; panel A splits this distance into
+     "the reaction phase (spotting the sign → starting to brake, still 20 m/s at constant velocity)" and "the braking phase (starting to brake → the car stops,
+     uniform deceleration)"; panel B gives the curve of displacement x against velocity v during the braking phase.
+
+     Geometry (1 unit ≈ 1 layout point):
+       canvas         measured bbox of the artwork: x = 20 → 995.8, y = 130.1 → 475.9 (see "Size comes from the aspect ratio" in <style>)
+       road front edge   y = 300, x = 20 → 450 (one thick flat line with all three cars on it)
+       road hatching     15 strokes spaced 28 apart (x = 36 → 428), 16 × 26 strokes slanting down-left from the front edge
+       the car (local coordinates, road at y = 0 as the underside datum, nose pointing right):
+                   body outline: tailgate at x = 6 (vertical) → roof y = −40 (x = 12 → 34) → windscreen sloping down to
+                   (46, −24) → bonnet to (78, −24) → rounded nose (86, −18), then back along the underside y = −18 to the tailgate;
+                   side window (15,−29)-(18,−37)-(31,−37)-(33,−29), solid;
+                   wheels: centres (22,−9) / (68,−9), r = 9 ⇒ the bottom of a wheel y = 0 sits on the road and its top y = −18 is tangent to the underside.
+                   **The three instants are one and the same car**, drawn once with <g id="car"> and reused by three <use> elements — drawing it three times by hand
+                   would eventually leave one bigger or facing differently, and then they would no longer be "three instants of one car".
+       the three positions of the car (the translate x): 40 / 138 / 313, giving the **nose** (local x = 86 → absolute 126 / 224 / 399)
+       ★ Scale: 1 m ↔ 7 units. Hence
+           reaction phase = 14 m → 98 units (126 → 224)
+           braking phase = 25 m → 175 units (224 → 399)
+           whole run     = 39 m → 273 units (126 → 399)
+         These two numbers (14 m, 25 m) are not arbitrary: 25 m is the braking displacement read off panel B, and 14 m = L − 25 m is the displacement of the
+         reaction phase ⇒ the ratio of the two lengths in panel A, 98 : 175, matches the given data exactly (14 : 25),
+         so recompute the car positions at 7 units per metre and never let "measuring on the figure" fight the answer.
+       ★ The dimensions measure the **nose**: the arrows run nose to nose — the distance between two instants of the same point (the nose) of the same car
+         is the displacement of the car; the tail works just as well, but both segments must use the same point — never measure one to the nose and one to the tail.
+       dimension lines   y = 372 (below the road hatching); end lines x = 126 / 224 / 399, y = 332 → 384;
+                   each segment has an arrow at both ends, and at x = 224 the two meet **tip to tip** (the usual chained dimensioning),
+                   sharing one end line ⇒ it is obvious that the braking segment starts counting at 224.
+       dimension names   reaction (175, 408) / braking (311.5, 408), each centred on its own segment
+       car-state labels     two lines each (as in the original), first baseline y = 208, second y = 238,
+                   the glyph centre aligned with the horizontal centre of its car at x = 86 / 184 / 359 (roof at y = 260, the lower edge of the second line at 246.9,
+                   13 units above the roof so the car is not touched; adjacent names take 52 units each side of their centre and stand 98 apart, so they never overlap)
+       panel letters   A (235, 464), B (794, 464): each centred on its own half (panel A spans 20 → 450 with its centre at 235;
+                   panel B spans 593 → 995.8 with its centre at 794.4), both 11 units below the lower edge 416.9 of the "reaction" label
+
+     geometry of panel B (the x–v curve): the whole panel sits **60 units lower than panel A** (horizontal axis y = 360, top of the axis y = 160) —
+       in the original the vertex of the curve sits at the height of the "spots the sign" line, and the two panels never shared a baseline;
+       an earlier version put both horizontal axes on y = 300, which left panel B 110 units higher than panel A and made the figure top-heavy (recorded here so it is not undone):
+       · origin O (620, 360); the x axis up to y = 160 (arrow), the v axis out to x = 880 (arrow)
+       · scale 25 m ↔ 180 units (y = 180), 72 km/h ↔ 220 units (x = 840)
+       · the curve M620 180 Q730 180 840 360: start (0, 25), end (72, 0)
+       ★ Why this quadratic Bézier is exactly a parabola: the given x = (v₀² − v²)/(2a) ⇒ x is a quadratic function of v,
+         so the curve must be a **parabola with its vertex at v = 0** (shallow at first, steeper and steeper to the right).
+         Write u = v/72, then x = 25(1 − u²); with px = 620 + 220u and py = 180 + 180u²,
+         substitute into the quadratic Bézier py(t) = (1−t)²·180 + 2t(1−t)·c + t²·360 and require it to equal 180 + 180t²,
+         which gives the control-point height c = 180 (the t¹ term −360 + 2c = 0) — i.e. **the control point is level with the start**, its abscissa at the midpoint 730.
+         So the curve is not "looks about right", it is the analytic solution; when the scale changes, solve for c again this way rather than nudging the control point.
+       · 25 is written left of the vertical axis (x = 608, right-aligned); 72 below the horizontal axis (x = 840, centred),
+         each hugging its own tick mark, and neither number sits on an axis
+
+     Things the figure does not show, and **should not** show:
+       · no v₀ = 20 m/s, no L = 39 m, no derivation of x = 25 m, no t₀ = 0.4 s or 0.7 s labels:
+         the problem gives 72 km/h, 39 m and 0.4 s, while 20 m/s, 25 m, 0.7 s and 8 m/s² are all **answers to be found**,
+         and putting them on the figure would be writing the results out for the reader (the same reason `01 example4.html` writes no 30° / 60°).
+         Panel B keeps only the two readings the problem gives (25 and 72); everything else is left to the analysis.
+       · no arrow for the direction of a and no free-body diagram of the volunteer: only part (3) involves forces, panel A is just "two stretches of road",
+         and one arrow would turn the reading of the apparatus into a free-body diagram and hide what the two stretches are asking.
+       · no velocity–time graph: the given panel B is x–v, and switching to v–t would replace the condition that is given.
+       · never draw the three instants in one position (or the three positions bunched together): the two lengths are the way into parts (1) and (2) here,
+         and bunched together they could not measure 14 : 25.
+
+     The quantitative relations behind the reading (recorded here so a later edit can check them; they do not appear in the figure):
+       · panel B gives x = 25 m at v = 0 ⇒ a braking displacement of 25 m; and v₀ = 72 km/h = 20 m/s
+         ⇒ a = v₀²/(2x) = 400/50 = 8 m/s²、t = v₀/a = 2.5 s
+       · the reaction phase is at constant velocity ⇒ reaction displacement = L − 25 = 14 m ⇒ reaction time after drinking = 14/20 = 0.7 s,
+         which is 0.3 s longer than an ordinary person's (0.4 s)
+       · consistency check: the two segments in panel A give 98 : 175 = 0.560 and the given data 14 : 25 = 0.560 ✓;
+         the whole run 273 units ↔ 39 m, 1 unit ↔ 0.1429 m ✓, the reciprocal of "1 m ↔ 7 units"
+       · part (3): as the volunteer decelerates with the car, the horizontal ma and the vertical mg are both supplied by the car (seat / seat belt)
+         ⇒ F = m√(a² + g²) = m√164，F/(mg) = √164/10 = √41/5 ≈ 1.28 -->
+
+<svg viewBox="-300 70 1600 465" xmlns="http://www.w3.org/2000/svg" role="img"
+     aria-label="Panel A: one car at three instants on a straight level road — furthest left it spots the sign, in the middle it starts braking, furthest right it has stopped; the stretch from spotting the sign to starting to brake is labelled reaction, and the stretch from starting to brake to stopping is labelled braking. Panel B: the displacement of the car against its velocity during the braking phase, with displacement x on the vertical axis in metres and the value 25 marked at the top; velocity v on the horizontal axis in kilometres per hour with 72 marked on the axis; the curve starts at zero velocity and 25 metres of displacement, shallow at first and ever steeper to the right, and ends at 72 kilometres per hour with zero displacement.">
+
+  <defs>
+    <!-- Axis / dimension-line arrows: same convention as the existing figures in this folder (7×7, scaled by strokeWidth) -->
+    <marker id="arrow" markerWidth="7" markerHeight="7" refX="5.5" refY="3.5"
+            orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L6,3.5 L0,7" fill="none" stroke="#ffb900" stroke-width="1.2"/>
+    </marker>
+    <!-- Reverse arrow: used at the left end of a dimension line (the same trick as `1 Kinematics/04 example6.html`) -->
+    <marker id="arrowRev" markerWidth="7" markerHeight="7" refX="0" refY="3.5"
+            orient="auto" markerUnits="strokeWidth">
+      <path d="M6,0 L0,3.5 L6,7" fill="none" stroke="#ffb900" stroke-width="1.2"/>
+    </marker>
+
+    <!-- ═══════════ the car: three instants of one car, drawn once and reused three times ═══════════ -->
+    <!-- Local coordinates: the underside datum y = 0 (on the road), negative upwards, nose to the right.
+         Body: tailgate at x = 6 vertical → roof y = −40 → windscreen sloping down → bonnet y = −24 → rounded nose (86, −18),
+         then back along the underside y = −18 to the tailgate (closed by Z). -->
+    <g id="car">
+      <path class="car" d="M6 -18 L6 -34 Q6 -40 12 -40 L34 -40 L46 -24 L78 -24 Q86 -24 86 -18 Z"/>
+      <!-- Side window: solid, sitting between the roof and the windscreen -->
+      <path class="glass" d="M15 -29 L18 -37 L31 -37 L33 -29 Z"/>
+      <!-- Wheels: the top y = −18 is tangent to the underside and the bottom y = 0 falls back on the road -->
+      <circle class="car" cx="22" cy="-9" r="9"/>
+      <circle class="car" cx="68" cy="-9" r="9"/>
+    </g>
+  </defs>
+
+  <!-- ═══════════════════════════ panel A: the road and the three instants of the car ═══════════════════════════ -->
+
+  <!-- road front edge: all three cars rest on the line y = 300 -->
+  <path class="rigid" d="M20 300 H450"/>
+  <!-- road hatching: 15 strokes spaced 28 apart (x = 36 → 428), 16 × 26 strokes slanting down-left from the front edge -->
+  <path class="hatch" d="M36 300 L20 326 M64 300 L48 326 M92 300 L76 326 M120 300 L104 326 M148 300 L132 326 M176 300 L160 326 M204 300 L188 326 M232 300 L216 326 M260 300 L244 326 M288 300 L272 326 M316 300 L300 326 M344 300 L328 326 M372 300 L356 326 M400 300 L384 326 M428 300 L412 326"/>
+
+  <!-- instant one: spots the sign (nose at x = 126) -->
+  <use href="#car" transform="translate(40 300)"/>
+  <!-- instant two: starts braking (nose at x = 224), the end of the reaction phase -->
+  <use href="#car" transform="translate(138 300)"/>
+  <!-- instant three: the car stops (nose at x = 399), the end of the braking phase -->
+  <use href="#car" transform="translate(313 300)"/>
+
+  <!-- Car-state labels: two lines each, glyph centre aligned with the horizontal centre of its car (86 / 184 / 359) -->
+  <text class="car-state" x="86" y="208"><tspan x="86">spots</tspan><tspan x="86" dy="30">sign</tspan></text>
+  <text class="car-state" x="184" y="208"><tspan x="184">starts</tspan><tspan x="184" dy="30">braking</tspan></text>
+  <text class="car-state" x="359" y="208"><tspan x="359">car</tspan><tspan x="359" dy="30">stops</tspan></text>
+
+  <!-- ═══════════ the two stretches of road: end lines + arrows, measuring "nose → nose" ═══════════ -->
+  <!-- End lines: from below the road hatching down to just under the dimension line, tying the measuring points of the dimension line to the noses -->
+  <path class="dim-tick" d="M126 332 V384 M224 332 V384 M399 332 V384"/>
+
+  <!-- reaction phase: 14 m ↔ 98 units (126 → 224) -->
+  <path class="dim" d="M126 372 H224" marker-start="url(#arrowRev)" marker-end="url(#arrow)"/>
+  <!-- braking phase: 25 m ↔ 175 units (224 → 399); its left end meets the right end of the previous segment tip to tip at x = 224 -->
+  <path class="dim" d="M224 372 H399" marker-start="url(#arrowRev)" marker-end="url(#arrow)"/>
+
+  <text class="proc" x="175" y="408">reaction</text>
+  <text class="proc" x="311.5" y="408">braking</text>
+
+  <text class="panel" x="235" y="464">A</text>
+
+  <!-- ═══════════════════════════ panel B: the x–v curve ═══════════════════════════ -->
+
+  <!-- Panel B sits 60 units lower than panel A (horizontal axis y = 360, top of the axis y = 160), the same proportion as the original:
+       the vertex of the curve falls exactly at the height of the "spots the sign" line instead of pushing out of the canvas.
+       An earlier version put both horizontal axes on the same baseline y = 300, which left panel B 110 units above panel A — the whole figure was top-heavy and
+       the first thing the reader saw was a coordinate axis hanging in mid air. There is no requirement for panels to share a baseline anyway (the original has none),
+       and after moving down 60 the two panels weigh the same; for further fine-tuning change only the dozen y values in this block, never panel A. -->
+
+  <!-- Axes: origin (620, 360); the vertical axis up to y = 160 (arrow), the horizontal axis out to x = 880 (arrow) -->
+  <path class="axis" d="M620 360 V160" marker-end="url(#arrow)"/>
+  <path class="axis" d="M620 360 H880" marker-end="url(#arrow)"/>
+
+  <!-- The x–v curve of the braking phase: a parabola with its vertex at v = 0 (the control point level with the start; the derivation is in the header note) -->
+  <path class="curve" d="M620 180 Q730 180 840 360"/>
+
+  <!-- Tick marks: the vertical axis at y = 180 (25 m), the horizontal axis at x = 840 (72 km/h) -->
+  <path class="axis-tick" d="M612 180 H620"/>
+  <path class="axis-tick" d="M840 360 V368"/>
+
+  <!-- Axis labels and tick digits -->
+  <text class="axis-name" x="632" y="154"><tspan>x</tspan><tspan class="up">/m</tspan></text>
+  <text class="axis-name" x="886" y="370"><tspan>v</tspan><tspan class="up">/(km/h)</tspan></text>
+  <text class="axis-name" x="612" y="382" text-anchor="end">O</text>
+  <text class="tick-num" x="608" y="188" text-anchor="end">25</text>
+  <text class="tick-num" x="840" y="394" text-anchor="middle">72</text>
+
+  <text class="panel" x="794" y="464">B</text>
+
+</svg>
+
+</body>
+</html>

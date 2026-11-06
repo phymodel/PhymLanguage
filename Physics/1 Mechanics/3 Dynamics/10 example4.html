@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cross-section of the Big Air Shougang ski jump: the athlete slides from rest at a, c is the lowest point between a and b, takes off at b, and the height difference between a and c is h</title>
+<style>
+  /* Figure-frame conventions: the same set as `01 example1.html`, `09 example1.html`, `10 example1-1.html` and
+     `10 example3.html` in this folder.
+     · The page **carries no background colour** — iOS / visionOS use a glass theme, so the figure must let the window material show through; painting a
+       solid plate inside the page makes the Markdown side recognise that "the author drew a plate" and stop injecting the canvas (MarkdownHtmlFigure.swift
+       `declaresOwnPageBackground`), and the two plates then fight each other. The original is a blue course with gold lettering on black;
+       **do not copy that background** — only the line artwork is carried over into this repository's palette.
+     · **Size comes from the aspect ratio** — the figure frame reads the aspect ratio of this file's viewBox, which must stay within 0.2–5
+       (`htmlFigureRatio` in `Markdown/doc.html`; out of range it degrades to a fixed 240px height).
+       This figure is a **cross-section of the course plus one height dimension**, spread sideways, so the canvas is naturally very wide:
+       the measured bbox of the artwork is x = 40 → 740, y = 24 → 418 (700 × 394, ratio ≈ 1.78,
+       where y = 24 is the top of the a glyph and y = 418 the lower end of the ground hatching).
+       viewBox = 780 × 480 (x from 0 to 780, y from −19 to 461, ratio ≈ 1.625),
+       leaving 40 units left and right and 43 above and below; the centroid of the artwork (390, 221) coincides exactly
+       with the viewBox centre (390, 221). To make the figure smaller, keep enlarging the viewBox (write the padding only in the viewBox,
+       never touch any artwork coordinate), but do not exceed the ratio limit of 5 — with height 480 the viewBox width tops out at 2400.
+     · Colours (two colours — do not add a third):
+         the course (the cross-section of the big air jump) / ground front edge / ground hatching ......... #ffb900 (gold, the same
+                                                         as "the large ring" in `10 example1-1.html` and
+                                                         "the table + ground" in `10 example3.html`:
+                                                         apparatus, terrain and supports in a figure are always gold)
+         the three position symbols a, b, c / the dimension line, end lines and reference line of h ... #075bff (dark blue, the same
+                                                         as "the small ring + point Q" in `10 example1-1.html` and
+                                                         "the dimension line of l" in `09 example1.html`:
+                                                         position symbols and dimensions are dark blue)
+       What is to be read here is only **one fixed course** and **three positions plus one height difference**, and two colours cut them apart:
+       gold is "what the terrain looks like", blue is "where this problem marks the course and what it measures".
+       The mistakes to avoid are the reverse: paint a / b / c gold and the three symbols merge into the course layer, so the reader cannot tell
+       "which stroke is the course and which marks the problem" — and painting the course blue makes the one static piece of apparatus
+       louder than the annotations, fighting the convention of `10 example1-1.html`: "fixed apparatus gold, moving parts and positions blue".
+     · Fonts: a, b, c, h are all symbols from the problem and use Georgia / Times New Roman italic
+       (consistent with `.sym` in this repository); the size is written in the <text>'s font-size attribute, never in the class
+       (or CSS would override the attribute). */
+
+  body {
+    background-color: transparent;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    overflow: hidden;
+  }
+  svg {
+    height: 100%;
+    width: auto;
+    max-width: 100%;
+  }
+  /* The course: the apparatus itself, one gold line. It spans the whole width with a single rise and fall,
+     and a weight of 6 makes it the heaviest stroke in the figure — the reader first sees "a course that drops from high to low and rises again",
+     and then the three symbols on it. Round caps keep both ends of the course clean (the course head is cut off, not chopped). */
+  .track {
+    fill: none;
+    stroke: #ffb900;
+    stroke-width: 6;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  /* The ground front edge: the same colour as the course (both are terrain) but one step thinner — it is the base plate and must not compete with the course */
+  .ground {
+    fill: none;
+    stroke: #ffb900;
+    stroke-width: 5;
+    stroke-linecap: round;
+  }
+  /* Ground hatching: the rough-surface mark, one step thinner again; only under the ground front edge, never across the course */
+  .hatch {
+    fill: none;
+    stroke: #ffb900;
+    stroke-width: 2.4;
+    stroke-linecap: round;
+  }
+  /* The **reference line** of the height difference: a thin solid line through c, parallel to the horizontal, ending at c on the right.
+     Why solid rather than dashed: it marks "the horizontal plane c lies in", a real geometric horizontal line,
+     not a leader drawn out from something; and being blue and thin against the gold, heavy course, it is a separate layer that cannot be misread
+     (`01 example5.html` uses dashes because there only six leaders separate the five s values and solid lines would smear into a row of bars;
+      here there is only one such line, so that problem does not arise). */
+  .ref {
+    fill: none;
+    stroke: #075bff;
+    stroke-width: 2.4;
+    stroke-linecap: round;
+  }
+  /* The dimension line of h: arrowed at both ends (the arrowheads come from a marker in <defs>), dark blue */
+  .dim {
+    fill: none;
+    stroke: #075bff;
+    stroke-width: 2.6;
+    stroke-linecap: round;
+  }
+  /* Symbols (a / b / c / h): italic serif, following the dark blue of the annotation layer.
+     ★ text-anchor is deliberately **not** set in the class — h needs end and the other three need middle;
+       written into the class, a `<text text-anchor="end">` attribute would be overridden by the CSS rule
+       (presentation attributes rank below any CSS rule), and h would be centred on x = 76 and cover the arrow.
+       So alignment always lives in each <text>'s own attribute (likewise font-size; see "Fonts" in the header). */
+  .sym {
+    fill: #075bff;
+    font-family: Georgia, "Times New Roman", serif;
+    font-style: italic;
+  }
+</style>
+</head>
+<body>
+
+<!-- Pairs with "Example 4" of `10 ConservationOfMechanicalEnergy.md` (2022 National Paper A, Q 2-14):
+     at the Big Air Shougang of the Beijing Winter Olympics the athlete slides freely from rest at a, c is the lowest point between a and b,
+     and the take-off is at b; the height difference between a and c is h. The pressure on the skis when passing c must not exceed k times the athlete's weight.
+     Find the lower bound on the radius of the circular arc of the course at c (answer r ≥ 2h/(k−1), option D).
+     The figure draws only the **cross-section of the course** and **three positions plus one height difference** on it: the whole reading turns on "how much higher a is than c"
+     and "c is the lowest point of that arc", and nothing else goes on the figure (see "Things the figure should not show" at the end).
+
+     Geometry (1 unit ≈ 1 layout point, one ruler for both directions — the height difference must be a measurable true ratio):
+       · the reference horizontal plane (= the height of c)    y = 300
+       · the platform of the high deck where a is            y = 90   ⇒ **h = 300 − 90 = 210 units**
+       · the ground front edge                  y = 392 (x = 40 → 740, running past the course at both ends)
+       · ground hatching                    17 strokes spaced 40 apart (x = 70 → 710), 24 × 26 strokes slanting down-left from 392 to y = 418
+       · the course (one path, gold, weight 6)  x = 60 → 720, y = 90 → 300:
+           ① the deck      M60 90 H175                          flat from x = 60 to 175 (a is marked on this stretch)
+           ② the drop      C270 90 330 300 430 300              plunging from just past a down to the valley floor,
+                                                             with horizontal tangents at both ends (zero slope at the ends, steepest in the middle)
+                                                              steepest at x = 299.4, y = 193.4, slope 1.33 ≈ 53°
+           ③ the valley floor        (430, 300)                           **the lowest point of the whole course**, horizontal tangent ⇒ this is c of the problem
+           ④ the rise      C490 300 515 272 560 264             lifting off the valley floor, flattening as it goes
+           ⑤ the take-off    C586 259.4 592 232 606 232           the small hump of b, crest (606, 232) with a horizontal tangent
+           ⑥ after the hump    C620 232 634 256 648 264             past b the course starts descending (the drop here is exactly what lets b be a take-off)
+                                                              which is the drop that makes it a take-off)
+           ⑦ the distant slope    C662 272 674 272 688 264
+                         C702 255 712 248 720 242             dipping a little further (to about y ≈ 270)
+                                                              and then rising to the right to end at the edge of the canvas
+       · the height dimension   the dimension line of h is at x = 92 (under the deck, 32 units from the head of the course),
+                      from (92, 297) to (92, 93), with 3 units of clearance at each end —
+                      the top end stops exactly at the lower edge of the course stroke and the bottom end exactly at the upper edge of the reference line,
+                      and the arrow tips sit **off** the axis of those lines: on the axis half an arrowhead would be swallowed by the gold line.
+                      The two arrowheads come from the marker `dimArrow` (`orient="auto-start-reverse"`), one at each end, in one stroke.
+       · the reference line       the thin horizontal line through c, x = 60 → 430 (its right end **ending exactly at c**):
+                      one end reaching the left boundary of the artwork and the other the lowest point, so the reader sees at once that
+                      "this line is at the height of c" and that h is its distance to the deck at y = 90.
+       · symbol positions     a (128, 56) above the deck and right of the h dimension line (not crowded against the arrow)
+                      h (76, 212) left of the dimension line with text-anchor: end, its right edge 16 units from the arrow
+                      b (606, 206) directly above the crest of the take-off, its baseline 26 units above the crest
+                      c (430, 350) directly below the lowest point, its top 18 units under the reference line and 42 above the ground
+                      All four symbols are 44 px (like Q in `10 example1-1.html`); no two share a corner and none sits on a line.
+
+     The quantitative relations behind the reading (recorded here so a later edit can check them; they do not appear in the figure):
+       · the 210 units of h is **the one ruler** here: when the canvas changes, fix the pixel length of h first,
+         then derive the deck y, the valley-floor y and the ground y from it — never move a single line. The valley floor must lie exactly on the reference line
+         (the height of c is the height of the reference line), and the vertical distance from the deck to the reference line must equal the length of the h dimension line exactly.
+       · the relation between the arc radius r at c and F_N is r ≥ 2h/(k−1) — it rests on two things:
+         "h is the height difference from a to c" and "the speed at c comes from mgh = ½mv²",
+         so the reading stays on course as long as the figure draws **the valley floor as the true lowest point**.
+
+     Things the figure does not show, and should not show:
+       · the athlete (the problem says "treat the athlete as a particle" and the original has no figure either): a small square or a stick figure
+         would send the reader hunting for "the height of the centre of mass", a quantity the problem never gives.
+       · the centre of the arc at c, its radius r, the centripetal force F_N and gravity mg: these are the quantities of the answer,
+         and putting them on the figure prints the derivation of r ≥ 2h/(k−1).
+       · no k, m or v_c labels: the problem gives the upper bound of k only in words, and m and v_c are intermediate quantities of the solution chain.
+       · no flight parabola after take-off and no landing area: the problem only asks about the radius at c, and the flight belongs to the next part;
+         the stretch of course after b is drawn only to the edge of the canvas, saying "the course continues" and not "where the jump lands".
+       · nothing beyond the second level of ground (scaffolding, stands, start platform): all this problem needs is one cross-section.
+
+     Five traps to avoid when drawing this:
+       ① never draw the valley floor as a sharp corner and never off centre: c is the one lowest point of the course, and both sides must pass through it smoothly (horizontal tangent);
+          a V shape would be the intersection of two inclines, and "this circular arc of the course at c" would no longer hold;
+       ② the height of the reference line must equal the y of the valley floor exactly (both 300): off by 1 unit and h no longer measures
+          "the height difference between a and c", and the figure shows two "floors" at once;
+       ③ the dimension line of h must not hug the head of the course: x = 92 is inside the deck (60 → 175) so the arrow lands on the course;
+          moved above x < 60 there is no course to catch it and the arrow points at air;
+       ④ never raise the ground (y = 392) towards the valley floor: the gap between 300 and 392 must stay open,
+          otherwise the symbol c has nowhere to sit and the reference line blurs into the ground hatching;
+       ⑤ never label b on the flank of the hump: b is the take-off point, i.e. the crest (606, 232);
+          on the flank it reads as "the take-off is on the slope", contradicting "takes off at b". -->
+
+<svg viewBox="-200 -19 1200 480" xmlns="http://www.w3.org/2000/svg" role="img"
+     aria-label="Diagram: a cross-section of a big air ski course, starting at a high deck at the upper left, running flat for a stretch, plunging steeply, rising again after the lowest point and ending in a small hump; a marks the deck, c the lowest point and b the crest of the hump. A horizontal reference line passes through the lowest point c, and its height difference from the deck is dimensioned h by a line arrowed at both ends. Below the course lies hatched ground. The athlete is not drawn, nor are the centre, radius or forces of the arc at c.">
+
+  <defs>
+    <!-- Arrowheads for the height difference: one at each end, `auto-start-reverse` making one marker point outwards at both ends.
+         `userSpaceOnUse` keeps the arrowheads from scaling with stroke-width — this dimension line is 204 units long,
+         and the stroke-width-scaled set (7×7 in this repository) would also do, but this follows the convention of the dimension line in
+         `01 example5.html`, so the arrowheads look the same at either canvas size. -->
+    <marker id="dimArrow" markerWidth="9" markerHeight="7" refX="8" refY="3.5"
+            orient="auto-start-reverse" markerUnits="userSpaceOnUse">
+      <path d="M0 0.4 L8 3.5 L0 6.6" fill="none" stroke="#075bff" stroke-width="1.4"
+            stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+  </defs>
+
+  <!-- ═══════════════════ the ground: front edge + hatching (17 strokes) ═══════════════════ -->
+  <path class="ground" d="M40 392 H740"/>
+  <path class="hatch" d="M70 392 L46 418 M110 392 L86 418 M150 392 L126 418 M190 392 L166 418 M230 392 L206 418 M270 392 L246 418 M310 392 L286 418 M350 392 L326 418 M390 392 L366 418 M430 392 L406 418 M470 392 L446 418 M510 392 L486 418 M550 392 L526 418 M590 392 L566 418 M630 392 L606 418 M670 392 L646 418 M710 392 L686 418"/>
+
+  <!-- ═══════════════ the course cross-section: one path of seven stretches (deck → drop → valley floor → rise → take-off → drop after the hump → distant slope) ═══════════════
+       ★ Three alignments must hold (measure these three before touching anything else):
+         · the deck runs strictly horizontally on y = 90 (the platform of a, and the upper end of h)
+         · the valley floor is strictly (430, 300): the one lowest point of the course, horizontal tangent, and the reference line passes through that y
+         · the crest of the take-off is strictly (606, 232): b is a take-off point only because the course starts dropping after the crest -->
+  <path class="track" d="M60 90 H175 C270 90 330 300 430 300 C490 300 515 272 560 264 C586 259.4 592 232 606 232 C620 232 634 256 648 264 C662 272 674 272 688 264 C702 255 712 248 720 242"/>
+
+  <!-- ═══════════════ the height reference line: the thin horizontal through c, ending at c ═══════════════ -->
+  <!-- Its y must equal the y of the valley floor unit for unit (both 300); its left end reaches the left boundary of the artwork at x = 60,
+       and together with the lower end of the h dimension line and the symbol c it pins down which level h is measured to. -->
+  <path class="ref" d="M60 300 H430"/>
+
+  <!-- ═══════════════ the height difference h: a double arrow from the deck to the reference line ═══════════════ -->
+  <!-- The dimension line is at x = 92 (inside the deck 60 → 175), from (92, 297) to (92, 93):
+       the top end stops at the lower edge of the course stroke (6) and the bottom end at the upper edge of the reference line stroke (2.4),
+       and the tips avoid the axis of those lines — on the gold line half an arrowhead is swallowed, on the reference line it blurs into the thin stroke. -->
+  <path class="dim" d="M92 297 V93" marker-start="url(#dimArrow)" marker-end="url(#dimArrow)"/>
+
+  <!-- ═══════════════ the symbols a, h, b, c ═══════════════ -->
+  <!-- a: above the deck, marking where the slide from rest begins; written right of the h dimension line, not crowded against the arrow -->
+  <text class="sym" x="128" y="56" font-size="44" text-anchor="middle">a</text>
+
+  <!-- h: written 16 units left of the dimension line (text-anchor: end, its right edge at x = 76),
+       with its baseline at y = 212 so the optical centre of the glyph falls near the midpoint 195 of the dimension line -->
+  <text class="sym" x="76" y="212" font-size="44" text-anchor="end">h</text>
+
+  <!-- b: directly above the crest of the take-off (606, 232), with its baseline 26 units above the crest -->
+  <text class="sym" x="606" y="206" font-size="44" text-anchor="middle">b</text>
+
+  <!-- c: directly below the lowest point (430, 300), under the reference line, with its top 18 units below that line and 42 units above the ground hatching -->
+  <text class="sym" x="430" y="350" font-size="44" text-anchor="middle">c</text>
+
+</svg>
+
+</body>
+</html>

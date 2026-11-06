@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The a–m graph for block P hanging a weight pan over a fixed pulley (four options)</title>
+<style>
+  /* Figure-frame conventions: the same set as `1 Kinematics/07 example1.html` and `11 example1-1.html`.
+     · The page **carries no background colour** — iOS / visionOS use a glass theme, so the figure must let the window material show through; painting a
+       solid plate inside the page makes the Markdown side recognise that "the author drew a plate" and stop injecting the canvas (MarkdownHtmlFigure.swift
+       `declaresOwnPageBackground`), and the two plates then fight each other.
+     · **Size comes from the aspect ratio** — the figure frame reads the aspect ratio of this file's viewBox, and it must stay within 0.2–5. This figure is
+       "one apparatus + four small coordinate systems" side by side, so the canvas is naturally very wide (the artwork spans x = 30 → 935); therefore 30–40 units
+       of empty space are left above and below: viewBox = 980 × 240, ratio ≈ 4.08. To make the figure smaller, keep widening the viewBox
+       (write the padding only in the viewBox, never touch any artwork coordinate), but do not exceed the ratio limit of 5.
+     · Colours:
+         table / axes / axis labels ............. #ffb900
+         string / fixed pulley / block P / weight pan / option letters #075bff
+         a–m graph lines ..................... #00eaff (the dashed g line #075bff)
+       The graph lines must **not** share the colour of the dashed line: all four candidate lines "climb all the way up yet never outrun g" and always hug that g
+       dashed line; with the same colour you cannot tell which is a candidate curve and which is the upper bound on a. */
+  body {
+    background-color: transparent;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    overflow: hidden;
+  }
+  svg {
+    height: 100%;
+    width: auto;
+    max-width: 100%;
+  }
+  /* Axes: one step thinner, so the four coordinate systems in one figure look equally weighted */
+  .axis {
+    fill: none;
+    stroke: #ffb900;
+    stroke-width: 2.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  /* Table: front edge (thick) + board thickness (thin) + legs (double lines) */
+  .rigid {
+    fill: none;
+    stroke: #ffb900;
+    stroke-width: 5;
+    stroke-linecap: round;
+  }
+  .rigid-thin {
+    fill: none;
+    stroke: #ffb900;
+    stroke-width: 2.4;
+    stroke-linecap: round;
+  }
+  /* String / pulley / block / weight pan: one dark blue for the whole "moving parts" family */
+  .part {
+    fill: none;
+    stroke: #075bff;
+    stroke-width: 3;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  /* The horizontal dashed line at g (upper bound of a) */
+  .dashed {
+    fill: none;
+    stroke: #075bff;
+    stroke-width: 2.6;
+    stroke-dasharray: 8 6;
+    stroke-linecap: round;
+  }
+  /* a–m graph lines */
+  .curve {
+    fill: none;
+    stroke: #00eaff;
+    stroke-width: 3.2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  /* Axis labels a / g / m / O: physical quantities are set in italic */
+  .axis-name {
+    fill: #ffb900;
+    font-family: Georgia, "Times New Roman", serif;
+    font-style: italic;
+    font-size: 22px;
+  }
+  /* Part names on the figure, P / m (symbols given by the problem, not units) */
+  .part-label {
+    fill: #075bff;
+    font-family: Georgia, "Times New Roman", serif;
+    font-style: italic;
+    font-size: 24px;
+  }
+  /* Option letters A–D: upright, centred */
+  .option {
+    fill: #075bff;
+    font-family: "Times New Roman", Georgia, serif;
+    font-style: normal;
+    font-size: 24px;
+    text-anchor: middle;
+  }
+  /* Numbers and units are always upright (Times New Roman lining figures) */
+  .up {
+    font-style: normal;
+  }
+</style>
+</head>
+<body>
+
+<!-- Pairs with "Example 1" of `01 NewtonsSecondLaw.md` (2024 National Paper A, Q 2-15):
+     block P sits on a rough horizontal table, a light string passes over a smooth fixed pulley at the table's right edge, and the other end holds a light pan + weights (total mass m variable);
+     m is varied and the magnitude a of the acceleration of P is measured, asking which a–m graph may be correct. The figure = the apparatus + the four candidate graphs A/B/C/D.
+
+     Geometry of the apparatus (1 unit ≈ 1 layout point):
+       · table         front edge y = 60 (x = 30→210, thick line), board thickness y = 70 (thin line)
+       · legs          double lines x = 150/158 and x = 196/204, running from y = 70 down to y = 186
+       · block P       rectangle (70, 26)–(116, 60) (its base sits exactly on the table), the string is tied at y = 39 on its right face
+       · fixed pulley  centre (218, 48), r = 9, overhanging the table's right edge; the short post (218, 57)→(218, 60) rests on the table
+       · string        horizontal run (116, 39)→(209, 39) tangent to the top of the pulley; vertical run (227, 48)→(227, 132)
+                       tangent to the right side of the pulley; together the two runs read as "passing over the fixed pulley"
+       · weight pan    rim (213, 133)–(241, 133), body the quadratic M213 133 Q227 152 241 133
+
+     Geometry of the four coordinate systems (origin O at (x₀, 145) for each, horizontal axis to x₀+125, vertical axis to y = 25):
+       · x₀ = 330 / 490 / 650 / 810, with the option letters centred at x₀+55, y = 190
+       · the horizontal dashed line at g is y = 52 (= full scale of the vertical-axis height); its left end aligns with the vertical axis and its right end stops at x₀+118, not reaching the arrow
+       · the vertical axis runs 145→25, 120 units in all, so g corresponds to 93 units; every graph line below ends **below** y = 52,
+         which is exactly the reading point of this problem: as m→∞, a→g, so no graph line may cross that dashed line, let alone overrun it.
+       · A straight line y = 145 → 66 (proportional to m, what a frictionless case would look like) — wrong, P and the table do have friction
+       · B curve 145 → asymptotic to 76 (≈0.74g, very steep at first, saturating too early) — wrong: starting from the origin means treating it as frictionless
+       · C straight line from x₀+26 on the horizontal axis → 78 (it does need m > μM to get moving, but afterwards it is not a straight line) — wrong
+       · D curve is **the same shape** as B (the increments of the three control points are identical, the whole set is merely shifted right by +16): its starting point sits on the horizontal axis
+         at x₀+16 instead of at the origin, matching the stretch of a = g(m − μM)/(M+m) where a = 0 for m ≤ μM — correct
+         There are two reading points: ① the curve does not pass through the origin (there is friction, and that is what separates D from A and B); ② it bulges upward and has a horizontal asymptote
+         (it is not a straight line like A and C). The figure only goes as far as "showing the trend"; the perfectly flat plateau before m = μM need not be drawn. -->
+<svg viewBox="-10 -12 980 240" xmlns="http://www.w3.org/2000/svg" role="img"
+     aria-label="The left figure is the apparatus: block P sits on a horizontal table, and a string runs horizontally over a fixed pulley at the right edge of the table and then hangs vertically, holding a weight pan whose total weight mass m is variable. The right figure shows four candidate graphs of a against m; in all four coordinate systems a horizontal dashed line at g above the vertical axis a marks the upper bound of the acceleration. A is a straight line from the origin that always stays below g; B is a curve from the origin that saturates quickly and rises only to about three quarters of g; C is a straight line starting from some point on the positive horizontal axis; D has exactly the same shape as B, merely shifted right by a short distance, so its starting point lies to the right of the origin O rather than at the origin.">
+     
+  <defs>
+    <!-- Axis arrows: same convention as the existing figures in this folder (7×7, scaled by strokeWidth) -->
+    <marker id="arrow" markerWidth="7" markerHeight="7" refX="5.5" refY="3.5"
+            orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L6,3.5 L0,7" fill="none" stroke="#ffb900" stroke-width="1.2"/>
+    </marker>
+  </defs>
+
+  <!-- ═══════════════════ Left: the apparatus ═══════════════════ -->
+  <g>
+    <!-- table (front edge + board thickness) and legs (double lines) -->
+    <path class="rigid" d="M30 60 H210"/>
+    <path class="rigid-thin" d="M30 70 H210"/>
+    <path class="rigid-thin" d="M196 70 V186 M204 70 V186"/>
+
+    <!-- block P: its base sits on the table -->
+    <rect class="part" x="70" y="22" width="46" height="34" rx="2"/>
+    <text class="part-label" x="93" y="51" text-anchor="middle">P</text>
+
+    <!-- string: the horizontal run is tangent to the top of the pulley -->
+    <path class="part" d="M116 39 H219"/>
+
+    <!-- fixed pulley: overhangs the table's right edge, the short post rests on the table -->
+    <circle class="part" cx="218" cy="48" r="9"/>
+
+    <!-- string: the vertical run is tangent to the right side of the pulley and hangs down to the weight pan -->
+    <path class="part" d="M227 48 V132"/>
+
+    <!-- weight pan: rim + body; the total mass of the weights in the pan is m -->
+    <path class="part" d="M213 133 H241"/>
+    <path class="part" d="M213 133 Q227 152 241 133"/>
+    <text class="part-label" x="250" y="141">m</text>
+  </g>
+
+  <!-- ═══════════════════ Right: the four candidate a–m graphs A / B / C / D ═══════════════════ -->
+
+  <!-- ───────── A: a straight line proportional to m (the frictionless, wrong option) ───────── -->
+  <g>
+    <path class="axis" d="M330 145 V25" marker-end="url(#arrow)"/>
+    <path class="axis" d="M330 145 H455" marker-end="url(#arrow)"/>
+    <path class="dashed" d="M330 52 H448"/>
+    <path class="curve" d="M330 145 L422 66"/>
+    <text class="axis-name" x="324" y="34" text-anchor="end">a</text>
+    <text class="axis-name" x="324" y="60" text-anchor="end">g</text>
+    <text class="axis-name" x="322" y="163" text-anchor="end">O</text>
+    <text class="axis-name" x="450" y="136" text-anchor="end">m</text>
+    <text class="option" x="385" y="190">A</text>
+  </g>
+
+  <!-- ───────── B: a curve that starts very steep and saturates too early at ≈0.74g ───────── -->
+  <g>
+    <path class="axis" d="M490 145 V25" marker-end="url(#arrow)"/>
+    <path class="axis" d="M490 145 H615" marker-end="url(#arrow)"/>
+    <path class="dashed" d="M490 52 H608"/>
+    <path class="curve" d="M490 145 C512 96 538 78 582 76"/>
+    <text class="axis-name" x="484" y="34" text-anchor="end">a</text>
+    <text class="axis-name" x="484" y="60" text-anchor="end">g</text>
+    <text class="axis-name" x="482" y="163" text-anchor="end">O</text>
+    <text class="axis-name" x="610" y="136" text-anchor="end">m</text>
+    <text class="option" x="545" y="190">B</text>
+  </g>
+
+  <!-- ───────── C: a straight line starting on the positive horizontal axis (friction present but linear, wrong option) ───────── -->
+  <g>
+    <path class="axis" d="M650 145 V25" marker-end="url(#arrow)"/>
+    <path class="axis" d="M650 145 H775" marker-end="url(#arrow)"/>
+    <path class="dashed" d="M650 52 H768"/>
+    <path class="curve" d="M666 145 L768 68"/>
+    <text class="axis-name" x="644" y="34" text-anchor="end">a</text>
+    <text class="axis-name" x="644" y="60" text-anchor="end">g</text>
+    <text class="axis-name" x="642" y="163" text-anchor="end">O</text>
+    <text class="axis-name" x="770" y="136" text-anchor="end">m</text>
+    <text class="option" x="705" y="190">C</text>
+  </g>
+
+  <!-- ───────── D: same shape as B, shifted right as a whole (friction → it only starts moving past m = μM, correct option) ───────── -->
+  <g>
+    <path class="axis" d="M810 145 V25" marker-end="url(#arrow)"/>
+    <path class="axis" d="M810 145 H935" marker-end="url(#arrow)"/>
+    <path class="dashed" d="M810 52 H928"/>
+    <!-- Point-by-point parallel to M490 145 C512 96 538 78 582 76 of B: every x is +336 (of which +320 is the coordinate-system shift
+         and only +16 is this graph line's own rightward shift) — the same shape differing by one translation, the difference being only "through the origin / not through the origin" -->
+    <path class="curve" d="M826 145 C848 96 874 78 918 76"/>
+    <text class="axis-name" x="804" y="34" text-anchor="end">a</text>
+    <text class="axis-name" x="804" y="60" text-anchor="end">g</text>
+    <text class="axis-name" x="802" y="163" text-anchor="end">O</text>
+    <text class="axis-name" x="930" y="136" text-anchor="end">m</text>
+    <text class="option" x="865" y="190">D</text>
+  </g>
+
+</svg>
+
+</body>
+</html>

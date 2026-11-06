@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Force analysis on the object: the tension T_P of rope P, the tension T_Q of rope Q and gravity mg resolved into orthogonal components</title>
+<style>
+  /* Figure-frame conventions: the same set as `09 example4-1.html`, `09 example1.html`, `01 example1.html`–`01 example7.html` and
+     `11 example1-1.html` in this folder.
+     · The page **carries no background colour** — iOS / visionOS use a glass theme, so the figure must let the window material show through; painting a
+       solid plate inside the page makes the Markdown side recognise that "the author drew a plate" and stop injecting the canvas (MarkdownHtmlFigure.swift
+       `declaresOwnPageBackground`), and the two plates then fight each other. The original (blue lines on black) — **do not copy that background**,
+       only the line artwork is carried over into this repository's palette.
+     · **Size comes from the aspect ratio** — the figure frame reads the aspect ratio of this file's viewBox (which must stay within 0.2–5).
+       This is a **free-body diagram** of three real forces + four orthogonal components + two reference axes, with all seven arrows radiating from one
+       common point of application C (500, 420); the artwork runs from T_P at the upper left to T_Q at the lower right, so the canvas is nearly square:
+       the measured bbox of the artwork is x 297.8 → 700, y 170 → 580 (402 × 410, ratio ≈ 0.98),
+       viewBox = 222 125 555 500 (x from 222 to 777, y from 125 to 625; 76 / 77 left and right,
+       45 units above and below) — the artwork takes only 402 / 555 ≈ 72% of the canvas width and 410 / 500 ≈ 82% of its height,
+       so the figure is displayed at 0.72 and does not fill the glass panel. To make it smaller, keep widening the viewBox
+       (write the padding only in the viewBox, never touch any artwork coordinate), but do not exceed the ratio limit of 5 —
+       with height 500 the viewBox width tops out at 2500.
+       Note that the left, right, top and bottom of the bbox are set by **the end points of the two reference axes** (300 / 700, 170 / 580):
+       an axis must reach 20 units beyond the longest component arrow, or the reader cannot tell these two dashed lines are axes rather than another arrow.
+     · Colours (a division of labour among three colours — do not add a fourth):
+         the three **real forces** (T_P / T_Q / mg) ........................ #075bff
+         the four **orthogonal components** (T_Pcosα / T_Psinα / T_Qsinβ / T_Qcosβ) .. #00eaff
+         the two reference axes (vertical / horizontal dashes), the arcs and symbols of α and β ......... #ffb900
+       This division follows the same convention as `01 example6-2.html`: **dark blue = forces the problem gives that really act on the body**,
+       **cyan = quantities produced by the resolution in the solution** (components are not given by the problem, they are derived),
+       **gold = purely geometric annotation** (axes, arcs, angle names). So "which arrows are forces and which are resolutions" separates at a glance —
+       the reading point here is exactly "three forces projected onto two axes", and painting the components the colour of forces would make the reader take the four components
+       for four independent forces and write a four-unknown equation.
+       The mistakes to avoid are the reverse: paint the components blue and the figure shows "seven forces", contradicting "slow ⇒ zero net force";
+       paint the axes cyan and axes and components blur together, so it is impossible to see which is a direction and which a projection.
+     · Fonts: T, m, g, α, β are symbols from the problem or the solution and use Georgia / Times New Roman italic (consistent with `.sym` in this repository);
+       `cos` and `sin` are function names and stay upright (as with LaTeX `\cos`, `\sin`); the subscripts P, Q are upright and one size smaller
+       (symbols upright, variables italic, as with `.tension-label .sub` in `01 example6-2.html`).
+       the size is written in each <text>'s font-size attribute, never in the class (or CSS would override the attribute);
+       only .sub is the exception — the subscript needs one size smaller (24px), and that tier is written in the class.
+       The Greek letters α, β lead with Georgia and fall back to Times New Roman — both carry Greek glyphs, so nothing drops out. */
+
+  body {
+    background-color: transparent;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    overflow: hidden;
+  }
+  svg {
+    height: 100%;
+    width: auto;
+    max-width: 100%;
+  }
+  /* The two reference axes: thinnest, dashed, stating only the vertical / horizontal directions and competing with no force */
+  .axis {
+    fill: none;
+    stroke: #ffb900;
+    stroke-width: 2.2;
+    stroke-dasharray: 10 8;
+    stroke-linecap: round;
+  }
+  /* The three real forces: one step heavier, the only things in the figure that really act on the object */
+  .force {
+    fill: none;
+    stroke: #075bff;
+    stroke-width: 4.2;
+    stroke-linecap: round;
+  }
+  /* The four orthogonal components: one step thinner, projections, so they do not outweigh the real forces */
+  .comp {
+    fill: none;
+    stroke: #00eaff;
+    stroke-width: 3.2;
+    stroke-linecap: round;
+  }
+  /* The one that stacks on the same line as mg (T_Qcosβ): widened to 7.0 so the cyan shows 1.4 units on either side of the blue mg shaft —
+     only then can two arrows with the same direction and the same start both be read; it stays the same cyan, not a fourth colour.
+     Its arrowhead uses a separate marker (`arrowCompUnder`): markerUnits scales with strokeWidth,
+     so once the shaft is widened the marker must be scaled by the inverse ratio 3.2 / 7 for its tip to match the other three. */
+  .comp-under {
+    stroke-width: 7;
+  }
+  /* The angle arcs: geometric annotations, on the axis convention */
+  .angle-arc {
+    fill: none;
+    stroke: #ffb900;
+    stroke-width: 2.8;
+    stroke-linecap: round;
+  }
+  /* Symbols: italic serif; subscripts and function names are each overridden to a smaller upright */
+  .force-label {
+    fill: #075bff;
+    font-family: Georgia, "Times New Roman", serif;
+    font-style: italic;
+  }
+  .comp-label {
+    fill: #00eaff;
+    font-family: Georgia, "Times New Roman", serif;
+    font-style: italic;
+  }
+  .angle-label {
+    fill: #ffb900;
+    font-family: Georgia, "Times New Roman", serif;
+    font-style: italic;
+  }
+  .sub {
+    font-family: "Times New Roman", Georgia, serif;
+    font-style: normal;
+    font-size: 24px;
+  }
+  .fn {
+    font-family: "Times New Roman", Georgia, serif;
+    font-style: normal;
+  }
+</style>
+</head>
+<body>
+
+<!-- The **second figure of the solution** of "Example 4" in `09 KineticEnergyTheorem.md` (2024 National New Curriculum Paper, Q 3-24):
+     `09 example4-1.html` draws the pose of the problem (each rope at α, β from the vertical), while this figure draws the first step of the solution —
+     "analysing the forces on the object, as shown": resolving the three real forces (T_P, T_Q, mg) onto the **vertical / horizontal** axes,
+     from which the two equations of part (1) read off at a glance.
+
+     Recap: the object m = 42 kg is lowered **vertically and slowly** by two ropes, rope P at α = 37° from the vertical and rope Q at β = 53° from the vertical.
+     Find T_P and T_Q (part (2), the total work done by the tensions, is computed separately with the kinetic energy theorem and does not involve this figure).
+
+     ★ Why this figure is legitimate (not written on the figure but here): **slowly** ⇒ the acceleration of the object is zero ⇒ the three forces balance.
+       So each of T_P and T_Q is resolved into the two legs of its right triangle —
+         horizontal: T_P sinα to the left and T_Q sinβ to the right, equal and opposite  ⇒  T_P sinα = T_Q sinβ
+         vertical: T_P cosα upwards while mg and T_Q cosβ both point down          ⇒  T_P cosα = T_Q cosβ + mg
+       Solving the two together gives the solution's T_P = 1200 N, T_Q = 900 N.
+
+     Geometry (1 unit ≈ 1 layout point):
+       common point of application C  (500, 420) — **all seven arrows**, three forces and four components, start here (a force analysis uses one point of application).
+                     The object itself is not drawn: `09 example4-1.html` has already shown the gold block, and this figure is the force analysis of that object —
+                     a second block would cover the start of all seven arrows and the reader would lose the common point.
+       ★ Force scale: **1 unit = 4 N**, the same scale for the four components and the three forces — length ratios are force ratios:
+           T_P   1200 N → 300 units      T_Q    900 N → 225 units      mg     420 N → 105 units
+           T_Pcosα 960 N → 240 units     T_Psinα 720 N → 180 units
+           T_Qsinβ 720 N → 180 units     T_Qcosβ 540 N → 135 units
+         Two conclusions can therefore be measured straight off the figure: **the two horizontal components are equal in length (180 = 180)** and
+         **T_Pcosα (240) equals exactly mg (105) + T_Qcosβ (135)** — the first is there because the two horizontal arrows are equally long,
+         the second because the same scale lets the two downward arrows on the vertical line **stack in the same direction** (105 short, 135 long, 240 in all,
+         matching the 240 of the upward T_Pcosα).
+         If m, g or either angle changes, recompute all seven arrow lengths from the new numbers (l = F / 4).
+       ★ The angles: the problem gives sin37° = 0.6, and the figure uses the exact 3-4-5 triangle orientation (36.87° / 53.13°,
+         which differs from the 37° / 53° drawn directly in `09 example4-1.html` by 0.3°, invisible to the eye); the benefit is that the component lengths
+         are **exactly** the force lengths times sin / cos, and the tips meet the corners of the rectangle:
+           T_P direction (−sinα, −cosα) = (−0.6, −0.8) → tip (320, 180)
+                 = the diagonal of the rectangle opened by the T_Pcosα tip (500, 180) and the T_Psinα tip (320, 420) ✓ closes exactly
+           T_Q direction (+sinβ, +cosβ) = (+0.8, +0.6) → tip (680, 555)
+                 = the diagonal of the rectangle opened by the T_Qsinβ tip (680, 420) and the T_Qcosβ tip (500, 555) ✓ closes exactly
+         ⇒ each oblique arrow and its two legs form a **strictly closed** rectangle (the sides being F·sin and F·cos).
+           The dashed closing sides of the rectangle are still **not drawn**: the four components are those four sides, and tracing them again would only repeat them;
+           moreover the two dashed lines that T_Q's side would need ((680,420)→(680,555), (500,555)→(680,555)) would add an L shape at the lower right
+           crowding the tip of T_Q and reading like a fourth force.
+       ★ mg and T_Qcosβ are **co-directional and coaxial** (both vertically down, both from C), and the figure **stacks them on one vertical line**,
+         separating them by **layer** rather than by position:
+           T_Qcosβ drawn first (cyan, shaft widened to 7.0, long) .... C → (500, 555), 135 units = 540 N
+           mg drawn afterwards (blue, shaft 4.2, short) ............... C → (500, 525), 105 units = 420 N, painted on top
+         ⇒ along 0 → 525 the blue mg lies on the cyan, which shows 1.4 units on either side (like an underlay),
+           so the reader sees two arrows with the same start and direction, one short and one long, not a single arrow;
+           along the 30 units from 525 → 555 mg has already ended, and the cyan shaft and **its own arrowhead** are fully visible.
+           Both arrowheads (the blue one at 525, the cyan at 555) are on the figure, and the 30-unit = 120 N difference in length can be measured.
+         ★ Why this one is widened (`class="comp comp-under"`, stroke 7.0, arrowhead switched to `arrowCompUnder`):
+           at the same width as the other three (3.2) the stretch 0 → 525 would be entirely covered by the mg shaft (4.2), leaving only the 30 units 525 → 555,
+           and the reader would take T_Qcosβ for a stub 30 long; only widened to 7.0 does "it too is on the axis and is 135 long" read.
+           The arrowhead must be swapped for a marker scaled by the inverse ratio 3.2 / 7 — markerUnits scales with strokeWidth, so without the swap it is three times too big.
+         ★ Why not draw them end to end (the cyan starting at 525 and running to 660): the total downward quantity would then read as
+           "all the way from C to 660", while the vertical balance in the problem has **both arrows starting at C** (T_Pcosα = mg + T_Qcosβ);
+           move them apart and the two forces no longer share a point.
+         ★ Nor may they be offset sideways: that is a drawing convention for parallel items, and it would suggest the vertical components are off the vertical axis,
+           and a 40-unit shift to the right would hit the shaft of T_Q itself (36.87° to the lower right).
+       the arc of α, centre C, radius 48: from "vertically up" (500, 372) round to the direction of T_P (471.2, 381.6), sweeping 36.87°
+       the arc of β, centre C, radius 48: from "vertically down" (500, 468) round to the direction of T_Q (538.4, 448.8), sweeping 53.13°
+         ★ Both arcs start on the vertical axis (the α start lies on the T_Pcosα shaft and the β start on the mg shaft) —
+           which is correct: the angles are measured from the vertical, so each arc must start on that axis (an arc end landing on a shaft does not count as sitting on a line).
+         ★ The radius is 48 (the "vertex + arc" figure `01 example6-2.html` uses 70 because there only one F has to be measured;
+           here seven arrows and nine symbols crowd around C, and a larger arc would run into the T_Q shaft and the mg and β symbols).
+           Any smaller than about 30 and the arc degenerates into a dot that no longer reads as an angle; 48 is the value that keeps the whole arc in the gap around C
+           without meeting either oblique arrow.
+       Symbol positions (all nine tuned with getBBox measurements in the browser; re-measure if a size or an arrow moves — every symbol keeps at least
+       13 units from the nearest line, and under 10 reads as sitting on it):
+           T_P (315, 266) ......... outside the T_P arrow (lower left), measured 23.2 from the shaft
+           T_Q (669, 476) ......... outside the T_Q arrow (upper right), measured 25.0 from the nearest horizontal axis
+           T_Pcosα (520, 250) ..... right of the upper vertical axis, 20.0 from it
+           T_Psinα (370, 386) ..... **above** the left horizontal axis, 19.8 from it (below would hit the mg symbol)
+           T_Qsinβ (612, 386) ..... above the right horizontal axis, 19.8 from it
+           mg (482, 470) .......... **left** of the mg arrow, 18.0 from the axis (on the right, the β arc and the T_Q shaft occupy the strip)
+           T_Qcosβ (482, 545) ..... left of the **lower middle** of the same vertical line, 18.0 from the axis (14.5 from the edge of the cyan
+                                    underlay widened to 7.0) — in the same column as the mg symbol (both with their right edge at x = 482),
+                                    75 apart vertically, so the reader follows the column to match "one short, one long" to the two arrows
+           α (470, 320) ........... near the bisector between T_P and the vertical axis, 23 / 20 from the two lines, ≥ 50 from the arc
+           β (546, 509) ........... between T_Q and the vertical axis, 13.1 / 46 from the two lines, ≥ 25 from the arc
+         ★ The tightest of the nine is β (13.1): its angle is only 53° and it is pinched between the T_Q shaft and the β arc,
+           so moving it towards the shaft puts it on the line and moving it back hits the mg symbol — to rework this area, shrink β's size first (34 → 30).
+
+     Things the figure does not show, and **should not** show:
+       · the object, the ropes, the two people, the wall and the sill: `09 example4-1.html` has them all; the force analysis needs only
+         "three forces + two axes", and apparatus artwork would bury the seven arrows.
+       · the direction and magnitude of the velocity: the problem says "slowly", v ≈ 0, so a velocity arrow would contradict itself.
+       · the numbers 37°, 53°, m = 42 kg, g = 10 m/s² and the answers 1200 N / 900 N: numbers belong to the problem and the solution,
+         and only symbols appear on the figure; written there, one revision would need two edits, and readers would back-solve the process from the numbers.
+       · the resultant of T_P and T_Q and the closed "zero net force" triangle: what is needed here is **two equations along two directions**,
+         and a vector triangle would replace the orthogonal-resolution approach with composition, inconsistent with the solution as written.
+
+     The quantitative relations behind the reading (recorded here so a later edit can check them; they do not appear in the figure):
+       · horizontal: T_P sin37° = T_Q sin53°  ⇒  0.6 T_P = 0.8 T_Q  ⇒  T_P = 4T_Q/3
+       · vertical: T_P cos37° = T_Q cos53° + mg  ⇒  0.8 T_P = 0.6 T_Q + 420
+       · together ⇒ T_Q = 900 N, T_P = 1200 N ✓ (on the figure 300 : 225 = 4 : 3, exactly 1200 : 900)
+       · consistency check: the horizontal components 720 N = 720 N ✓; vertically up 960 N = down 540 + 420 = 960 N ✓
+       · reading direction: α < β ⇒ rope P is steeper ⇒ T_P > T_Q (1200 > 900). If T_P is drawn shallower than T_Q, the figure is backwards. -->
+
+<svg viewBox="-300 125 1600 500" xmlns="http://www.w3.org/2000/svg" role="img"
+     aria-label="Force analysis diagram: at the common point of application C the object feels three real forces — the tension T with subscript P of rope P towards the upper left, the tension T with subscript Q of rope Q towards the lower right, and gravity mg vertically downward. T with subscript P and T with subscript Q are then resolved into orthogonal components: T subscript P times cosine α vertically upward, T subscript P times sine α horizontally to the left, T subscript Q times sine β horizontally to the right; T subscript Q times cosine β also points vertically down and, starting from the same point and on the same vertical line, stacks with gravity mg, being longer than mg so that its arrowhead shows below the arrowhead of mg. Two dashed lines, vertical and horizontal, serve as reference axes; α is the angle between T subscript P and the upward vertical, and β the angle between T subscript Q and the downward vertical. The two horizontal components are equal in length, showing that the horizontal components of the two tensions balance, and the two downward ones (gravity and T subscript Q cosine β) add up to the same length as the upward T subscript P cosine α, showing that the vertical direction balances.">
+
+  <defs>
+    <!-- Every arrow needs its own arrowhead (7×7, scaled by strokeWidth), each in the colour of its shaft -->
+    <marker id="arrowForce" markerWidth="7" markerHeight="7" refX="5.5" refY="3.5"
+            orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L6,3.5 L0,7" fill="none" stroke="#075bff" stroke-width="1.2"/>
+    </marker>
+    <marker id="arrowComp" markerWidth="7" markerHeight="7" refX="5.5" refY="3.5"
+            orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L6,3.5 L0,7" fill="none" stroke="#00eaff" stroke-width="1.2"/>
+    </marker>
+    <!-- The arrowhead of the widened shaft (stroke 7): scaled by the inverse ratio 3.2 / 7 so its on-screen tip matches the others -->
+    <marker id="arrowCompUnder" markerWidth="3.2" markerHeight="3.2" refX="2.51" refY="1.6"
+            orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L2.74,1.6 L0,3.2" fill="none" stroke="#00eaff" stroke-width="0.55"/>
+    </marker>
+  </defs>
+
+  <!-- ═══════════ the reference axes: vertical / horizontal (drawn first, covered by the arrows) ═══════════ -->
+
+  <path class="axis" d="M300 420 H700"/>
+  <path class="axis" d="M500 170 V580"/>
+
+  <!-- ═══════════ the four orthogonal components: the same scale as the real forces (1 unit = 4 N) ═══════════ -->
+
+  <!-- T_P cosα: 960 N → 240, up along the vertical axis -->
+  <path class="comp" d="M500 420 V180" marker-end="url(#arrowComp)"/>
+  <!-- T_P sinα: 720 N → 180, left along the horizontal axis -->
+  <path class="comp" d="M500 420 H320" marker-end="url(#arrowComp)"/>
+  <!-- T_Q sinβ: 720 N → 180, right along the horizontal axis (equal in length to the left one ⇒ the horizontal components balance) -->
+  <path class="comp" d="M500 420 H680" marker-end="url(#arrowComp)"/>
+  <!-- T_Q cosβ: 540 N → 135, vertically down; on **the same vertical line and the same start C** as mg, drawn first (below the mg layer),
+       shaft widened to 7.0 (class="comp comp-under") so the cyan shows on both sides of the blue mg shaft — otherwise 0 → 525
+       would be entirely covered by mg and T_Qcosβ would be misread as "the 30-unit stub from 525 → 555". -->
+  <path class="comp comp-under" d="M500 420 V555" marker-end="url(#arrowCompUnder)"/>
+
+  <!-- ═══════════ the three real forces: from the common point of application C ═══════════ -->
+
+  <!-- T_P: 1200 N → 300, along (−0.6, −0.8), at α from the upward vertical -->
+  <path class="force" d="M500 420 L320 180" marker-end="url(#arrowForce)"/>
+  <!-- T_Q: 900 N → 225, along (+0.8, +0.6), at β from the downward vertical -->
+  <path class="force" d="M500 420 L680 555" marker-end="url(#arrowForce)"/>
+  <!-- mg: 420 N → 105, vertically down, staying on the axis -->
+  <path class="force" d="M500 420 V525" marker-end="url(#arrowForce)"/>
+
+  <!-- ═══════════ the angle arcs: α measured in the upper half (vertically up ↔ T_P), β in the lower half (vertically down ↔ T_Q) ═══════════ -->
+
+  <path class="angle-arc" d="M500 372 A48 48 0 0 0 471.2 381.6"/>
+  <path class="angle-arc" d="M500 468 A48 48 0 0 0 538.4 448.8"/>
+
+  <!-- ═══════════ symbols: forces (dark blue), components (cyan), angles (gold), each in the colour of its own layer ═══════════ -->
+
+  <text class="force-label" x="315" y="246" font-size="34" text-anchor="middle">T<tspan class="sub" dy="9">P</tspan></text>
+  <text class="force-label" x="669" y="496" font-size="34" text-anchor="middle">T<tspan class="sub" dy="9">Q</tspan></text>
+  <text class="force-label" x="482" y="470" font-size="34" text-anchor="end">mg</text>
+
+  <text class="comp-label" x="520" y="250" font-size="32" text-anchor="start">T<tspan class="sub" dy="9">P</tspan><tspan class="fn" dy="-9" dx="4">cos</tspan><tspan dx="6">α</tspan></text>
+  <text class="comp-label" x="370" y="386" font-size="32" text-anchor="middle">T<tspan class="sub" dy="9">P</tspan><tspan class="fn" dy="-9" dx="4">sin</tspan><tspan dx="6">α</tspan></text>
+  <text class="comp-label" x="612" y="386" font-size="32" text-anchor="middle">T<tspan class="sub" dy="9">Q</tspan><tspan class="fn" dy="-9" dx="4">sin</tspan><tspan dx="6">β</tspan></text>
+  <text class="comp-label" x="482" y="545" font-size="32" text-anchor="end">T<tspan class="sub" dy="9">Q</tspan><tspan class="fn" dy="-9" dx="4">cos</tspan><tspan dx="6">β</tspan></text>
+
+  <text class="angle-label" x="470" y="320" font-size="34" text-anchor="middle">α</text>
+  <text class="angle-label" x="546" y="509" font-size="34" text-anchor="middle">β</text>
+
+</svg>
+
+</body>
+</html>

@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>A small block sliding onto the left end of a long board: the board is l long and the block starts with v₀</title>
+<style>
+  /* Figure-frame conventions: the same set as `01 example1.html`–`01 example7.html` and `11 example1-1.html` in this folder.
+     · The page **carries no background colour** — iOS / visionOS use a glass theme, so the figure must let the window material show through; painting a
+       solid plate inside the page makes the Markdown side recognise that "the author drew a plate" and stop injecting the canvas (MarkdownHtmlFigure.swift
+       `declaresOwnPageBackground`), and the two plates then fight each other.
+     · **Size comes from the aspect ratio** — the figure frame reads the aspect ratio of this file's viewBox (which must stay within 0.2–5).
+       This figure is "one apparatus (ground + board + block) plus one length dimension l above the board", so the canvas is naturally wide:
+       the measured bbox of the artwork is x = 40 → 660, y = 62 → 406 (620 × 344, ratio ≈ 1.80).
+       viewBox = 800 × 440 (x from −50 to 750, y from 14 to 454), leaving 90 units on each side and
+       48 units above and below — the artwork takes only 620 / 800 ≈ 78% of the canvas width, so the figure is shown at 0.78 and does not
+       fill the glass panel. To make the figure smaller, keep widening the viewBox (write the padding only in the viewBox, never touch any artwork coordinate),
+       but do not exceed the ratio limit of 5 — with height 440 the viewBox width tops out at 2200.
+     · Colours (a division of labour among three colours — do not add a fourth):
+         ground front edge / ground hatching / the board / the symbol M ........ #ffb900 (the fixed apparatus: the same
+                                                      "iron stand + board + stop" convention as `01 example4.html`)
+         block m / the v₀ arrow and symbol / the dimension line and symbol of l ..... #075bff (the moving part + the initial velocity that belongs to it)
+       Gold = the apparatus, dark blue = what moves. The board itself is gold and the block (with its v₀) is blue, so "who moves and who does not"
+       separates at a glance — and what this problem settles is exactly "how far the block went and how far the board went", so these two strokes must differ in colour.
+       The dimension line of l is blue (as in the original): it hangs 195 units above the board, with a whole stretch of blank
+       between it and the gold board, so it cannot be misread; conversely, painting l gold would weld it to the board and the ground into one "apparatus" layer,
+       and the reader would take this annotation for another edge of the board.
+     · Fonts: m, M, l, v are physical quantities and use Georgia italic; the subscript 0 and all units are upright (Times New Roman). */
+  body {
+    background-color: transparent;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    overflow: hidden;
+  }
+  svg {
+    height: 100%;
+    width: auto;
+    max-width: 100%;
+  }
+  /* The fixed apparatus: the ground front edge and the outline of the board (one and the same thick line — the apparatus is a single rigid body) */
+  .rigid {
+    fill: none;
+    stroke: #ffb900;
+    stroke-width: 5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  /* Ground hatching: the rough-surface mark, one step thinner so it does not compete with the front edge */
+  .hatch {
+    fill: none;
+    stroke: #ffb900;
+    stroke-width: 2.4;
+    stroke-linecap: round;
+  }
+  /* The block: the moving part, as hollow line artwork (the same convention as block P in `01 example1.html`) */
+  .part {
+    fill: none;
+    stroke: #075bff;
+    stroke-width: 3.2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  /* The dimension line (l) and its two end lines */
+  .dim {
+    fill: none;
+    stroke: #075bff;
+    stroke-width: 2.6;
+    stroke-linecap: round;
+  }
+  .dim-tick {
+    fill: none;
+    stroke: #075bff;
+    stroke-width: 2.2;
+    stroke-linecap: round;
+  }
+  /* Symbols (m / M / l / v₀ as given by the problem): italic, each following the colour of the artwork it belongs to.
+     **The size is written in each <text>'s font-size attribute** (never in the class, or CSS would override the attribute). */
+  .sym {
+    font-family: Georgia, "Times New Roman", serif;
+    font-style: italic;
+    text-anchor: middle;
+  }
+  .sym-gold {
+    fill: #ffb900;
+  }
+  .sym-blue {
+    fill: #075bff;
+  }
+  /* Subscripts, digits and units: upright */
+  .up {
+    font-style: normal;
+  }
+</style>
+</head>
+<body>
+
+<!-- Pairs with "Example 1" of `09 KineticEnergyTheorem.md` (2023 National Paper B, Q 2-21, multiple choice):
+     a small block of mass m (to be treated as a particle) slides onto the board of mass M and length l from its **left end** with velocity v₀ to the right;
+     the board rests on a smooth horizontal table, and the kinetic friction between block and board has magnitude f.
+     The question is about the kinetic energies of the board and of the block when the block leaves the right end, so the figure needs only three things:
+     **the block standing at the left end of the board, v₀ pointing right, and the board l long**. Nothing else is drawn (see "Things the figure should not show" below).
+
+     Geometry (1 unit ≈ 1 layout point):
+       canvas         measured bbox of the artwork: x = 40 → 660, y = 62 → 406 (see "Size comes from the aspect ratio" in <style>)
+       ground front edge   y = 380, x = 40 → 660 (one thick flat line with the board and the hatching resting on it)
+       ground hatching     18 strokes spaced 34 apart (x = 60 → 638), 18 × 26 strokes slanting down-left from the front edge
+       board         rectangle x = 100 → 580, y = 285 → 380 (480 units long ↔ l, 95 thick),
+                    with its bottom edge falling exactly on the ground front edge y = 380
+       block         square x = 100 → 170, y = 215 → 285 (side 70),
+                    its bottom edge on the upper surface of the board at y = 285 and **its left side flush with the left end of the board, x = 100**
+                    (the problem says "starts moving from the left end of the board"; the bottom edge of the square is collinear with the upper surface of the board,
+                     and the later blue bottom edge covers the gold line — as in the original, where the stretch under the block is blue)
+       v₀ arrow      y = 250 (the vertical centre line of the block), x = 178 → 262, pointing right, starting 8 units off the right face of the block
+       symbol v₀      (220, 234): centred directly above the arrow, 16 units clear of it, with the subscript 0 slightly lowered
+       symbol m       at the centre of the block (135, 262); the symbol M at the centre of the board (340, 346)
+       length        the dimension line y = 90; end lines at x = 100 / 580, y = 62 → 118 (28 above and below the dimension line);
+                    the left segment M100 90 H300 carries an arrow only at its left end and the right segment M380 90 H580 only at its right end,
+                    with the space between 300 → 380 left open for the symbol l (340, 102)
+                    — the usual chained dimensioning: the arrow tips butt against the end lines and the symbol sits in the gap between the two segments
+       ★ Scale: 480 units ↔ l ⇒ 1 unit ↔ l/480. This is the only quantitative convention on the figure,
+         so when the board length changes recompute from it (moving the end lines, both ends of the dimension line and the left end of the block together — not the board alone).
+
+     Things the figure does not show, and **should not** show:
+       · an arrow for the friction f: one arrow turns this "apparatus + initial velocity" sketch into a free-body diagram,
+         while the chain here is "displacement → work → kinetic energy", not Newton's second law.
+       · the final velocity v of the block and v′ of the board: they appear only in the answer, and on the figure they would half-write the result for the reader.
+       · displacement arrows x_m / x_M: the problem does not give them and they are intermediate quantities of the solution (see below); drawing them would make them look given.
+       · the words "smooth horizontal table" and any second level of table top beyond the ground: in this figure the table is one front edge,
+         and whether it is smooth is a condition in words, not an element of the drawing.
+       · further ground hatching past the right end of the board stops here — the hatching reaches only x = 638 and must not run far past the right end of the board,
+         lest it read as "there is more road to travel after the block leaves".
+
+     The quantitative relations behind the reading (recorded here so a later edit can check them; they do not appear in the figure):
+       · the relative sliding distance is exactly l (the block slides from the left end to the right end) ⇒ x_m = x_M + l
+         ⇒ x_m > l and x_M < l (strictly less: the block is faster than the board throughout, so the excess ∫v_block dt − ∫v_board dt never reaches l).
+         ★ The 70-unit side of the square is **not** "the length of the block": the block is a particle, and the relative displacement measured is
+           the whole stretch "left end of the board → right end of the board", i.e. the dimension line of l; never measure with the side of the square.
+       · for the board: f x_M = ½Mv′² − 0, with x_M < l ⇒ ½Mv′² < fl (B correct, A wrong)
+       · for the block: −f x_m = ½mv² − ½mv₀², with x_m > l ⇒ ½mv² < ½mv₀² − fl (D correct, C wrong)
+       · both inequalities use **only the geometric fact x_M < l < x_m** — which is exactly why the figure must draw
+         "the block standing at the very left end of the board and the board l long" accurately: draw it slightly wrong and that geometric fact disappears. -->
+
+<svg viewBox="-600 14 1800 440" xmlns="http://www.w3.org/2000/svg" role="img"
+     aria-label="Apparatus diagram: one horizontal ground front edge with hatching below it; a thick board rests on the ground, its length l dimensioned above. At the very left end of the board sits a small square block labelled with its mass m, and a horizontal arrow to the right of the square shows its initial velocity v₀ pointing right. There is nothing on the board but the block.">
+
+  <defs>
+    <!-- Arrows: same convention as the existing figures in this folder (7×7, scaled by strokeWidth); the arrows here all belong to the dark-blue layer -->
+    <marker id="arrow" markerWidth="7" markerHeight="7" refX="5.5" refY="3.5"
+            orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L6,3.5 L0,7" fill="none" stroke="#075bff" stroke-width="1.2"/>
+    </marker>
+    <!-- Reverse arrow: used at the left end of a chained dimension -->
+    <marker id="arrowRev" markerWidth="7" markerHeight="7" refX="0" refY="3.5"
+            orient="auto" markerUnits="strokeWidth">
+      <path d="M6,0 L0,3.5 L6,7" fill="none" stroke="#075bff" stroke-width="1.2"/>
+    </marker>
+  </defs>
+
+  <!-- ═══════════════════════════ the ground: front edge + hatching ═══════════════════════════ -->
+
+  <path class="rigid" d="M40 380 H660"/>
+  <path class="hatch" d="M60 380 L42 406 M94 380 L76 406 M128 380 L110 406 M162 380 L144 406 M196 380 L178 406 M230 380 L212 406 M264 380 L246 406 M298 380 L280 406 M332 380 L314 406 M366 380 L348 406 M400 380 L382 406 M434 380 L416 406 M468 380 L450 406 M502 380 L484 406 M536 380 L518 406 M570 380 L552 406 M604 380 L586 406 M638 380 L620 406"/>
+
+  <!-- ═══════════════════════════ the board M: 480 units long ↔ l ═══════════════════════════ -->
+
+  <rect class="rigid" x="100" y="285" width="480" height="95" rx="6"/>
+  <text class="sym sym-gold" x="340" y="346" font-size="40">M</text>
+
+  <!-- ═══════════ the length l: left end → right end of the board (chained dimensioning, the symbol sitting in the gap) ═══════════ -->
+
+  <path class="dim-tick" d="M100 62 V118 M580 62 V118"/>
+  <path class="dim" d="M100 90 H300" marker-start="url(#arrowRev)"/>
+  <path class="dim" d="M380 90 H580" marker-end="url(#arrow)"/>
+  <text class="sym sym-blue" x="340" y="102" font-size="34">l</text>
+
+  <!-- ═══════════ the block m: standing at the very left end of the board, v₀ pointing right ═══════════ -->
+  <!-- Drawn later: the bottom edge of the square covers the gold line of the board's upper surface, matching the original's blue stretch under the block -->
+
+  <rect class="part" x="100" y="215" width="70" height="70" rx="3"/>
+  <text class="sym sym-blue" x="135" y="262" font-size="34">m</text>
+
+  <path class="part" d="M178 250 H262" marker-end="url(#arrow)"/>
+  <text class="sym sym-blue" x="220" y="234" font-size="30">v<tspan class="up" font-size="21" dy="5">0</tspan></text>
+
+</svg>
+
+</body>
+</html>

@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Five displacements s₁–s₅ of a small copper block sliding down a tile incline of angle α with a ruler attached</title>
+<style>
+  /* Figure-frame conventions: the same set as `01 example1.html` / `01 example2.html` / `01 example3.html` /
+     `01 example4.html`, `11 example1-1.html` and `1 Kinematics/07 example1.html`.
+     · The page **carries no background colour** — iOS / visionOS use a glass theme, so the figure must let the window material show through; painting a
+       solid plate inside the page makes the Markdown side recognise that "the author drew a plate" and stop injecting the canvas (MarkdownHtmlFigure.swift
+       `declaresOwnPageBackground`), and the two plates then fight each other. The original figure is gold lines on black; **do not copy that background** —
+       only the line artwork is carried over into this repository's palette.
+     · **Size comes from the aspect ratio** — the figure frame reads the aspect ratio of this file's viewBox (which must stay within 0.2–5). This figure is
+       a wide composition of "one long incline + one table top" (artwork spans x = 58 → 660, y = 32 → 291), so the viewBox is
+       690 × 305 (ratio ≈ 2.26), and all the padding is written only in the viewBox, never on any artwork coordinate.
+     · Colours (a division of labour among three colours — do not add a fourth):
+         table top + tile incline + the leader lines of s₁–s₅ ...... #ffb900 (the same 
+                                                     "table top" line of `01 example1.html` and the
+                                                     "scale / leader line" convention in `1 Kinematics/01 DisplacementImage.html`: gold = the fixed apparatus and its annotations)
+         small copper block ...................... #075bff (the moving-part blue of "block P" in example1)
+         the five dimension lines and symbols of s₁–s₅ .... #00eaff (the a–m graph-line colour of example1: cyan = results obtained by measurement
+                                                     or analysis, not the apparatus itself)
+       In other words: **the gold lines only point at positions (dashed leaders that never touch the board), and the cyan lines are the measured displacements** — in this problem the two
+       must be read apart: the leaders annotate the apparatus side (anyone could draw them), while s₁–s₅ only hold under the condition "within consecutive equal time intervals"
+       of the measurement. Only six leaders separate the five s values; drawn solid, the first thing read would be six bars rather than five s values, hence the dashes.
+       A symbol sharing the colour of its own artwork is the rule laid down by example3; the arc and symbol of α take the apparatus colour (a geometric annotation).
+     · Fonts: s₁–s₅ and α are symbols from the problem and use Georgia italic (consistent with `.part-label` in this repository);
+       "tile" and "copper block" are device names (not variables), set upright in the serif stack —
+       so they never follow the italic of the symbols.
+       Subscript digits use upright Times New Roman: Georgia's figures are **old-style figures** (3 4 5 7 9 descend below the baseline),
+       so s₃ / s₄ would look as if they had dropped below the baseline, a fault lining Times figures do not have
+       (same as the note on `.tick-num` in `1 Kinematics/01 DisplacementImage.html`). */
+
+  body {
+    background-color: transparent;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    overflow: hidden;
+  }
+  svg {
+    height: 100%;
+    width: auto;
+    max-width: 100%;
+  }
+  /* The front edge of the table top: a single thick line */
+  .table {
+    fill: none;
+    stroke: #ffb900;
+    stroke-width: 4.2;
+    stroke-linecap: round;
+  }
+  /* Table hatching: the rough-surface mark, one step thinner so it does not compete with the front edge */
+  .hatch {
+    fill: none;
+    stroke: #ffb900;
+    stroke-width: 2.2;
+    stroke-linecap: round;
+  }
+  /* The tile: the incline itself in this problem, all in gold (it does not move, it is the apparatus) */
+  .tile {
+    fill: none;
+    stroke: #ffb900;
+    stroke-width: 3.6;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  /* The leader lines of s₁–s₅: six of them, perpendicular to the ruler face, running along the normal from "16 off the ruler face" to "54 off it" (length 38).
+     One displacement is measured between two such lines, so they must meet the dimension line at exact right angles and their extensions must pass precisely through the positions P₀…P₅.
+       · **Dashed** — they are annotation leaders, not physical lines of the board. Solid, they would compete in weight with the tile edge and the table top:
+         the five s values are separated by only six lines, and solid they would read as six bars rather than five s values.
+       · **Never touching the tile** — the start is 16 off the ruler face (the upper-surface stroke only reaches ±1.8): a small gap is left between the lower end of the line and the board,
+         so it reads as "an annotation drawn out from the board face" rather than a score mark on the board; the position is still identified by the line's extension, with no ambiguity. */
+  .ruler {
+    fill: none;
+    stroke: #ffb900;
+    stroke-width: 2.4;
+    stroke-dasharray: 7 6;
+    stroke-linecap: round;
+  }
+  /* The dimension lines of s₁–s₅: cyan, arrowed at both ends, marking exactly "between two adjacent leaders" */
+  .dim {
+    fill: none;
+    stroke: #00eaff;
+    stroke-width: 2.2;
+    stroke-linecap: round;
+  }
+  /* The small copper block: the moving part, dark blue */
+  .block {
+    fill: none;
+    stroke: #075bff;
+    stroke-width: 3.6;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  /* The arc of the angle α: a geometric annotation, one step thinner */
+  .angle-arc {
+    fill: none;
+    stroke: #ffb900;
+    stroke-width: 2.4;
+    stroke-linecap: round;
+  }
+  /* Displacement symbols s₁–s₅: variables are set in italic */
+  .dim-label {
+    fill: #00eaff;
+    font-family: Georgia, "Times New Roman", serif;
+    font-style: italic;
+    font-size: 26px;
+  }
+  /* Subscript digits / units: upright with lining figures */
+  .up {
+    font-style: normal;
+    font-family: "Times New Roman", Georgia, serif;
+  }
+  /* The angle symbol α */
+  .angle-name {
+    fill: #ffb900;
+    font-family: Georgia, "Times New Roman", serif;
+    font-style: italic;
+    font-size: 28px;
+  }
+  /* Device names (not variables): upright, in the colour of their own artwork */
+  .device {
+    font-family: Georgia, "Times New Roman", serif;
+    font-style: normal;
+    font-size: 26px;
+  }
+  .device-tile {
+    fill: #ffb900;
+  }
+  .device-block {
+    fill: #075bff;
+  }
+  /* Leader lines for the device names: thin, in the colour of their own label, so they do not compete with the artwork */
+  .leader-tile {
+    fill: none;
+    stroke: #ffb900;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+  }
+  .leader-block {
+    fill: none;
+    stroke: #075bff;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+  }
+</style>
+</head>
+<body>
+
+<!-- Pairs with "Example 5" of `01 NewtonsSecondLaw.md` (2021 National Paper A, Q 3-22):
+     one end of a tile with a ruler attached is placed on a horizontal table, forming an incline of angle α (sin α = 0.34, cos α = 0.94);
+     a small copper block slides down the incline with acceleration. A phone films the whole process and the video is analysed, giving the distances s₁–s₅ the block slides along the incline within **5 consecutive equal time intervals** (ΔT = 0.20 s);
+     a is found by the successive-difference method and then μ from mg sin α − μmg cos α = ma.
+     The figure shows exactly this apparatus — six recorded positions led out with dashed lines, five displacements hanging between those six leaders — together with the five quantities it yields.
+
+     Geometry of the apparatus (1 unit ≈ 1 layout point, 1 cm ≈ 8.17 units measured along the board):
+       · angle        drawn strictly from the problem's sin α = 0.34 / cos α = 0.94, i.e. α = 19.9°, slope 0.34/0.94 = 0.362.
+                     Do not copy the steeper look of the original figure — the problem gives the trigonometric values, so the figure must agree with the data.
+       · ruler face (the **upper surface** of the board)  passes through P₀(150,100) with direction u = (0.94, 0.34) (rightwards and downwards is the sliding direction);
+                     the board normal n = (0.34, −0.94) points **up** (the face the block rides on) and −n points down into the body of the board.
+       · six positions and six leaders  P₀…P₅ are the positions of the block at t = 0, ΔT, 2ΔT, …, 5ΔT, accumulated along u:
+                     P₀(150.0,100.0) P₁(195.1,116.3) P₂(253.3,137.4) P₃(324.8,163.2)
+                     P₄(409.4,193.8) P₅(507.3,229.2)
+                     each position sends a **dashed** leader along +n (16 → 54 off the ruler face, never touching the board); no dot and no cross is drawn at the position itself,
+                     the extension of that line being the only identifier.
+                     segment lengths 47.96 / 61.93 / 76.06 / 90.03 / 104.09 = 5.87 / 7.58 / 9.31 / 11.02 / 12.74 cm
+                     × 8.17 units/cm — **the scale really follows the numbers in the table**, so on the figure "each segment is a little longer than the one before" can be
+                     seen and measured; each segment exceeds the previous one by aΔT² = 1.717 cm ≈ 14.0 units, consistent over all five
+                     (13.97 / 14.13 / 13.97 / 14.06) — exactly what makes the successive-difference method work; an edit must keep that correspondence.
+       · the first leader is **not at the top of the board**: 70 more units (to Ut(84.2,76.2)) are left before the upper end.
+                     Why? Because s₁ = 5.87 cm is far larger than the ½aΔT² = 0.86 cm a first segment from rest would be —
+                     by the time the recording starts timing, the block has long been moving (v₀ ≈ 0.25 m/s); P₀ is merely the timing origin,
+                     **not the release point**. Leaving a stretch at the upper end of the board keeps the figure from being read as "released from rest at the very top".
+       · lower end of the board  stops at P₅: the board is drawn up to the last recorded position, and **the end face of the board (the face perpendicular to the ruler face there)
+                     is collinear with the leader of P₅** — looking up from the end of the board, the end face, the 16-unit gap and the dashed line form one line,
+                     so s₅ is measured exactly to the end of the board and no un-annotated stub is left to hint at a sixth segment.
+                     The intersection of the lower surface with the table top, Eb(501.9,244.2), is the lower corner of the board and the vertex of α.
+                     The upper end is unsupported — the problem only says "one end is placed on a horizontal table" and never says what holds the other end,
+                     so no support is invented for it here either (the original figure leaves the same blank).
+       · table top   front edge y = 244.2 (the lower corner of the board presses on it), x = 60 → 660;
+                     14 strokes under the table (spacing 44, slanting down-left 16 × 26).
+       · copper block  a square of side 22, about 2.7 cm in scale terms, riding on the ruler face. Written as in `01 example4.html`:
+                     `translate(P₀) rotate(19.885)` first moves the origin to P₀ and then rotates about **that origin** until the square lies along the ruler face,
+                     so local +x runs along the sliding direction and local +y goes into the board, and the y = −22 face of the rect lies on the ruler face;
+                     **the rect's x is the distance from the upstream face of the square to P₀**, and this version takes x = 9 (the square occupies s = 9…31,
+                     inside the s₁ segment, touching neither the leader of P₀ nor that of P₁).
+                     Which segment the square is drawn in carries no information (it is only an indication of "sliding down this board with acceleration"),
+                     the information lives in the six leaders; putting it right on P₀ would smear the P₀ leader,
+                     and the original figure also drew it slightly off the point.
+       · α           vertex Eb(501.9,244.2) = the lower corner of the board = the intersection of the lower surface with the table top; r = 80:
+                     the start (421.9,244.2) lies on the table top and the end (426.7,217.0) on the lower surface of the board, sweeping 19.9°.
+                     **The vertex can only be taken on the lower-face side** — the angle lives in the wedge bounded by "lower surface + table top";
+                     taking the other intersection of the extended lower surface with the table as the vertex would push a short stretch of the arc into the board.
+                     A 20° wedge is very narrow and the α glyph (28px, about 15 high) does not fit at the arc, so it is pushed out along the angle bisector to radius 150
+                     (glyph centre at 354.2,218.2), where the wedge leaves about 20 / 19 units above and below, so the glyph sits on neither the lower surface nor the table top.
+
+     Things the figure does not show, and **should not** show:
+       · no force arrows (the component of gravity along the board, friction, the normal force): the whole reading point is "the displacement differences over five consecutive equal time intervals",
+         and a pile of arrows would suggest a free-body analysis is wanted; the problem gives only the apparatus and a table of data.
+       · no numeric values of μ, a or g and no ΔT = 0.20 s label: they are all "wanted or given as text" conditions,
+         and written into the figure they would become quantities the figure supplies. Only the symbols s₁–s₅ appear, and the values live in the problem's table.
+       · no velocity or acceleration arrows and no "P₀ is t = 0" time annotation: the lines themselves say only "position", the times are in the table.
+
+     The quantitative relations behind the reading (recorded here so a later edit can check them; they do not appear in the figure):
+       · successive-difference method: a = [(s₄+s₅) − (s₂+s₃)] / (2ΔT)² = [(11.02+12.74) − (7.58+9.31)]×10⁻² / 0.16
+         ≈ 0.43 m/s²。 · μ = (sin α − a/g) / cos α = (0.34 − 0.0438) / 0.94 ≈ 0.32。 -->
+
+<svg viewBox="-200 8 1100 284" xmlns="http://www.w3.org/2000/svg" role="img"
+     aria-label="Apparatus diagram: one end of a tile with a ruler attached rests on a horizontal table, forming an incline of angle α, and a small copper block slides down the incline with acceleration. Above the incline, each of six recorded positions sends out a dashed line perpendicular to the ruler face; between two adjacent dashed lines lies one displacement, labelled in order s one, s two, s three, s four and s five, and the five of them are marked with a dimension line arrowed at both ends, each longer than the one above it. The last leader is collinear with the lower end face of the tile, so s five is measured exactly to the end of the board, and a stretch of board is left above the first leader, showing that the timing origin is not the release point.">
+
+  <!-- Arrows for the dimension line: one at each end. markerUnits is userSpaceOnUse so the arrows do not scale with stroke-width —
+       the s₁ segment is only 48 units long, and stroke-width-scaled arrows (the 7×7 set used for axes in this repository) would eat up most of it.
+       marker-start uses auto-start-reverse so one marker points outwards at both ends. -->
+  <defs>
+    <marker id="dimArrow" markerWidth="9" markerHeight="7" refX="8" refY="3.5"
+            orient="auto-start-reverse" markerUnits="userSpaceOnUse">
+      <path d="M0 0.4 L8 3.5 L0 6.6" fill="none" stroke="#00eaff" stroke-width="1.4"
+            stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+  </defs>
+
+  <!-- ═══════════════════ the table top ═══════════════════ -->
+  <!-- front edge y = 244.2: the lower corner Eb of the board presses on it -->
+  <path class="table" d="M60 244.2 H660"/>
+  <path class="hatch" d="M80 244.2 L64 270.2 M124 244.2 L108 270.2 M168 244.2 L152 270.2 M212 244.2 L196 270.2 M256 244.2 L240 270.2 M300 244.2 L284 270.2 M344 244.2 L328 270.2 M388 244.2 L372 270.2 M432 244.2 L416 270.2 M476 244.2 L460 270.2 M520 244.2 L504 270.2 M564 244.2 L548 270.2 M608 244.2 L592 270.2 M652 244.2 L636 270.2"/>
+
+  <!-- ═══════════════════ the tile (the incline itself) ═══════════════════ -->
+  <!-- upper surface y = 100 + 0.362(x − 150), from the top Ut(84.2,76.2) to **the end Et = P₅(507.3,229.2)**;
+       the board is 16 thick, on the lower-surface side (the lower-right normal): Ub(78.8,91.2) → Eb(501.9,244.2).
+       This end face at the board head is perpendicular to the ruler face and passes exactly through P₅ — it is **collinear** with the leader of P₅ (only the 16-unit gap between them),
+       so s₅ ends exactly at the board head. Eb is at once the contact point of the board with the table top and the vertex of α. -->
+  <polygon class="tile" points="84.2,76.2 507.3,229.2 501.9,244.2 78.8,91.2"/>
+
+  <!-- ═══════════════════ the six leaders (dashed, not touching the tile) ═══════════════════ -->
+  <!-- Drawn from the six positions P₀…P₅ along the board normal n = (0.34,−0.94): the start is 16 off the ruler face (16n = 5.44, −15.04)
+       and the end 54 off it (54n = 18.36, −50.76), length still 38. **The whole run was moved 10 further out along the normal from the initial 6→44** —
+       "moved out" means along n, not a blanket subtraction of coordinates: an oblique translation would take each line off its own position P_k,
+       and the arrow tips of the dimension line would end up 6.8 units beside the line, in empty space; shifting along n both lifts it and keeps it through P_k.
+       Start 16: a clean gap is left to the board face (the upper-surface stroke only reaches ±1.8), so the line reads as an annotation floating above the board,
+       not a score mark on it; the 16…54 stretch still crosses the dimension line at 32, so the five segments stay separated. Dash pattern 7/6.
+       **The last leader (the one at P₅) is collinear with the end face of the board** — the board is drawn only as far as P₅, and the end face is perpendicular to the ruler face and sits exactly at that
+       position, the dashed line being its extension outwards, so s₅ stops exactly at the board head (see the "tile" note above).
+       The position is identified by the extension of that line — no dot and no cross is drawn. -->
+  <path class="ruler" d="M155.4 85.0 L168.4 49.2 M200.5 101.3 L213.5 65.5 M258.7 122.4 L271.7 86.6 M330.2 148.2 L343.2 112.4 M414.8 178.8 L427.8 143.0 M512.7 214.2 L525.7 178.4"/>
+
+  <!-- ═══════════════════ the five displacements s₁–s₅ ═══════════════════ -->
+  <!-- The dimension lines lie on a parallel at 32 units off the ruler face and are broken segment by segment: one double arrow per segment, its tips landing exactly on the leaders.
+       What their ends connect to are the **leaders** and nothing else, so they must be strictly collinear with the 32 offset (the ends of adjacent segments share
+       the four points D₁…D₄: D₁(206.0,86.2) D₂(264.2,107.3) D₃(335.7,133.1) D₄(420.3,163.7)). -->
+  <path class="dim" d="M160.9 69.9 L206.0 86.2" marker-start="url(#dimArrow)" marker-end="url(#dimArrow)"/>
+  <path class="dim" d="M206.0 86.2 L264.2 107.3" marker-start="url(#dimArrow)" marker-end="url(#dimArrow)"/>
+  <path class="dim" d="M264.2 107.3 L335.7 133.1" marker-start="url(#dimArrow)" marker-end="url(#dimArrow)"/>
+  <path class="dim" d="M335.7 133.1 L420.3 163.7" marker-start="url(#dimArrow)" marker-end="url(#dimArrow)"/>
+  <path class="dim" d="M420.3 163.7 L518.2 199.1" marker-start="url(#dimArrow)" marker-end="url(#dimArrow)"/>
+
+  <!-- The symbols sit at each segment's midpoint, 56 units further out (one glyph height above the dimension line), set horizontally and not following the slope of the board:
+       the five s values step upwards by exactly one segment, so the reader matches each one to its segment at a glance. -->
+  <text class="dim-label" x="191.6" y="55.5" text-anchor="middle">s<tspan class="up" dy="7" font-size="18">1</tspan></text>
+  <text class="dim-label" x="243.2" y="74.2" text-anchor="middle">s<tspan class="up" dy="7" font-size="18">2</tspan></text>
+  <text class="dim-label" x="308.1" y="97.7" text-anchor="middle">s<tspan class="up" dy="7" font-size="18">3</tspan></text>
+  <text class="dim-label" x="386.1" y="125.9" text-anchor="middle">s<tspan class="up" dy="7" font-size="18">4</tspan></text>
+  <text class="dim-label" x="477.4" y="158.9" text-anchor="middle">s<tspan class="up" dy="7" font-size="18">5</tspan></text>
+
+  <!-- ═══════════════════ the small copper block ═══════════════════ -->
+  <!-- translate(P₀) rotate(19.885): local +x along the sliding direction, +y into the board, so the y = −22 face of the rect lies on the ruler face;
+       the rect's x = 9 is the distance along the board from the upstream face of the square to P₀ (the same ruler as the s_i).
+       To move it, change this one x and leave y alone (any non-zero y takes the square off the ruler face).
+       Note that it must **not** be written as rotate(19.885 150 100): that (150,100) is a point of the parent coordinate system, while the rect's local coordinates sit near the origin,
+       so one rotation about it would fling the square elsewhere (example4 fell into exactly this trap). -->
+  <g transform="translate(150 100) rotate(19.885)">
+    <rect class="block" x="9" y="-25" width="22" height="22" rx="1"/>
+  </g>
+
+  <!-- ═══════════════════ the angle α ═══════════════════ -->
+  <!-- vertex Eb(501.9,244.2) = the lower corner of the board = the intersection of the lower surface with the table top; r = 80, from the table top (421.9,244.2)
+       to the lower surface of the board (426.7,217.0). The vertex can only be taken on the lower-face side, otherwise the arc runs into the board. -->
+  <path class="angle-arc" d="M421.9 244.2 A80 80 0 0 1 426.7 217.0"/>
+  <!-- The α glyph is pushed out to radius 150 along the angle bisector: a 20° wedge is only 27 units wide at the arc and the glyph does not fit there (see the file header note) -->
+  <text class="angle-name" x="354" y="225.5" text-anchor="middle">α</text>
+
+  <!-- ═══════════════════ device names ═══════════════════ -->
+  <!-- tile: written in the gap under the board, with the leader running down onto the lower surface at (320,178.4) -->
+  <text class="device device-tile" x="240" y="205">tile</text>
+  <path class="leader-tile" d="M296 197 L320 178.4"/>
+
+  <!-- copper block: written in the gap upstream of the board top, with the leader landing near the upper-left corner of the square at (165.9,82.4).
+       Not written directly above the square: that space is already taken by the P₀ leader and the s₁ dimension line. -->
+  <text class="device device-block" x="136" y="52" text-anchor="end">copper block</text>
+  <path class="leader-block" d="M140 44 L163 79"/>
+
+</svg>
+
+</body>
+</html>

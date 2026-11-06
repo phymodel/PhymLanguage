@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>A light spring fixed to a wall at the left end of a smooth horizontal table presses a small ball, which on release flies horizontally off the right end and falls to the ground</title>
+<style>
+  /* Figure-frame conventions: the same set as `01 example3.html` (spring + horizontal table), `09 example4-1.html` and
+     `10 example1-1.html` in this folder.
+     · The page **carries no background colour** — iOS / visionOS use a glass theme, so the figure must let the window material show through; painting a
+       solid plate inside the page makes the Markdown side recognise that "the author drew a plate" and stop injecting the canvas (MarkdownHtmlFigure.swift
+       `declaresOwnPageBackground`), and the two plates then fight each other. The original is cyan lines and a blue ball on black;
+       **do not copy that background** — only the line artwork is carried over into this repository's palette.
+     · **Size comes from the aspect ratio** — the figure frame reads the aspect ratio of this file's viewBox, which must stay within 0.2–5
+       (`htmlFigureRatio` in `Markdown/doc.html`; out of range it degrades to a fixed 240px height).
+       This figure is an apparatus laid out sideways (wall + spring + ball + table + legs + ground), so the canvas is naturally very wide:
+       the measured bbox of the artwork is x = 40 → 900, y = 190 → 546 (860 × 356, ratio ≈ 2.42).
+       viewBox = 1320 × 550 (x from −190 to 1130, y from 93 to 643, ratio ≈ 2.40),
+       leaving 230 units left and right and 97 above and below; the centroid of the artwork (470, 368) coincides exactly with the viewBox centre
+       (470, 368). The padding follows `01 example3.html` in this folder (1800 × 380, artwork about
+       40% of the frame width); here the artwork is wider, so both dimensions grew and both paddings scaled together: the artwork takes 65% of the frame width
+       and 65% of its height, so it does not look oversized or undersized beside the other apparatus figures of the same document.
+       To make the figure smaller, keep enlarging the viewBox (write the padding only in the viewBox, never touch any artwork coordinate),
+       but do not exceed the ratio limit of 5 — with height 550 the viewBox width tops out at 2750.
+     · Colours (two colours — do not add a third):
+         wall / table top (with its thickness) / legs / ground (with hatching) ....... #ffb900 (gold, the same
+                                                          as "table + ground hatching" in `01 example3.html` and
+                                                          "the large ring" in `10 example1-1.html`:
+                                                          apparatus and supports in a figure are always gold)
+         light spring / small ball ................................. #075bff (dark blue, the same
+                                                          as "blocks / spring" in `01 example3.html`:
+                                                          the one thing that can move is dark blue)
+       What is to be read here is only **two things that move (the spring, the ball)** and **one set of fixed supports (wall, table, legs, ground)**,
+       and two colours cut them apart cleanly: blue is "the stretch this problem is about", gold is "where it happens".
+       The mistakes to avoid are the reverse: paint the spring gold and it blurs into one static support with the wall and the table, so the reader sees "the ball propped against the wall";
+       paint the ball gold and the only thing that flies off becomes the least conspicuous. The cyan spring of the original is not used here:
+       this repository's two-colour convention has no third line, and the spring in `01 example3.html` is already dark blue.
+     · Fonts: this figure carries **no lettered symbols at all** — Ep, m, h, v0 in the problem are all letters for wanted or given quantities,
+       and written on the figure they become a second source of information: "in the figure but not in the text" (see "Things the figure should not show" below). */
+
+  body {
+    background-color: transparent;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    overflow: hidden;
+  }
+  svg {
+    height: 100%;
+    width: auto;
+    max-width: 100%;
+  }
+  /* Wall / ground front edge: a single thick line is the front edge */
+  .rigid {
+    fill: none;
+    stroke: #ffb900;
+    stroke-width: 5;
+    stroke-linecap: round;
+  }
+  /* The table top: half a step heavier than wall and ground — the table is "the track" here and holds down the lower half of the figure */
+  .plank {
+    fill: none;
+    stroke: #ffb900;
+    stroke-width: 6.5;
+    stroke-linecap: round;
+  }
+  /* Board thickness / the double lines of the legs / ground hatching / wall hatching: one step thinner, not competing with the front edges */
+  .rigid-thin {
+    fill: none;
+    stroke: #ffb900;
+    stroke-width: 2.4;
+    stroke-linecap: round;
+  }
+  /* The light spring: drawn as a zigzag, the same line and the same weight as in `01 example3.html` */
+  .coil {
+    fill: none;
+    stroke: #075bff;
+    stroke-width: 3.4;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  /* The small ball: a solid blue disc (the original is a solid ball, and "the object" in `09 example4-1.html` is also
+     solid — a physical body is filled in; a hollow circle reads as a ring or as a particle marker) */
+  .ball {
+    fill: #075bff;
+    stroke: #075bff;
+    stroke-width: 3;
+  }
+</style>
+</head>
+<body>
+
+<!-- Pairs with "Example 3" of `10 ConservationOfMechanicalEnergy.md` (2023 National Paper A, Q 3-24):
+     a light spring lies on a smooth horizontal table, its left end fixed to a vertical wall on the left and its right end pressing a small ball of mass m,
+     giving the spring an elastic potential energy Ep; on release the ball starts from rest and moves along the table under the spring, and after separating from it leaves the
+     right end of the table horizontally and falls to the ground (the bouncing afterwards is given in words and is not drawn).
+     The figure draws only the configuration of the instant after release when the ball is still against the spring: part (1) asks for the speed v0 at the end of that stretch
+     (on leaving the table), and part (2) is about the projectile motion and bounce afterwards.
+
+     Geometry of the apparatus (1 unit ≈ 1 layout point):
+       · ground front edge   y = 520 (x = 40 → 900, running past the legs at both ends as in the original)
+       · ground hatching     26 × 26 strokes slanting down-left from the front edge to (x − 26, 546), one every 40 from x = 70 → 870, 21 in all
+       · table front edge   y = 300 (x = 130 → 830, weight 6.5)
+       · table thickness     y = 312 (weight 2.4), closed at both ends x = 130 / 830 by a vertical line y = 300 → 312 —
+                      so the table reads as a board with thickness rather than a line; its left end reaches 40 units past the wall
+                      (as in the original: the table edge reaches a little left of the wall, so it reads as "the wall stands on the table" rather than "the wall is outside it")
+       · legs         double lines x = 744 / 752, from the board thickness y = 312 down to the ground y = 520 (the same drawing as
+                      the legs of `01 example1.html`: two thin lines enclosing one leg, never filled)
+       · wall face    x = 170, from y = 190 down to the table at y = 300; four hatching strokes on the wall,
+                      from (170, y) down-left 24 × 24 to (146, y + 24), at y = 198 / 220 / 242 / 264
+                      — the hatching is drawn only on the **left side** of the wall and always **above** the table front edge (see trap ③ below)
+       · light spring       axis y = 252, x = 170 → 524 (left end against the wall face, right end against the leftmost point of the ball)
+                      The zigzag follows the static-spring convention established in this repository: lead → half a fold into the zigzag → evenly spaced zigzag → half a fold back to the centre line → lead
+                        end leads   170 → 190 and 504 → 524 (20 long each, on the axis y = 252)
+                        zigzag span   204 → 484, 15 vertices one every 20 (8 up, 7 down),
+                                   amplitude 46: up to y = 206, down to y = 298
+       · small ball   centre (572, 252), radius 48, solid blue; its lowest point falls exactly on the table front edge y = 300
+                      → the ball centre is **coaxial** with the spring (both at y = 252), which reads as "the spring pushes the ball at its centre height"
+
+     The three alignments the reading depends on (checkable at a glance, and the three things most easily ruined in this figure):
+       ① the ball centre (572, 252) is at the height of the spring axis y = 252 — the spring force acts along the table through the centre, so the ball does not spin;
+       ② the bottom of the ball y = 300 = the table front edge — the ball sits on the table; its centre = 300 − r = 300 − 48;
+       ③ the downward folds of the zigzag reach y = 298, only 2 units from the table at y = 300 — the spring lies on the table (the problem says "a light spring
+          lies on a smooth horizontal table", so it does not float). Break any of the three and the figure reads as "a ball floating in the air being pushed by a spring"
+          or "the spring passing through the ball".
+
+     Things the figure does **not** show, and should not show:
+       · no projectile trajectory, no bounce parabola, no h: part (2) deals with "after it flies off", and drawing it would lay
+         part (2)'s answers (landing point, bounce height) on the figure; the original also shows the apparatus only, with no trajectory.
+       · no Ep / m / v0 / h / Δx labels: the problem gives them in words and the original labels none. Labelling creates "given in the figure,
+         not in the text" — and Ep and h are precisely the unknowns of the two parts.
+       · no forces at all (spring force, gravity, normal force): the question is about conservation of mechanical energy (ΔEk = −ΔEp), and a force analysis
+         does not belong in an apparatus figure; with force arrows the reader looks for "work done by the net force" instead of "whose energy went to whom".
+       · the **spacing of the zigzag does not show a compression**: the problem only says "giving the spring an elastic potential energy Ep" and gives no compression Δx.
+         Drawn specially tight or specially loose, it would read as a known compression state; so the zigzag here is drawn once at even spacing,
+         expressing only "the spring is still being pressed by the ball", not "by how much".
+       · no position of the ball after it flies off and no spring at its natural length: the figure stops at the instant when the ball is still against the spring,
+         the ball meeting the right end of the spring at x = 524, which leaves the separation itself for later.
+
+     Five traps to avoid when drawing this:
+       ① never let the ball centre leave the spring axis: it must equal 252 (= table 300 − radius 48). When the radius changes, the centre follows;
+          changing only the radius sinks the ball into the table or floats it above;
+       ② the leftmost point of the ball must meet the right end of the spring exactly: centre x = 572, r = 48 ⇒ leftmost point x = 524, so the last lead of the spring
+          must stop at 524; stopping left of it leaves a gap, right of it stabs into the ball;
+       ③ the wall hatching goes only on the left side of the wall and never across the table front edge: on the table it would blur with the table and ground hatching,
+          and the reader could not tell which stroke is wall and which is ground;
+       ④ the right end of the table must reach past the legs and the ball: the right side of the ball is x = 620, the legs x = 744, the table edge x = 830 — the table must be longer than the ball
+          by a stretch ("flies horizontally off the table" needs some table left to run on), and the legs must not stand on the very edge;
+       ⑤ the spring is **one** zigzag path (not a stack of ellipses): both leads lie strictly on the axis y = 252,
+          the vertices alternate strictly up and down, and no fold may be off by an order of magnitude — that stretch would look like a knot in the spring. -->
+
+<svg viewBox="-400 93 1700 550" xmlns="http://www.w3.org/2000/svg" role="img"
+     aria-label="Apparatus diagram: a smooth horizontal table on legs stands on the ground, with a vertical wall at its left end; a light spring lies along the table with its left end fixed to the wall and its right end pressing a solid small ball that rests on the table, the spring held compressed by the ball (storing elastic potential energy). The ball sits some way to the right on the table, which extends a little further right with a leg reaching the ground. The diagram shows the apparatus only: no trajectory of the ball after leaving the table, and no labels for the elastic potential energy, the mass, the launch speed or the bounce height.">
+
+  <!-- ═══════════════════ the ground (with 21 hatching strokes) ═══════════════════ -->
+  <path class="rigid" d="M40 520 H900"/>
+  <path class="rigid-thin" d="M70 520 L44 546 M110 520 L84 546 M150 520 L124 546 M190 520 L164 546 M230 520 L204 546 M270 520 L244 546 M310 520 L284 546 M350 520 L324 546 M390 520 L364 546 M430 520 L404 546 M470 520 L444 546 M510 520 L484 546 M550 520 L524 546 M590 520 L564 546 M630 520 L604 546 M670 520 L644 546 M710 520 L684 546 M750 520 L724 546 M790 520 L764 546 M830 520 L804 546 M870 520 L844 546"/>
+
+  <!-- ═══════════════════ the table: front edge + thickness + closed ends + double-line legs ═══════════════════ -->
+  <path class="plank" d="M130 300 H830"/>
+  <path class="rigid-thin" d="M130 312 H830"/>
+  <path class="rigid-thin" d="M130 300 V312 M830 300 V312"/>
+  <path class="rigid-thin" d="M744 312 V520 M752 312 V520"/>
+
+  <!-- ═══════════════════ the wall (standing on the left end of the table, hatched only on its left side) ═══════════════════ -->
+  <path class="rigid" d="M170 190 V300"/>
+  <path class="rigid-thin" d="M170 198 L146 222 M170 220 L146 244 M170 242 L146 266 M170 264 L146 288"/>
+
+  <!-- ═══════════════════ the light spring (a zigzag drawn in one stroke) ═══════════════════ -->
+  <!-- Left end against the wall face at x = 170, right end against the leftmost point of the ball at x = 524; the axis y = 252 is level with the ball centre.
+       Measurements (axis y = 252, amplitude A = 46 → up folds at 206 / down folds at 298):
+         · end leads  170 → 190 and 504 → 524 (20 long each, about 6% of the whole)
+         · zigzag span  204 → 484 (15 vertices, one every 20, 8 up and 7 down),
+                      the first fold starting 14 units past the end of the lead (following the "slightly shorter first fold" of `01 example3.html`)
+         · vertex x   204 / 224 / 244 / 264 / 284 / 304 / 324 / 344 / 364 / 384 / 404 / 424 / 444 / 464 / 484
+                      alternating up and down (204 up, 224 down, … 484 up), then half a fold from (484, 206) back to the axis at (504, 252)
+         · a fold pitch of 20 against an amplitude span of 46 ×2 makes the zigzag climb and fall steeply throughout — it reads as "the spring is still being pressed by the ball",
+           but the spacing does not show how far it is compressed (the problem gives no Δx; see "Things the figure should not show" in the header) -->
+  <path class="coil" d="M170 252 H190 L204 206 L224 298 L244 206 L264 298 L284 206 L304 298 L324 206 L344 298 L364 206 L384 298 L404 206 L424 298 L444 206 L464 298 L484 206 L504 252 H524"/>
+
+  <!-- ═══════════════════ the small ball: its centre coaxial with the spring, sitting on the table ═══════════════════ -->
+  <!-- Centre (572, 252), r = 48 ⇒ leftmost point x = 524 (meeting the right end of the spring), bottom y = 300 (on the table front edge)
+       and top y = 204 (2 units above the up folds of the spring at 206 — the ball is slightly bigger than the spring, as in the original) -->
+  <circle class="ball" cx="572" cy="252" r="48"/>
+
+</svg>
+
+</body>
+</html>

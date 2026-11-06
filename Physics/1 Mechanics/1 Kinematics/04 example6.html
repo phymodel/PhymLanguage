@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>A car approaching a junction: 18 m from the stop line, the green light about to go out</title>
+<style>
+  /* Figure-frame conventions: the same set as `04 example5.html`, `03 VelocityTime.html` and `04 example2.html` in
+     this folder.
+     · The page **carries no background colour** — iOS / visionOS use a glass theme, so the figure must let the
+       window material show through. Painting a solid plate inside the page (the original artwork of the question had
+       a black background) has two consequences: an off-colour block sits on the glass panel; and as soon as the
+       Markdown side recognises that "the author drew a plate" it stops injecting the canvas (see
+       MarkdownHtmlFigure.swift `declaresOwnPageBackground`), so the two plates fight each other.
+     · **Size comes from the aspect ratio** — the figure frame takes its shape from this document's own viewBox
+       ratio (the Markdown side reads that ratio and requires it to lie between 0.2 and 5; outside that range the
+       frame degenerates to a fixed height of 240 px), the svg fills the height of the frame, and whatever is left
+       at the sides is empty space. This figure has viewBox = 1800 × 490 → ratio about 3.67.
+       The canvas is **deliberately much wider than the artwork**: the frame width comes from the document flow and
+       the frame height = frame width ÷ ratio, so 490 units of empty space are added on the left and on the right of
+       the viewBox (the artwork still occupies x = 40 → 860) and the artwork is displayed at 900/1800 = 0.50 — to
+       make the figure smaller still, keep widening the viewBox (e.g. -750 → 2400 wide, ratio 4.90, artwork at
+       0.375, but stay below the ratio limit of 5), and change nothing but this line, never a coordinate inside the
+       figure.
+     · Colours: the road, the dimension lines and the "18 m" / "stop line" labels use #0865ff (the graph-line /
+       moving-body tier); the car body, the tyres and the signal casing use #ffb900 / #ff8a00 (a warm moving body);
+       the three lamps use #ff1111 / #ffe23d / #00ff12. */
+  body {
+    background-color: transparent;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    overflow: hidden;
+  }
+  svg {
+    height: 100%;
+    width: auto;
+    max-width: 100%;
+  }
+  .road, .stopline, .tick, .dim, .pole {
+    fill: none;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .road     { stroke: #0865ff; stroke-width: 5; }                     /* the road surface (one flat straight line) */
+  .stopline { stroke: #ffb900; stroke-width: 4.6; stroke-dasharray: 15 13; } /* the stop line (a vertical dashed line) */
+  .tick     { stroke: #0865ff; stroke-width: 3.4; }                   /* the end strokes of the dimension lines */
+  .dim      { stroke: #0865ff; stroke-width: 3.4; }                   /* the 18 m dimension line */
+  .pole     { stroke: #ffb900; stroke-width: 4.6; }                   /* the suspension pole of the signal */
+  .body     { fill: #ffb900; stroke: #ffb900; stroke-width: 3; stroke-linejoin: round; }
+  .glass    { fill: #ff8a00; }
+  .part     { fill: none; stroke: #ffb900; stroke-width: 3; stroke-linecap: round; }
+  .tyre     { fill: #ff8a00; }
+  .hub      { fill: #ffb900; }
+  .head-lamp { fill: #ff8a00; }                                        /* the headlamp (the marker that the nose points right) */
+  .case     { fill: #ff8a00; stroke: none; }
+  .lamp     { stroke: none; }
+  .lamp-on  { fill: none; stroke: #00ff12; stroke-width: 3; }         /* the green lamp is on: it gets a bright ring */
+  text {
+    font-family: Georgia, "Times New Roman", serif;
+    fill: #0865ff;
+    text-anchor: middle;
+  }
+  /* The font sizes are chosen so that the figure is still legible once scaled to 50 % of the frame width: 44 becomes
+     about 14 px in a 640 px document flow, and the 28 of the stop-line note about 9 px — anything smaller blurs. */
+  .len  { font-size: 44px; }
+  .note { font-size: 28px; }
+</style>
+</head>
+<body>
+
+<!-- Pairs with Example 6 of `04 DisplacementTimeRelation.md` (2009 Jiangsu Province): a car travelling at a constant
+     8 m/s is about to pass a junction, the green light will go out in 2 s, and the car is 18 m from the stop line.
+
+     Geometry (1 unit in x ≈ 6.2 cm; the car is drawn larger than a real one — as in the figure of the question, all
+     that matters is "the car is recognisable and the 18 m is measurable"):
+       canvas      x = -450 → 1350 (the artwork only occupies x = 40 → 860, with 490 units of empty space on the left
+                   and on the right, which displays the whole figure at 50 % of the frame width; see "Size comes from
+                   the aspect ratio" in <style>)
+       road        y = 380, x = 40 → 860 (one flat straight line, with the car standing on it)
+       car body    tailgate x = 94, nose x = 270, underside y = 352, roof y = 288
+       wheels      centres (126, 360) and (232, 360), r = 20 ⇒ the bottom of a wheel, y = 380, lies exactly on the road
+       heading     to the right (towards the stop line): the tailgate is almost vertical and the rear overhang is short
+                   (32), while the front is "a raked windscreen + a long bonnet + a headlamp", so the three together
+                   read at a glance and the car cannot be mistaken for one driving backwards.
+       stop line   a vertical dashed line at x = 560, from y = 380 (the road) to 150
+       18 m        end strokes at x = 270 (directly below the nose) / x = 560 (directly below the stop line),
+                   y = 390 → 428; the dimension line at y = 418 with arrows pointing outwards into the end strokes, and
+                   the label written at the midpoint x = 415, baseline y = 458
+       signal      pole x = 760, y = 8 → 118 (running out of the top of the canvas); casing x = 726 → 794, y = 118 →
+                   288, radius 18; the three lamps are centred at (760,152) / (760,203) / (760,254) with r = 20, and the
+                   green one carries a bright ring
+     Changing the scale only changes how it looks, not what the "18 m" label means. -->
+<svg viewBox="-450 0 1800 490" xmlns="http://www.w3.org/2000/svg" role="img"
+     aria-label="A car on a straight level road, moving to the right at constant velocity; 18 metres directly ahead of its nose is the stop line of a junction, a signal stands outside the stop line, and at this moment the green lamp is on">
+
+  <defs>
+    <!-- Dimension-line arrows: the two outward arrows (the left one points left, the right one points right), in the
+         same colour as the dimension line -->
+    <marker id="arrow" markerWidth="7" markerHeight="7" refX="5.5" refY="3.5"
+            orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L6,3.5 L0,7" fill="none" stroke="#0865ff" stroke-width="1.2"/>
+    </marker>
+    <marker id="arrowRev" markerWidth="7" markerHeight="7" refX="0" refY="3.5"
+            orient="auto" markerUnits="strokeWidth">
+      <path d="M6,0 L0,3.5 L6,7" fill="none" stroke="#0865ff" stroke-width="1.2"/>
+    </marker>
+  </defs>
+
+  <!-- ═══════════ The road: one flat straight line, with the car and the stop line both standing on it ═══════════ -->
+  <path class="road" d="M40 380 H860"/>
+
+  <!-- ═══════════ The stop line: the vertical dashed line ahead of the car (running out of the road, as in the figure
+       of the question) ═══════════ -->
+  <path class="stopline" d="M560 380 V150"/>
+  <text class="note" x="560" y="132">stop line</text>
+
+  <!-- ═══════════ The car (nose to the right, moving at constant velocity towards the stop line) ═══════════ -->
+  <g id="car">
+    <!-- Body outline, read from left to right: vertical tailgate → roof → strongly raked windscreen → bonnet →
+         rounded nose. A vertical tailgate with a short rear overhang (32), and a long front overhang (38) with a long
+         bonnet, so the direction cannot be read the wrong way round. -->
+    <path class="body"
+          d="M94 352
+             L94 306 Q94 288 110 288
+             L180 288
+             L226 320
+             L254 324 Q270 327 270 344
+             L270 352 Z"/>
+
+    <!-- Side windows: the band follows the roof, its right-hand edge runs parallel to the windscreen, and a B-pillar
+         breaks it in the middle -->
+    <path class="glass"
+          d="M112 316
+             L116 297 Q117 296 120 296
+             L170 296 Q173 296 175 299
+             L194 316 Z"/>
+    <path class="part" d="M150 296 V316"/>
+
+    <!-- Headlamp: it only exists on the nose, which pins "facing right" once more -->
+    <rect class="head-lamp" x="248" y="328" width="16" height="9" rx="4"/>
+
+    <!-- Wheels: the bottom of a wheel, y = 380, lies exactly on the road -->
+    <circle class="tyre" cx="126" cy="360" r="20"/>
+    <circle class="hub"  cx="126" cy="360" r="8"/>
+    <circle class="tyre" cx="232" cy="360" r="20"/>
+    <circle class="hub"  cx="232" cy="360" r="8"/>
+  </g>
+
+  <!-- ═══════════ The distance from the nose to the stop line: 18 m ═══════════ -->
+  <!-- The two end strokes: directly below the nose, x = 270, and directly below the stop line, x = 560 -->
+  <path class="tick" d="M270 390 V428"/>
+  <path class="tick" d="M560 390 V428"/>
+  <!-- The dimension line: the arrows at both ends point outwards into the end strokes -->
+  <path class="dim" d="M270 418 H560" marker-start="url(#arrowRev)" marker-end="url(#arrow)"/>
+  <text class="len" x="415" y="458">18 m</text>
+
+  <!-- ═══════════ The signal: suspended above the junction, outside the stop line ═══════════ -->
+  <path class="pole" d="M760 8 V118"/>
+  <rect class="case" x="726" y="118" width="68" height="170" rx="18"/>
+  <circle class="lamp" style="fill:#ff1111" cx="760" cy="152" r="20"/>
+  <circle class="lamp" style="fill:#ffe23d" cx="760" cy="203" r="20"/>
+  <circle class="lamp" style="fill:#00ff12" cx="760" cy="254" r="20"/>
+  <circle class="lamp-on" cx="760" cy="254" r="27"/>
+
+</svg>
+
+</body>
+</html>

@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Two blocks P and Q joined by a light spring on a rough table, with a horizontal force F pulling P</title>
+<style>
+  /* Figure-frame conventions: the same set as `01 example1.html`, `01 example2.html`, `11 example1-1.html` and
+     `1 Kinematics/07 example1.html`.
+     · The page **carries no background colour** — iOS / visionOS use a glass theme, so the figure must let the window material show through; painting a
+       solid plate inside the page makes the Markdown side recognise that "the author drew a plate" and stop injecting the canvas (MarkdownHtmlFigure.swift
+       `declaresOwnPageBackground`), and the two plates then fight each other. The original figure is gold lines on black; **do not copy that background** —
+       only the line artwork is carried over into this repository's palette.
+     · **Size comes from the aspect ratio** — the figure frame reads the aspect ratio of this file's viewBox, and it must stay within 0.2–5
+       (`htmlFigureRatio` in `Markdown/doc.html`; out of range it degrades to a fixed 240px height).
+       This figure is one apparatus laid out horizontally (table + Q + spring + P + pulling force arrow), so the canvas is naturally very wide:
+       the artwork spans x = 110 → 830 (the top of the F symbol reaches y = 131, the highest point in the figure), y = 131 → 286,
+       viewBox = -430 18 1800 380 → ratio ≈ 4.74, leaving 540 units on each side and 113 / 112 units above and below.
+       The padding follows `01 example2.html` in this folder (viewBox 1600 × 380, ratio ≈ 4.21, artwork about 28% of the frame width);
+       here the artwork itself is wider (720 units), so the viewBox height had to grow as well to keep the same padding ratio:
+       1000 × 300 (140 on each side, the figure almost filled the frame) → 1260 × 300 (270 on each side) → this version 1800 × 380,
+       where the artwork takes only 40% of the frame width, so inside one document it and example2 look comparable instead of one big and one small.
+       To make the figure smaller, keep widening the viewBox (write the padding only in the viewBox, never touch any artwork coordinate), but do not exceed the
+       ratio limit of 5 — with height 380 the viewBox width tops out at 1900 (590 on each side).
+     · Colours:
+         table (ground) + ground hatching ........ #ffb900 (the same "support surface / axis" convention as `11 example1-1.html`)
+         blocks Q / P, light spring, pulling force arrow F ... #075bff (the same "moving parts" convention as example1)
+       The three symbols P, Q, F use #075bff as well: they are part names given by the problem, so each carries the colour of the artwork it belongs to and
+       you can see at a glance which letter means which thing.
+     · Fonts: P, Q, F are part symbols from the problem and use Georgia italic (consistent with `.part-label` in this repository). */
+
+  body {
+    background-color: transparent;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    overflow: hidden;
+  }
+  svg {
+    height: 100%;
+    width: auto;
+    max-width: 100%;
+  }
+  /* Table (ground): a single thick line is the front edge */
+  .rigid {
+    fill: none;
+    stroke: #ffb900;
+    stroke-width: 5;
+    stroke-linecap: round;
+  }
+  /* Ground hatching: the rough-surface mark, one step thinner so it does not compete with the front edge */
+  .hatch {
+    fill: none;
+    stroke: #ffb900;
+    stroke-width: 2.4;
+    stroke-linecap: round;
+  }
+  /* Blocks / spring / pulling force arrow: one dark blue for the whole "moving parts" family */
+  .part {
+    fill: none;
+    stroke: #075bff;
+    stroke-width: 3.4;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  /* Part names on the figure, Q / P / F (symbols given by the problem, not units) */
+  .part-label {
+    fill: #075bff;
+    font-family: Georgia, "Times New Roman", serif;
+    font-style: italic;
+    font-size: 42px;
+  }
+</style>
+</head>
+<body>
+
+<!-- Pairs with "Example 3" of `01 NewtonsSecondLaw.md` (2022 National Paper A, Q 2-19):
+     two blocks P and Q of equal mass sit on the same rough horizontal table (the same coefficient of friction μ), joined horizontally by a light spring;
+     a horizontal force F to the right pulls P so that the two blocks move right together at constant velocity; at a certain moment F is suddenly removed.
+     The figure shows only the apparatus at the instant before the removal (the original figure is in that state) — options A–D are all about what happens afterwards, and
+     the problem has no second figure, so no post-removal position is presumed here either, lest the choice of "which stretch of the process" be frozen in advance.
+
+     Geometry of the apparatus (1 unit ≈ 1 layout point):
+       · ground front edge  y = 260 (x = 110 → 830, running past the blocks at both ends as in the original)
+       · ground hatching   20 × 26 strokes slanting down-left from the front edge, spaced 34 units (x = 138 → 818, 21 strokes in all)
+       · block Q      rectangle (230, 150)–(340, 260), side 110, its base sitting exactly on the ground
+       · block P      rectangle (560, 150)–(670, 260), **the same size** as Q — the problem states equal masses, so
+                     the figure must show two equally large squares, never a size difference
+       · light spring  centred between the two blocks (x = 340 → 560, centre line y = 205), drawn as a **zigzag**:
+                       end leads 340 → 358 and 542 → 560 (horizontal, at the centre height of the blocks)
+                       12 zigzag vertices in between, the first fold 10 and then every fold 14.5 at equal spacing, amplitude ±34 (up and down to 171 / 239)
+                     The spring is drawn stretched (sparse zigzag, long leads), consistent with T = μmg > 0 in the constant-velocity stage;
+                     do not draw tight coils or a compressed spring — that would mean a very large spring force with the two blocks about to collide
+       · pulling force F  from the right face of P at (670, 205) horizontally right to x = 815, arrow tip pointing right;
+                     the symbol F sits **above and to the right** of the shaft (x = 778), neither on the shaft nor overlapping the square of P
+
+     Things the figure does not show, and **should not** show:
+       · no μ, m or T labels: the problem gives them only in words and the original figure labels none of them; labelling them would create a new condition "in the figure but not in the text".
+       · no friction or spring-force arrows: the question is about what happens after F is removed, and mixing a free-body diagram into the apparatus figure
+         would make it impossible to see which forces still act.
+
+     The quantitative relations behind the reading (recorded here so a later edit can check them; they do not appear in the figure):
+       constant-velocity stage   for Q: T = μmg (the spring pulls Q right, balancing the kinetic friction to the left)
+                 for P: F = T + μmg = 2μmg
+       the instant F is removed  the spring force cannot change yet → for P: −T − μmg = m·a_P ⇒ a_P = −2μg (P is decelerating hardest at this instant)
+                 for Q: the spring force still points right and friction points left ⇒ a_Q = 0 (Q has not started slowing down yet)
+       until the spring returns to its natural length  the spring force falls all the way to 0 ⇒ a_P decreases monotonically from 2μg to μg while a_Q increases monotonically from 0 to μg —
+       so P always decelerates faster than Q and v_P ≤ v_Q at any instant (D is correct); the distance between the blocks keeps shrinking, so
+       the displacement of P is certainly smaller than that of Q (C is wrong). -->
+<svg viewBox="-430 18 1800 380" xmlns="http://www.w3.org/2000/svg" role="img"
+     aria-label="Apparatus diagram: two equally large blocks Q and P sit on a rough horizontal table, joined by a horizontal light spring that is in a stretched state; the right side of block P feels a horizontal pulling force F to the right, under which the two blocks move right together at constant velocity.">
+
+  <defs>
+    <!-- Pulling force arrow: same convention as the existing figures in this folder (7×7, scaled by strokeWidth), with the stroke in the moving-parts dark blue -->
+    <marker id="arrowForce" markerWidth="7" markerHeight="7" refX="5.5" refY="3.5"
+            orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L6,3.5 L0,7" fill="none" stroke="#075bff" stroke-width="1.2"/>
+    </marker>
+  </defs>
+
+  <!-- ═══════════════════ The rough horizontal table ═══════════════════ -->
+  <!-- front edge + ground hatching (21 strokes, spacing 34, from x = 138 to 818) -->
+  <path class="rigid" d="M110 260 H830"/>
+  <path class="hatch" d="M138 260 L118 286 M172 260 L152 286 M206 260 L186 286 M240 260 L220 286 M274 260 L254 286 M308 260 L288 286 M342 260 L322 286 M376 260 L356 286 M410 260 L390 286 M444 260 L424 286 M478 260 L458 286 M512 260 L492 286 M546 260 L526 286 M580 260 L560 286 M614 260 L594 286 M648 260 L628 286 M682 260 L662 286 M716 260 L696 286 M750 260 L730 286 M784 260 L764 286 M818 260 L798 286"/>
+
+  <!-- ═══════════════════ block Q (left) ═══════════════════ -->
+  <rect class="part" x="230" y="150" width="110" height="110" rx="2"/>
+  <text class="part-label" x="285" y="220" text-anchor="middle">Q</text>
+
+  <!-- ═══════════════════ the light spring (drawn as a zigzag) ═══════════════════ -->
+  <!-- The drawing follows the static-spring convention established in this repository: straight lead → half a fold into the zigzag → evenly spaced zigzag → half a fold back to the centre line → straight lead,
+       done in one stroke (not a stack of ellipses). That way the spring and the two blocks are one and the same line artwork of matching weight,
+       and the spacing of the zigzag naturally reads as "the spring is being stretched right now".
+       Measurements (x = 340 → 560, centre line y = 205, amplitude A = 34 → the zigzag reaches 171 / 239):
+         · end leads  340 → 358 and 542 → 560 (18 long, about 8% of the whole length, the same league as 15/220 in the reference figure)
+         · zigzag span 358 → 542 (184), 12 vertices: the first fold 10, then every fold 14.5 at equal spacing (the first fold takes 2/3 of the fold pitch,
+                      following the reference figure's slightly shorter first fold), the last fold 14.5 closing on the centre line
+         · vertex x   368 / 382.5 / 397 / 411.5 / 426 / 440.5 / 455 / 469.5 / 484 / 498.5 / 513 / 527.5
+                      alternating up and down (6 up, 6 down), the ends landing exactly on the facing sides of the two blocks with no gap -->
+  <path class="part" d="M340 205 H358 L368 171 L382.5 239 L397 171 L411.5 239 L426 171 L440.5 239 L455 171 L469.5 239 L484 171 L498.5 239 L513 171 L527.5 239 L542 205 H560"/>
+
+  <!-- ═══════════════════ block P (right, the same size as Q) ═══════════════════ -->
+  <rect class="part" x="560" y="150" width="110" height="110" rx="2"/>
+  <text class="part-label" x="615" y="220" text-anchor="middle">P</text>
+
+  <!-- ═══════════════════ the pulling force F: pulling P horizontally to the right ═══════════════════ -->
+  <path class="part" d="M670 205 H815" marker-end="url(#arrowForce)"/>
+  <text class="part-label" x="772" y="170" text-anchor="middle">F</text>
+
+</svg>
+
+</body>
+</html>

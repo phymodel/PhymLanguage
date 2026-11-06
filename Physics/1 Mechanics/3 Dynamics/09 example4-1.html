@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>A heavy object lowered slowly by two ropes P and Q: rope P makes an angle α with the vertical and rope Q an angle β</title>
+<style>
+  /* Figure-frame conventions: the same set as `09 example1.html`, `01 example1.html`–`01 example7.html` and
+     `11 example1-1.html` in this folder.
+     · The page **carries no background colour** — iOS / visionOS use a glass theme, so the figure must let the window material show through; painting a
+       solid plate inside the page makes the Markdown side recognise that "the author drew a plate" and stop injecting the canvas (MarkdownHtmlFigure.swift
+       `declaresOwnPageBackground`), and the two plates then fight each other. The original is blue lines on white; **do not copy that background** —
+       only the line artwork is carried over into this repository's palette.
+     · **Size comes from the aspect ratio** — the figure frame reads the aspect ratio of this file's viewBox (which must stay within 0.2–5).
+       The figure is an **obliquely opened cross** made of one heavy object, two ropes pulling out at angles and one vertical dashed line,
+       so the canvas is naturally squarish, and the two rope ends have to frame the vertical reference line above and below:
+       the measured bbox of the artwork is x = 311 → 756, y = 70 → 620 (445 × 550, ratio ≈ 0.81).
+       viewBox = 620 × 660 (x from 220 to 840, y from 15 to 675), leaving 91 / 84 units left and right and
+       55 units above and below — the artwork takes only 445 / 620 ≈ 72% of the canvas width and 550 / 660 ≈ 83% of its height,
+       so the figure is displayed at 0.72 and does not fill the glass panel. To make it smaller, keep widening the viewBox
+       (write the padding only in the viewBox, never touch any artwork coordinate), but do not exceed the ratio limit of 5 — with height 660
+       the viewBox width tops out at 3300.
+     · Colours (a division of labour among three colours — do not add a fourth):
+         the object itself .......................................... #ffb900 (the thing to be "taken down to the ground",
+                                                              as in the original: a physical object is drawn as a solid gold block,
+                                                              the same convention as "stop P" in `01 example4.html`,
+                                                              a "solid piece of the apparatus")
+         rope P / rope Q / the vertical reference dashed line / the arcs and the symbols α, β ....... #075bff (the constraints the problem gives and the geometric annotations)
+       What is to be read here is not "who moves and who does not" but "how far each rope opens away from the vertical" — the three directional lines
+       (P, vertical, Q) are the only protagonists here and share one blue; the object is merely their intersection, and a solid gold block
+       pinned on that intersection lets the reader find at once where the angles are measured and what is pulling.
+       The mistakes to avoid are the reverse: paint the object blue too and the intersection blurs into the three lines, so α and β no longer show which line they are measured to;
+       paint the ropes gold and the reader takes them for a fixed frame, while in this problem both ropes keep changing length
+       (the object is descending) — they are live constraints, not a frame.
+     · Fonts: P, Q, α, β are symbols from the problem and use Georgia / Times New Roman italic (consistent with `.sym` in this repository);
+       the size is written in each <text>'s font-size attribute, never in the class (or CSS would override the attribute).
+       The Greek letters α, β lead with Georgia and fall back to Times New Roman — both carry Greek glyphs, so nothing drops out. */
+
+  body {
+    background-color: transparent;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    overflow: hidden;
+  }
+  svg {
+    height: 100%;
+    width: auto;
+    max-width: 100%;
+  }
+  /* The object: a solid gold block (painted that way in the original), with a gold outline over a gold fill so the edge does not go soft */
+  .weight {
+    fill: #ffb900;
+    stroke: #ffb900;
+    stroke-width: 3;
+    stroke-linejoin: round;
+  }
+  /* The two ropes: straight lines pulled out at angles, with round ends, not competing with the edges of the block */
+  .rope {
+    fill: none;
+    stroke: #075bff;
+    stroke-width: 4.2;
+    stroke-linecap: round;
+  }
+  /* The vertical reference: it runs through the object, which interrupts it — dashed and solid above and below, the usual way of drawing "the vertical" */
+  .plumb {
+    fill: none;
+    stroke: #075bff;
+    stroke-width: 2.6;
+    stroke-dasharray: 11 9;
+    stroke-linecap: round;
+  }
+  /* The angle arcs: α is measured in the upper half (vertically up ↔ rope P) and β in the lower half (vertically down ↔ rope Q) */
+  .angle {
+    fill: none;
+    stroke: #075bff;
+    stroke-width: 2.8;
+    stroke-linecap: round;
+  }
+  /* Symbols (P / Q / α / β): italic, each in the colour of its own layer */
+  .sym {
+    font-family: Georgia, "Times New Roman", serif;
+    font-style: italic;
+    text-anchor: middle;
+  }
+  .sym-blue {
+    fill: #075bff;
+  }
+</style>
+</head>
+<body>
+
+<!-- Pairs with "Example 4" of `09 KineticEnergyTheorem.md` (2024 National New Curriculum Paper, Q 3-24):
+     one person high up controls rope P and another on the ground controls rope Q, and together they lower the object (m = 42 kg) **vertically and slowly**,
+     keeping it a certain distance from the wall of the building. The pose given is:
+       rope P makes an angle α = 37° with the vertical and rope Q an angle β = 53°.
+     Part (1) asks for the two tensions T_P, T_Q and part (2) for the total work the tensions do on the object.
+     So the figure needs only three things: **the direction of rope P, the direction of rope Q and the vertical** (which enclose α and β).
+     The two people and the wall are never drawn; the reason is under "Things the figure should not show" below.
+
+     Geometry (1 unit ≈ 1 layout point):
+       canvas          measured bbox of the artwork: x = 311 → 756, y = 70 → 620 (see "Size comes from the aspect ratio" in <style>)
+       intersection C        (492, 342) — the **lines of action** of both ropes and the vertical reference meet here.
+                    The object is drawn on C (rect x = 470 → 514, y = 314 → 370, a block 44 × 56 standing on end),
+                    so the gold block covers the intersection of the three lines and what the reader sees is "each rope pulling away from a corner of the block"
+                    — the same impression as the original, and exactly the common point of application a force analysis should take.
+       vertical reference    x = 492, y = 70 → 620; **drawn before the block**, so the block covers the stretch of dashes behind it
+        rope P        from the top edge of the block (471, 314) up and to the left at α = 37°, out to (311.5, 102.4)
+                    (direction vector (−sin37°, −cos37°) = (−0.6018, −0.7990))
+        rope Q        from the right edge of the block (514, 358.6) down and to the right at β = 53°, out to (755.5, 540.6)
+                    (direction vector (+sin53°, +cos53°) = (+0.7986, +0.6018))
+       ★ Both ropes **start at the boundary of the gold block** and never cross it: hiding the line of action inside the block is the conventional drawing,
+         and drawing them from C itself would lay blue on the gold face and cut the block in two.
+       the arc of α      centre C, radius 62: from "vertically up" (492, 280) round to the direction of rope P (454.7, 292.5)
+                    (62 units is just larger than the half-diagonal of the block, √(22² + 28²) ≈ 35.6, so the whole arc stays outside it)
+       the arc of β      centre C, radius 62: from "vertically down" (492, 404) round to the direction of rope Q (541.5, 379.3)
+       symbol positions     P (334, 224) — below and left of rope P, 20.8 units from it, not on the line
+                    Q (612, 508) — below and left of rope Q, 20.4 units from it
+                    α (458, 246) — inside the upper angle (16.2 units from rope P, 22.6 from the vertical dashed line)
+                    β (536, 444) — inside the lower angle (20.4 units from rope Q, 12.3 from the arc, 32.4 from the vertical dashed line)
+                    — the "distance from the rope" of all four symbols was tuned after measuring getBBox in the browser,
+                       so re-measure if the size or a rope moves (under 10 units reads as sitting on the line)
+       ★ Scale: **only the angles are quantitative here** (α = 37° and β = 53° are drawn strictly), and no length carries a dimension —
+         the only length in the problem is h = 10 m in part (2), and that is "the displacement of the descent", not the length of either rope run.
+         To change α or β later, recompute only the end points of P and Q and the ends of the two arcs; every other coordinate stays.
+
+     Things the figure does not show, and **should not** show:
+       · the two people's hands, the wall and the window sill: the problem states "one high up, one on the ground" only as a **given condition**,
+         and the solution uses "the two rope directions + slow (a = 0)" — nobody's height, stance or distance to the wall enters the equations.
+         A wall would suggest something false — that "the distance from the object to the wall" is a quantity, when it is a condition in words, not an element of the drawing.
+       · force arrows T_P, T_Q, mg: one arrow turns this "pose" figure into a free-body diagram and the reader skips the step "slow ⇒ zero net force"
+         and reads the answer straight off the arrows. The force analysis has its own figure ("analysing the forces on the object, as shown" in the solution).
+       · a velocity arrow for the object (slow descent ⇒ v ≈ 0): the operative word here is "slowly", and an arrow would contradict itself.
+       · the numeric angles 37°, 53° and h = 10 m: numbers belong to the text, and only symbols appear on the figure;
+         the problem states how symbols map to words, and repeating the numbers on the figure would mean editing two places.
+
+     The quantitative relations behind the reading (recorded here so a later edit can check them; they do not appear in the figure):
+       · "slowly" ⇒ the object is always in equilibrium and the net force is zero:
+           horizontal: T_P sinα = T_Q sinβ          (the horizontal components of the two ropes are equal and opposite, one left, one right)
+           vertical: T_P cosα = T_Q cosβ + mg     (rope P pulls up while rope Q and gravity both pull down)
+         ⇒ T_P = 1 200 N, T_Q = 900 N (with m = 42 kg, g = 10 m/s², sin37° = 0.6, cos37° = 0.8,
+            sin53° = 0.8, cos53° = 0.6). These two numbers are the answers in the solution and can be used to check the figure was not drawn backwards:
+            **α < β ⇒ rope P is steeper ⇒ T_P > T_Q** (1200 > 900). If P is drawn shallower than Q, the figure is wrong.
+       · part (2): as the object descends h slowly its kinetic energy does not change ⇒ mgh + W_rope = 0 ⇒ W_rope = −mgh = −4 200 J.
+         This is independent of the two angles — which is why the change in rope length never has to be known, and why the figure need not show any rope length. -->
+
+<svg viewBox="-400 15 1800 660" xmlns="http://www.w3.org/2000/svg" role="img"
+     aria-label="Pose diagram: at the centre is a gold block standing on end, with a vertical dashed line passing through it and drawn dashed above and below. A blue rope P pulls obliquely upward to the upper left from the block, and the angle between rope P and the upward vertical is labelled α; a blue rope Q pulls obliquely downward to the lower right from the block, and the angle between rope Q and the downward vertical is labelled β.">
+
+  <!-- ═══════════ the vertical reference: drawn first, interrupted by the gold block ═══════════ -->
+
+  <path class="plumb" d="M492 70 V620"/>
+
+  <!-- ═══════════ the object: drawn on the intersection of the three lines, covering it ═══════════ -->
+
+  <rect class="weight" x="470" y="314" width="44" height="56" rx="5"/>
+
+  <!-- ═══════════ the two ropes: each starting on a boundary of the gold block and pulled out at an angle ═══════════ -->
+
+  <path class="rope" d="M471 314 L311.5 102.4"/>
+  <path class="rope" d="M514 358.6 L755.5 540.6"/>
+
+  <!-- ═══════════ the arcs: α measured in the upper half, β in the lower half (radius 62, the whole arc outside the gold block) ═══════════ -->
+
+  <path class="angle" d="M492 280 A62 62 0 0 0 454.7 292.5"/>
+  <path class="angle" d="M492 404 A62 62 0 0 0 541.5 379.3"/>
+
+  <!-- ═══════════ symbols: P and Q follow their ropes, α and β each sit inside their own angle ═══════════ -->
+
+  <text class="sym sym-blue" x="334" y="224" font-size="42">P</text>
+  <text class="sym sym-blue" x="612" y="508" font-size="42">Q</text>
+  <text class="sym sym-blue" x="458" y="246" font-size="38">α</text>
+  <text class="sym sym-blue" x="536" y="444" font-size="38">β</text>
+
+</svg>
+
+</body>
+</html>

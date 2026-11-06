@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>A smooth long board of adjustable angle θ on an iron stand, with a small block sliding from Q to P</title>
+<style>
+  /* Figure-frame conventions: the same set as `01 example1.html` / `01 example2.html` / `01 example3.html`,
+     `11 example1-1.html` and `1 Kinematics/07 example1.html`.
+     · The page **carries no background colour** — iOS / visionOS use a glass theme, so the figure must let the window material show through; painting a
+       solid plate inside the page makes the Markdown side recognise that "the author drew a plate" and stop injecting the canvas (MarkdownHtmlFigure.swift
+       `declaresOwnPageBackground`), and the two plates then fight each other. The original figure is gold lines on black; **do not copy that background** —
+       only the line artwork is carried over into this repository's palette.
+     · **Size comes from the aspect ratio** — the figure frame reads the aspect ratio of this file's viewBox (which must stay within 0.2–5).
+       This figure is an **upright** apparatus (vertical rod + base + a board leaning on it), so the canvas is naturally close to square: the artwork spans
+       x = 100 → 543, y = 50 → 508 (getBBox measured in the browser), so the viewBox is 800 × 570 (ratio ≈ 1.40):
+       x runs from −78 to 722 (about 178 / 179 left and right) and y from −6 to 564 (about 56 / 56 above and below).
+       To make the figure smaller, keep widening the viewBox (write the padding only in the viewBox, never touch any artwork coordinate).
+     · Colours (a division of labour among three colours — do not add a fourth):
+         iron stand (vertical rod / base + base hatching / stop P / crossbar) ...... #ffb900 (the same
+                                                                  "support surface / axis" convention as `11 example1-1.html`)
+         smooth long board ........................................... #075bff (the same
+                                                                  "moving parts" convention as example1 / example3)
+         small block Q and its symbol Q ............................ #00eaff (the same cyan as the a–m graph lines of example1
+                                                                  and the P / Q letters of example2)
+         the arc of the angle θ and the symbol θ ................... #ffb900 (a geometric annotation, the same convention as the axis labels)
+       Gold = the fixed apparatus, dark blue = the board (the incline itself in this problem), cyan = the only moving part, the block.
+       The board rests on the crossbar and the rod passes the board, so the two are already drawn on top of each other at that spot; the block then sits right on that intersection,
+       and squeezing one more blue onto the board would leave nothing distinguishable, so only the block (with its symbol Q) is lifted to cyan.
+       A symbol sharing the colour of its own artwork is the rule laid down by example3 — you can see at a glance which letter means which thing.
+     · Fonts: P, Q, θ are symbols from the problem and use Georgia italic (consistent with `.part-label` in this repository);
+       "smooth long board", "crossbar" and "iron stand" are device names (not variables), set upright in the serif stack —
+       so they never follow the italic of the symbols. */
+
+  body {
+    background-color: transparent;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    overflow: hidden;
+  }
+  svg {
+    height: 100%;
+    width: auto;
+    max-width: 100%;
+  }
+  /* The rods and base of the iron stand: a single thick line is the front edge */
+  .rigid {
+    fill: none;
+    stroke: #ffb900;
+    stroke-width: 5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  /* Base hatching: the rough-surface mark, one step thinner so it does not compete with the front edge */
+  .hatch {
+    fill: none;
+    stroke: #ffb900;
+    stroke-width: 2.4;
+    stroke-linecap: round;
+  }
+  /* The long board: dark blue (the incline itself in this problem) */
+  .part {
+    fill: none;
+    stroke: #075bff;
+    stroke-width: 3.4;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  /* Small block Q: cyan. It is the only thing in the figure that moves, and it has to sit on the already crowded "board × rod" intersection,
+     where staying dark blue would blur it into the board; lifted to cyan, the release point can be found at a glance. */
+  .block {
+    fill: none;
+    stroke: #00eaff;
+    stroke-width: 3.4;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  /* The arc of the angle θ: a geometric annotation, one step thinner */
+  .angle-arc {
+    fill: none;
+    stroke: #ffb900;
+    stroke-width: 2.6;
+    stroke-linecap: round;
+  }
+  /* Leader lines for the device names: thin, in the colour of their own label, so they do not compete with the artwork */
+  .leader-rigid {
+    fill: none;
+    stroke: #ffb900;
+    stroke-width: 2;
+    stroke-linecap: round;
+  }
+  .leader-part {
+    fill: none;
+    stroke: #075bff;
+    stroke-width: 2;
+    stroke-linecap: round;
+  }
+  /* Symbols given by the problem, P (the stop) / Q (the block) / θ (the angle): italic */
+  .point-rigid {
+    fill: #ffb900;
+    font-family: Georgia, "Times New Roman", serif;
+    font-style: italic;
+    font-size: 36px;
+  }
+  .point-part {
+    fill: #ffb900;
+    font-family: Georgia, "Times New Roman", serif;
+    font-style: italic;
+    font-size: 36px;
+  }
+  .angle-name {
+    fill: #ffb900;
+    font-family: Georgia, "Times New Roman", serif;
+    font-style: italic;
+    font-size: 34px;
+  }
+  /* Device names (not variables): upright */
+  .device-rigid {
+    fill: #ffb900;
+    font-family: Georgia, "Times New Roman", serif;
+    font-style: normal;
+    font-size: 30px;
+  }
+  .device-part {
+    fill: #075bff;
+    font-family: Georgia, "Times New Roman", serif;
+    font-style: normal;
+    font-size: 30px;
+  }
+</style>
+</head>
+<body>
+
+<!-- Pairs with "Example 4" of `01 NewtonsSecondLaw.md` (2021 National Paper A, Q 2-14):
+     a horizontal crossbar is clamped on the vertical rod of an iron stand, and the lower end of a smooth long board presses against the stop P at the right end of the base while its upper part rests on the crossbar;
+     the height of the crossbar is adjustable ⇒ the angle θ between the board and the base is variable. A small block is released from rest at the point Q where the board meets the vertical rod,
+     slides along the board to P, and the question is how the sliding time t changes as θ grows from 30° to 60°.
+     The figure shows the apparatus at one intermediate value of θ — the problem gives one apparatus and one variable θ, with no second figure,
+     so neither the 30° nor the 60° configuration is drawn for the reader, and no concrete angle value appears in the figure.
+
+     Geometry of the apparatus (1 unit ≈ 1 layout point):
+       · vertical rod  x = 240, from y = 50 down to y = 460 (the top of the rod is higher than the upper end of the board, as in the original)
+       · base front edge  y = 460, x = 180 → 506 (extending past the vertical rod on both sides, as in the original)
+       · base hatching  11 strokes spaced 28 apart (x = 210 → 490), 16 × 26 strokes slanting down-left from the front edge
+       · stop P      a small vertical plate (498,430)–(506,460) standing at the far right of the base, 30 above it
+       · smooth long board  the upper surface passes through (497,450) and (143,96) — **slope 1, i.e. θ = 45° in the figure**;
+                    the board is 14 thick (the thickness lies to the lower left while the upper surface faces upper right — that is the face the block slides on, and the lower end of that face
+                    (497,450) presses exactly on the stop); its four corners are (497,450) → (143,96) → (133,106) → (487,460)
+                    The two lower corners fit exactly between the inner face of the stop (x = 498) and the base front edge (y = 460),
+                    which reads as "the lower end is placed at the stop P"; the upper end reaches 97 units to the left past the vertical rod
+                    (a board that "rests on the crossbar" must overhang its support and must not stop at the rod)
+       · crossbar    a small horizontal plate (210,213)–(240,222) reaching **left** 30 from the vertical rod, its top edge y = 213.
+                    Why to the left and not to the right: the lower face is y = x − 27, which at the rod (240,213) is tangent to the top edge of the crossbar;
+                    going left (x smaller) the lower face rises above 213, the whole crossbar lies below the lower face of the board, and it reads as
+                    "the board rests on the crossbar"; going right (x larger) the lower face drops below 213, the crossbar would float above the board's surface,
+                    could not support the board, and would look like a horizontal line unrelated to the board.
+       · block Q      a square of side 24 whose base lies on the upper surface of the board, its centre exactly at the "board × vertical rod" intersection
+                    (240,193): the problem says "released at the intersection Q", so the square should sit astride that point,
+                    not in the middle of the board and not on the rod
+       · angle θ      the arc takes its vertex at "the intersection of the board's lower face with the base front edge" (487,460), radius 90:
+                    the start (423,396) lies on the lower face of the board and the end (397,460) on the base front edge, sweeping 45°.
+                    **The vertex must be taken on the lower-face side** — the visible gap near P is bounded by "lower face + base";
+                    taking the upper surface (507,460) as the vertex would push a short stretch of the arc into the body of the board. The centre of the θ glyph must lie between the arc and the vertex
+                    and keep ≥ 9 units clear of the board face and of the base, otherwise the glyph sits on a line.
+
+     Things the figure does not show, and **should not** show:
+       · no numeric value of θ (30° / 60° are the limits offered in the options; putting them in the figure would turn them into given quantities).
+       · no acceleration, gravity-component or friction arrows: the whole reading point is the monotonicity of t(θ), and a pile of arrows in the figure would
+         suggest a free-body analysis is wanted on the spot; the problem gives the apparatus only, with no free-body diagram.
+       · no l label and no dimension line for "the board length from Q to P": the problem has neither quantity, and one extra stroke in the figure is one extra condition.
+
+     The quantitative relations behind the reading (recorded here so a later edit can check them; they do not appear in the figure):
+       · l ≡ the horizontal distance from P to the vertical rod = 498 − 240 = 258 (the stop is fixed, so l does not change with θ);
+         the sliding distance from Q to P = l / cos θ, which at θ = 45° is 258/0.7071 ≈ 365, exactly the board length from Q(240,193) to
+         the lower end of the board (497,450) in the figure ≈ 363.5 — the figure and the formula agree, and an edit must keep that correspondence.
+       · along the board: a = g sin θ (the board is smooth, no friction term); and l/cos θ = ½at²
+         ⇒ t = √( 4l / (g sin 2θ) )。
+       · as θ: 30° → 60°, 2θ goes 60° → 120°, and sin 2θ first increases (reaching 1 at 45°) then decreases ⇒ t first decreases then increases ⇒ D is correct.
+         Note that the extremum of t is at θ = 45°, not at either end of the given range — drawing θ near 45° in the figure shows exactly the extremal configuration,
+         which explains "both ends are slower than the middle" better than 30° or 60° would. -->
+
+<svg viewBox="-460 -6 1600 570" xmlns="http://www.w3.org/2000/svg" role="img"
+     aria-label="Apparatus diagram: an iron stand made of a vertical rod and a horizontal base, with a stop P standing at the right end of the base. The lower end of a smooth long board presses against the stop P and leans on the base; the board rises obliquely past the vertical rod and overhangs to the upper left, its upper part resting on a horizontal crossbar that reaches left from the vertical rod. The angle between the board and the base is θ. A small block Q rests at the intersection of the board and the vertical rod and will slide along the board towards P.">
+
+  <!-- ═══════════════════ the iron stand: vertical rod + base ═══════════════════ -->
+  <!-- the vertical rod: its top is higher than the upper end of the board (as in the original) and its bottom lands exactly on the base front edge -->
+  <path class="rigid" d="M240 50 V460"/>
+  <!-- base front edge: extending past the vertical rod on both sides -->
+  <path class="rigid" d="M180 460 H506"/>
+  <!-- base hatching: 11 strokes, spacing 28 -->
+  <path class="hatch" d="M210 460 L194 486 M238 460 L222 486 M266 460 L250 486 M294 460 L278 486 M322 460 L306 486 M350 460 L334 486 M378 460 L362 486 M406 460 L390 486 M434 460 L418 486 M462 460 L446 486 M490 460 L474 486"/>
+
+  <!-- stop P: the small vertical plate standing at the far right of the base (the lower end of the board presses on its inner face) -->
+  <rect class="rigid" x="498" y="430" width="8" height="30"/>
+
+  <!-- crossbar: a small horizontal plate clamped on the vertical rod and reaching left, its top edge tangent to the board's lower face at the rod -->
+  <rect class="rigid" x="210" y="213" width="30" height="9"/>
+
+  <!-- ═══════════════════ the smooth long board ═══════════════════ -->
+  <!-- upper surface: the 45° line y = x − 47, from the inner side of the stop (497,450) up-left to (143,96);
+       lower surface y = x − 27, from (487,460) on the base to (133,106); the two ends are closed to form a board 14 thick -->
+  <polygon class="part" points="497,450 143,96 133,106 487,460"/>
+
+  <!-- ═══════════════════ block Q: astride the "board × vertical rod" intersection ═══════════════════ -->
+  <!-- translate(240 193) rotate(-135): first move the local origin to the intersection (240,193), then rotate the square about **that origin** so that it lies along
+       the board face — local +x runs up-left along the board and local +y along the normal of its upper surface; the base of the rect at y = 0 therefore lands exactly on
+       the upper surface of the board. **The rect's x is the signed distance from the midpoint of its base to the intersection Q**: at x = −12 the midpoint of the base lies exactly on
+       Q (240,193) (the configuration of "released at the intersection Q"); this version takes x = −160, i.e. the square has slid down the board to a point below Q
+       148 units down. To move it, change this one number only and leave y alone (any non-zero y takes the square off the board face).
+       Note that it must **not** be written as rotate(-135 240 193): that (240,193) is a point of the parent coordinate system, while the rect's local coordinates sit near the origin,
+       so one rotation about it would fling the square below the canvas (the first version of this figure fell into exactly that trap and the square ended up under the base). -->
+  <g transform="translate(240 193) rotate(-135)">
+    <rect class="block" x="-160" y="3" width="24" height="24" rx="1"/>
+  </g>
+
+  <!-- ═══════════════════ the angle θ ═══════════════════ -->
+  <!-- vertex (487,460) = the intersection of the board's lower face with the base front edge; r = 90, sweeping from the lower face (423,396) to the base (397,460).
+       The vertex can only be taken on the lower-face side: the visible gap near P is bounded by "lower face + base", and taking the upper surface as the vertex would push the arc into the body of the board. -->
+  <path class="angle-arc" d="M450 426 A30 30 0 0 0 436 460"/>
+  <text class="angle-name" x="415" y="440" text-anchor="middle">θ</text>
+
+  <!-- ═══════════════════ symbols and device names ═══════════════════ -->
+  <!-- P: the stop, written to its right at the height of the base -->
+  <text class="point-rigid" x="520" y="458">P</text>
+
+  <!-- Q: the block, written at the upper right of the square, clear of the board face and the leader line -->
+  <text class="point-part" x="255" y="188">Q</text>
+
+  <!-- smooth long board: at the upper right, with the leader line landing on (301,254) of the board -->
+  <text class="device-part" x="335" y="148">smooth long board</text>
+  <path class="leader-part" d="M334 156 L301 254"/>
+
+  <!-- crossbar: to the left of the rod, with the leader line landing on the left end of the crossbar -->
+  <text class="device-rigid" x="165" y="262" text-anchor="end">crossbar</text>
+  <path class="leader-rigid" d="M170 252 L211 219"/>
+
+  <!-- iron stand: written in the gap left of the vertical rod, with the leader line running down onto the front edge.
+       Not written directly under the base: the base hatching would fight it for room and the leader line would have to cut across a row of strokes. -->
+  <text class="device-rigid" x="190" y="412" text-anchor="end">iron stand</text>
+  <path class="leader-rigid" d="M194 416 L205 456"/>
+
+</svg>
+
+</body>
+</html>

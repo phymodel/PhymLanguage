@@ -1,0 +1,111 @@
+
+Behavior()
+.name("tap_SquareTextRun")
+.trigger{
+    Tap(){
+        objects: ["SquareTextRun"]
+    }
+}
+.actions{
+
+    Hide(0){
+        objects: ["SquareTextRun"]
+        motionType: .scale
+        duration: 0.5
+    }
+    // ---------- id=1：播放前瞬时复位（并行） ----------
+    //   范围选择 + index：等价于原来的 9 个逐球 Transform，公式与成员 .position(...) 同源
+    //   （duration=0 时 translation 是绝对位姿，故必须与声明位置保持一致）
+    Transform(1){
+        objects: ["SquareSphere[0..4]"],
+        translation: [-0.5 + 0.4/pi * ((index >= 1 ? 1 : 0) + (index >= 2 ? 1/3 : 0) + (index >= 3 ? 1/5 : 0) + (index >= 4 ? 1/7 : 0)), 1.5, 0.0],
+        duration: 0
+    }
+    Transform(1){
+        objects: ["SquareCircle[0..3]"],
+        translation: [-0.5 + 0.4/pi * ((index >= 1 ? 1 : 0) + (index >= 2 ? 1/3 : 0) + (index >= 3 ? 1/5 : 0) + (index >= 4 ? 1/7 : 0)), 1.5, 0.0],
+        duration: 0
+    }
+
+    // ---------- id=2：动画（并行） ----------
+    Orbit(2){
+        objects: ["SquareSphere1, SquareCircle1"],
+        center: "SquareSphere0",
+        angle: 90,
+        alignPath: false,
+        clockwise: true,
+        revolutions: 1,
+        duration: 12
+    }
+    Orbit(2){
+        objects: ["SquareSphere2, SquareCircle2"],
+        center: "SquareSphere1",
+        angle: 90,
+        alignPath: false,
+        clockwise: true,
+        revolutions: 3,
+        duration: 12
+    }
+    Orbit(2){
+        objects: ["SquareSphere3, SquareCircle3"],
+        center: "SquareSphere2",
+        angle: 90,
+        alignPath: false,
+        clockwise: true,
+        revolutions: 5,
+        duration: 12
+    }
+    Orbit(2){
+        objects: ["SquareSphere4"],
+        center: "SquareSphere3",
+        angle: 90,
+        alignPath: false,
+        clockwise: true,
+        revolutions: 7,
+        duration: 12
+    }
+    MoveAlong(2){
+        objects: ["SquareSphereSine"],
+        path: "SquareSineY",
+        tStart: 2*pi,
+        tEnd: 0.0,
+        alignPath: false,
+        clockwise: false,
+        iterations: 1,
+        duration: 12.0
+    }
+    EntityMesh(2){
+        objects: "SquareSineWave",
+        y: "(40/pi)*(sin(t+phase)+sin(3*(t+phase))/3+sin(5*(t+phase))/5+sin(7*(t+phase))/7)",
+        phase: "[2*pi, 0]",
+        duration: 12.0
+    }
+    Show(3){
+        objects: ["SquareTextRun"]
+        motionType: .pop
+        duration: 0.5
+    }
+}
+
+Behavior()
+.name("tap_SquareTextBack")
+.trigger{
+    Tap(){
+        objects: ["SquareTextBack"]
+    }
+}
+.actions{
+    Emphasize(1){
+        objects: ["SquareTextBack"]
+        motionType: .pop
+        duration: 0.4
+    }
+    Speak(2){
+        object: "SquareTextBack"
+        text: "返回傅立叶级数。"
+    }
+    OpenScene(3){
+        scene: "1 傅立叶级数.md"
+        duration: 0
+    }
+}

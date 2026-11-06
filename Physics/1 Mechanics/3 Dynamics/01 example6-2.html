@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Force analysis at the midpoint of the string: the two tensions F_T combined against the constant force F (θ fixed by 3L/10 and L/2)</title>
+<style>
+  /* Figure-frame conventions: the same set as `01 example1.html`–`01 example5.html`, `01 example6-1.html`,
+     `11 example1-1.html` and `1 Kinematics/07 example1.html`.
+     · The page **carries no background colour** — iOS / visionOS use a glass theme, so the figure must let the window material show through; painting a
+       solid plate inside the page makes the Markdown side recognise that "the author drew a plate" and stop injecting the canvas (MarkdownHtmlFigure.swift
+       `declaresOwnPageBackground`), and the two plates then fight each other. The original figure is gold lines on black; **do not copy that background** —
+       only the line artwork is carried over into this repository's palette.
+     · **Size comes from the aspect ratio** — the figure frame reads the aspect ratio of this file's viewBox (which must stay within 0.2–5).
+       The composition here is a wide one: two balls + one outward F + one resultant rhombus pointing left,
+       and the artwork spans x = −15 → 553, y = 106 → 349 (getBBox measured in the browser: 568.1 × 243.6),
+       so the viewBox is 660 × 300 (ratio = 2.2, the same league as 2.26 in `01 example5.html`):
+       x from −61 to 599 (46 / 45.9 left and right), y from 78 to 378 (27.9 / 28.5 above and below).
+       The centroid of the artwork (269.1, 227.7) differs from the viewBox centre (269, 228) by only 0.1 / 0.3, so the figure looks centred.
+       To make the figure smaller, keep widening the viewBox (write the padding only in the viewBox, never touch any artwork coordinate),
+       but do not exceed the ratio limit of 5 — with height 300 the viewBox width tops out at 1500.
+     · Colours (a division of labour among three colours — do not add a fourth):
+         the two balls / the symbol m / the constant force F and its arrow ..... #075bff (the same
+                                                          "two balls / force arrow F" of `01 example6-1.html`: what the problem gives,
+                                                          moving parts, always dark blue, with symbols sharing their artwork's colour)
+         the two tensions F_T and the rhombus they add up to .... #00eaff (the same line as "s₁–s₅" in `01 example5.html`
+                                                          and "the a–m graph lines" in `01 example1.html`: cyan = what is obtained by measurement
+                                                          or analysis, not the apparatus the problem gives. F_T and the relation
+                                                          "2F_T cos θ = F" are both derived)
+         the dashed line joining the balls / the 3L/10 and L/2 dimension lines / the arc of θ ... #ffb900 (the same
+         the extension of F's line of action left of O (axis of symmetry) ........  "arc and symbol of the angle θ" of `01 example4.html`: a geometric annotation follows the axis-label convention)
+       This figure has **no** second use for gold and no fourth colour: there is neither another quantity nor a second axis to identify.
+     · Fonts: m, F, F_T, θ, L are symbols from the problem or the analysis and use Georgia italic (consistent with `.part-label` in this repository);
+       the digits inside fractions (3 / 10 / 1 / 2) use upright Times New Roman — Georgia's figures are **old-style figures**
+       (3 4 5 7 9 descend below the baseline), so 3/10 would look as if it had dropped (as with s₃ / s₄ in `01 example5.html`).
+     · Fractions are always **stacked by hand** (numerator / rule / denominator as three elements), never as `½` or a slanted `3/10`: the two lengths here
+       are the two numbers in sin θ = (3L/10) / (L/2), and a slanted form would blur with the division sign. */
+
+  body {
+    background-color: transparent;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    overflow: hidden;
+  }
+  svg {
+    height: 100%;
+    width: auto;
+    max-width: 100%;
+  }
+  /* The balls / the constant force F: the dark blue of problem-given apparatus and problem-given force */
+  .part {
+    fill: none;
+    stroke: #075bff;
+    stroke-width: 3.4;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  /* The tensions F_T and the resultant rhombus: the cyan of derived results, kept apart from the problem's blue */
+  .derived {
+    fill: none;
+    stroke: #00eaff;
+    stroke-width: 3.4;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  /* The auxiliary sides and diagonal of the rhombus: one step thinner and dashed, so they do not compete with the two real arrows */
+  .derived-aid {
+    fill: none;
+    stroke: #00eaff;
+    stroke-width: 2.4;
+    stroke-dasharray: 9 7;
+    stroke-linecap: round;
+  }
+  /* Solid geometric annotations (dimension lines, the extension of the line of centres): the thinnest */
+  .geo {
+    fill: none;
+    stroke: #ffb900;
+    stroke-width: 2.2;
+    stroke-linecap: round;
+  }
+  /* Dashed geometric annotations (the line joining the balls, the extension of F's line of action, the horizontal lead from the ball centre) */
+  .geo-dashed {
+    fill: none;
+    stroke: #ffb900;
+    stroke-width: 2.2;
+    stroke-dasharray: 8 6;
+    stroke-linecap: round;
+  }
+  /* The arc of the angle θ: a geometric annotation, on the gold convention */
+  .angle-arc {
+    fill: none;
+    stroke: #ffb900;
+    stroke-width: 2.6;
+    stroke-linecap: round;
+  }
+  /* Symbols m, F: given by the problem, in the colour of their artwork */
+  .part-label {
+    fill: #075bff;
+    font-family: Georgia, "Times New Roman", serif;
+    font-style: italic;
+    font-size: 34px;
+  }
+  /* The symbol F_T: a derived quantity, cyan; the subscript T is upright and one size smaller (symbols upright, variables italic) */
+  .tension-label {
+    fill: #00eaff;
+    font-family: Georgia, "Times New Roman", serif;
+    font-style: italic;
+    font-size: 30px;
+  }
+  .tension-label .sub {
+    font-family: "Times New Roman", Georgia, serif;
+    font-style: normal;
+    font-size: 21px;
+  }
+  /* The symbol θ and the L in the dimensions: geometric annotations, gold italic */
+  .geo-label {
+    fill: #ffb900;
+    font-family: Georgia, "Times New Roman", serif;
+    font-style: italic;
+    font-size: 34px;
+  }
+  .dim-var {
+    fill: #ffb900;
+    font-family: Georgia, "Times New Roman", serif;
+    font-style: italic;
+    font-size: 26px;
+  }
+  /* Numerator / denominator of the fractions: digits use upright Times */
+  .dim-num {
+    fill: #ffb900;
+    font-family: "Times New Roman", Georgia, serif;
+    font-style: normal;
+    font-size: 26px;
+  }
+</style>
+</head>
+<body>
+
+<!-- The **second figure of the analysis** of "Example 6" in `01 NewtonsSecondLaw.md` (2022 National Paper B, Q 2-15):
+     `01 example6-1.html` draws the apparatus of the problem (top view, the configuration with the balls 3L/5 apart), while this figure draws the first step of the analysis —
+     **the force analysis at the midpoint O of the string**, and how θ follows from the two lengths 3L/10 and L/2.
+
+     Recap of the problem: each end of a pair of equal light half-strings (L in total) is tied to a small ball of mass m, and a constant force F acts horizontally at the midpoint of the string, perpendicular to the line joining the balls;
+     what is the acceleration of each ball when they are 3L/5 apart (answer a = 5F/8m).
+
+     This figure settles one thing only: the midpoint is massless ⇒ it is in equilibrium under three forces ⇒ F = 2 F_T cos θ ⇒ F_T = 5F/8 ⇒ a = F_T/m.
+
+     Geometry (1 unit ≈ 1 layout point; the string length L is taken as 300, as in `01 example6-1.html`):
+       · string midpoint O (= the point of action of F) ......... (330, 240)
+       · upper / lower ball centre .............. (210, 150) / (210, 330), r = 15
+                                        **Equally large** — both balls have mass m (the same treatment of "equal mass" as
+                                        in example6-1 / example3)
+       · the two halves of the string (which are also the two F_T arrows)  from the ball-surface points (222, 159) / (222, 321) meeting at O; the directions (±0.8, ±0.6)
+                                        are antisymmetric, (330−222) : (240−159) = 108 : 81 = 4 : 3
+                                        ⇒ tan θ = 3/4、sin θ = 3/5、cos θ = 4/5，θ ≈ 36.87°
+       · 3L/10 ....................... distance from each ball to the line of action of F (y = 240) = 330 − 240 = 90 = 3/10 × 300 ✓
+                                        the dimension line is drawn at x = 50, with end bars matched to "the height of the ball centres y = 150" and "the line of action of F
+                                        y = 240"; a gold dashed lead runs from outside the ball surface up to the upper bar (stopping before
+                                        the m symbol), so that the reader knows which height that bar measures
+       · L/2 ......................... half string = from the ball centre to O = 150 = 1/2 × 300 ✓, with the symbol written at the ball end,
+                                        so that it does not overlap the F_T symbol written near O
+       · constant force F ...................... from O (330, 240) horizontally right to (546, 240), arrow tip pointing right;
+                                        the symbol F is written below and right of the tip at (540, 288) — the same placement convention as 6-1
+
+     **All force arrows share one scale.** With 135 units ≙ F_T = 5F/8:
+       · each F_T arrow is 135 long (drawn exactly to the ball surface: half string 150 − ball radius 15), pointing along the string towards a ball —
+         which is the direction of "the pull of the string on the midpoint O" (the force acts at O, the arrow is drawn outwards from O and its head lands at the ball end,
+         the same convention as a textbook free-body diagram of a knot; it is **not** "the string pushing the ball", the force on the ball points the other way);
+       · the constant force F arrow is 216 = 135 × 8/5 long ✓ (the same scale);
+       · the diagonal of the rhombus = 2 F_T cos θ = F is also 216 long, **equal in length** to the F arrow and opposite to it —
+         so measuring on the figure shows that "the two tensions together exactly balance F", with no numbers needed.
+       Note that the force scale and the length scale are **two different things**: the half string is 150 units and the F_T arrow is 135 units,
+       two unrelated numbers on one line — an edit must not check one against the other.
+       The rhombus is only a construction aid (its sides S₁→R and S₂→R are each one arrow translated, with R = (114, 240)),
+       dashed and one step thinner, of the same colour family as the real arrows, so it is obvious which two are real forces and which two are translations.
+
+     Things the figure does not show, and **should not** show:
+       · no table, ground or hatching: for the same reason as 6-1, this is a top view (the line of sight is perpendicular to the table), and a front edge would be read as a side view
+         with gravity downwards and the balls pressing on a board. The top view is stated by the aria-label and this note.
+       · no free-body arrows on the balls (each ball feels only one F_T along the string) and no acceleration arrows: the analysis needs the equilibrium at the midpoint,
+         and drawing the forces on the balls too would put six arrows of two groups on one figure and blur every ratio.
+       · no numeric value of θ, no F_T = 5F/8 and no a = 5F/8m: the numbers are derived, and on the figure they would become
+         "conditions given by the figure" (the same reason `01 example4.html` writes no 30° / 60°).
+       · no 3L/5 (the separation of the balls): that quantity belongs to the apparatus figure 6-1, while this figure measures only "half of it, down to the line of action of F",
+         and the same 90 has a different purpose on each figure — drawn together they would read as two ways of labelling one quantity.
+
+     The quantitative relations behind the reading (recorded here so a later edit can check them; they do not appear in the figure):
+       · sin θ = (3L/10) / (L/2) = (90) / (150) = 3/5 ⇒ θ ≈ 36.87°，cos θ = 4/5
+       · the midpoint (massless) along F: F = 2 F_T cos θ = 2 F_T · (4/5) ⇒ F_T = 5F/8
+       · each ball feels only the string tension (no second force in the smooth horizontal plane) and its acceleration points along the string towards the midpoint: a = F_T/m = 5F/(8m) ⇒ A is correct
+       · consistency check: the component of each acceleration along F is a cos θ = (5F/8m)(4/5) = F/(2m),
+         exactly the F/(2m) obtained by treating the two balls as one body; equal half strings and equal masses ⇒ the left–right symmetry on the figure and "the two accelerations are equal" are the same statement. -->
+
+<svg viewBox="-300 78 1200 300" xmlns="http://www.w3.org/2000/svg" role="img"
+     aria-label="Top-view force analysis: two small balls of equal mass, each labelled m, one above the other, with a light string pulled into a V at the middle by a constant force F; each half of the string carries a tension arrow labelled F with subscript T, pointing along the string towards its ball. The parallelogram of the two tensions is completed with dashed lines, and its diagonal runs horizontally to the left with the same length as the rightward constant force F, showing that F equals the sum of the components of the two tensions along F. The angle between the string and the direction of F is labelled θ, the distance from a ball centre to the line of action of F is labelled 3L/10, and a half string is labelled L/2.">
+
+  <defs>
+    <!-- Each of the two forces needs its own arrow (the arc of θ carries none): the geometry follows the same convention as example6-1 / example1
+         (7×7, scaled by strokeWidth), with the stroke in the colour of its arrow -->
+    <marker id="arrowForce" markerWidth="7" markerHeight="7" refX="5.5" refY="3.5"
+            orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L6,3.5 L0,7" fill="none" stroke="#075bff" stroke-width="1.2"/>
+    </marker>
+    <marker id="arrowTension" markerWidth="7" markerHeight="7" refX="5.5" refY="3.5"
+            orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L6,3.5 L0,7" fill="none" stroke="#00eaff" stroke-width="1.2"/>
+    </marker>
+  </defs>
+
+  <!-- ═══════════════════ geometry: the line joining the balls (strictly perpendicular to F) ═══════════════════ -->
+  <!-- Drawn only in the gap between the balls (stopping at the surfaces 165 / 315, one radius clear), never through a ball;
+       both balls lie on the vertical line x = 210 ⇒ the perpendicularity to F reads at a glance and needs no right-angle mark -->
+  <path class="geo-dashed" d="M210 165 V315"/>
+
+  <!-- ═══════════════════ geometry: the 3L/10 dimension line ═══════════════════ -->
+  <!-- Upper lead: from outside the ball surface up to the upper bar (stopping at its right end 60, not overlapping the bar),
+       showing that the upper bar measures the height of the ball centre; nothing else runs along y = 150 (the string is at y ≥ 159
+       and the rhombus sides at y ≥ 159) — it stops only at the m symbol (158 → 188) without entering the glyph -->
+  <path class="geo-dashed" d="M150 150 H60"/>
+  <!-- The dimension line itself: x = 50, measuring the vertical distance from y = 150 (ball-centre height) to y = 240 (the line of action of F) = 90 = 3L/10 -->
+  <path class="geo" d="M50 150 V240"/>
+  <!-- the end bars -->
+  <path class="geo" d="M40 150 H60 M40 240 H60"/>
+  <!-- The fraction 3/10 L: stacked to the left of the dimension line (the line is at x = 50, the right edge of the symbol at 41.7, 8.3 clear) -->
+  <text class="dim-num" x="0" y="187" text-anchor="middle">3</text>
+  <path class="geo" d="M-15 199 H15"/>
+  <text class="dim-num" x="0" y="229" text-anchor="middle">10</text>
+  <text class="dim-var" x="26" y="208">L</text>
+
+  <!-- ═══════════════════ geometry: the extension of F's line of action left of O (axis of symmetry) ═══════════════════ -->
+  <!-- From the right end of the lower bar (64) to the vertex R of the rhombus (114): first, it gives the arc of θ somewhere to stand; second, it ties the height y = 240
+       to the dimension line; and third, it follows the same convention as the axis of symmetry in 6-1 (a short gold dashed stretch left of A).
+       Further right (114 → 330) it becomes the diagonal of the rhombus, taken over by the cyan dashes — the colour changes hands at R,
+       reminding the reader that the left stretch is geometry and the right stretch is a derived result -->
+  <path class="geo-dashed" d="M64 240 H114"/>
+
+  <!-- ═══════════════════ the analysis: the rhombus of the two tensions ═══════════════════ -->
+  <!-- The two sides: translate one arrow to the tail of the other, R = S₁ + (O→S₂) = (114, 240);
+       each side is 135 long, equal to a real arrow, so the rhombus is oblique (not a square) with apex angle 2θ -->
+  <path class="derived-aid" d="M222 159 L114 240 L222 321"/>
+  <!-- The diagonal: O → R, horizontal to the left, length 216 = 2 · 135 · cos θ = the length of the constant force F -->
+  <path class="derived-aid" d="M330 240 H114"/>
+
+  <!-- ═══════════════════ geometry: the angle θ ═══════════════════ -->
+  <!-- vertex O (330,240), r = 70: the start (260,240) lies on the diagonal (the line of action of F)
+       and the end (274,198) on the upper half of the string, sweeping arctan(3/4) ≈ 36.87° -->
+  <path class="angle-arc" d="M260 240 A70 70 0 0 1 274 198"/>
+  <!-- The centre of the θ glyph lies in the gap bounded by the diagonal, the upper string and the arc: along the bisector direction (−0.949, −0.315),
+       ≈ 95 from the vertex (outside the arc radius 70), touching none of the three sides — measured bbox in the browser (230.6, 190.9, 18.7, 38.7):
+       9.1 from the upper string, 11.3 from the arc of θ, 10.5 from the diagonal (the line of action of F) and 20.6 from the line joining the balls.
+       The wedge is only 36.87° wide: moving the glyph towards the string would hit it, and moving it down would land on the line of action of F -->
+  <!-- Two more symbols hang outside the upper string, "L/2" and "F_T": the former at the ball end, 9.6 from the string at its closest,
+       the latter at the O end, 10.5 from it — they share the line by splitting along it and never overlap (measured bboxes do not intersect) -->
+  <text class="geo-label" x="240" y="222" text-anchor="middle">θ</text>
+
+  <!-- ═══════════════════ the apparatus: the two balls (equally large) ═══════════════════ -->
+  <circle class="part" cx="210" cy="150" r="15"/>
+  <circle class="part" cx="210" cy="330" r="15"/>
+  <!-- The symbol m: written to the left of each ball, vertically centred, in the ball's colour, with its right end 7 units clear of the ball surface -->
+  <text class="part-label" x="188" y="162" text-anchor="end">m</text>
+  <text class="part-label" x="188" y="342" text-anchor="end">m</text>
+
+  <!-- ═══════════════════ the analysis: the two tensions F_T ═══════════════════ -->
+  <!-- From O along the upper / lower halves of the string to the ball surfaces (135 = half string 150 − ball radius 15), with the tips landing on the surfaces:
+       this is the direction of the pull of the string on O. Equal lengths ⇒ left–right symmetry on the figure ⇒ consistent with "the two masses are equal" -->
+  <path class="derived" d="M330 240 L222 159" marker-end="url(#arrowTension)"/>
+  <path class="derived" d="M330 240 L222 321" marker-end="url(#arrowTension)"/>
+  <!-- The symbol F_T is written outside the O end of each arrow (above the string for the upper one, below it for the lower one),
+       on a different line from the L/2 symbol near the ball end, so they never overlap -->
+  <text class="tension-label" x="318" y="206">F<tspan class="sub" dy="7">T</tspan></text>
+  <text class="tension-label" x="318" y="286">F<tspan class="sub" dy="7">T</tspan></text>
+
+  <!-- ═══════════════════ geometry: the half-string length L/2 ═══════════════════ -->
+  <!-- The fraction ½L is stacked on the ball side of the upper string, kept clear of the F_T symbol (7.8 horizontally, 22 vertically);
+       no dimension line is drawn for it — what it measures is that very stretch of string (S₁ → O, length 150 = L/2),
+       and a parallel pair of lines would only cover the string. The nearest element to the string is the denominator "2" (measured 9.6), the numerator and the L at 43 / 46 -->
+  <text class="dim-num" x="268" y="129" text-anchor="middle">1</text>
+  <path class="geo" d="M254 141 H282"/>
+  <text class="dim-num" x="268" y="171" text-anchor="middle">2</text>
+  <text class="dim-var" x="294" y="150">L</text>
+
+  <!-- ═══════════════════ the constant force F: acting horizontally to the right at the midpoint of the string ═══════════════════ -->
+  <!-- Length 216 = 135 × 8/5, equal to the diagonal of the rhombus ⇒ "the resultant of the two tensions exactly balances F" reads directly off the figure.
+       Drawn from O (the problem says "acts at the midpoint of the light string", so it starts at the fold rather than pulling from a ball) -->
+  <path class="part" d="M330 240 H546" marker-end="url(#arrowForce)"/>
+  <text class="part-label" x="540" y="288" text-anchor="middle">F</text>
+
+</svg>
+
+</body>
+</html>

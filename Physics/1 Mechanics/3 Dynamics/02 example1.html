@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The spring dynamometer inside the elevator (its pointer and an enlarged view of the reading)</title>
+<style>
+  /* Figure-frame conventions: the same set as `01 example1.html`–`01 example7.html`, `11 example1-1.html` and
+     `1 Kinematics/07 example1.html`.
+     · The page **carries no background colour** — iOS / visionOS use a glass theme, so the figure must let the window material show through; painting a
+       solid plate inside the page makes the Markdown side recognise that "the author drew a plate" and stop injecting the canvas (MarkdownHtmlFigure.swift
+       `declaresOwnPageBackground`), and the two plates then fight each other. The original is glowing line artwork on black; **do not copy that background** —
+       only the line artwork is carried over into this repository's palette.
+     · **Size comes from the aspect ratio** — the figure frame reads the aspect ratio of this file's viewBox (which must stay within 0.2–5).
+       This figure is "one upright dynamometer + one enlarged view of the reading at the upper right"; the artwork spans
+       x = 138 → 980 (the left side of the dynamometer casing at 138, the right side of the magnifier ellipse at 980) and y = 49 → 730 (the top of the ring to the bottom of the block),
+       which is nearly square (842 × 681 ≈ 1.24), while the figures in this repository's notes sit around 1.4; so the viewBox is 1156 × 797
+       (ratio = 1.450, the same league as 1.398 in `01 example6-1.html`):
+       x from −19 to 1137 (157 / 157 left and right), y from −9 to 788 (58 / 58 above and below).
+       The centroid of the artwork (559, 389.5) coincides exactly with the viewBox centre (559, 389.5).
+       To make the figure smaller, keep widening the viewBox (write the padding only in the viewBox, never touch any artwork coordinate),
+       but do not exceed the ratio limit of 5 — with height 797 the viewBox width tops out at 3985.
+     · Colours (three colours — do not add a fourth):
+         dynamometer casing / suspension ring / scale lines and tick values / the unit N / the hook / the suspended block ...... #075bff (dark blue,
+                                                        the same as "block P" in `01 example1.html` and
+                                                        "the car" in `01 example7.html`: what the figure shows
+                                                        is always dark blue hollow line artwork)
+         the pointer (the same one in the main figure and in the enlarged view) .......... #00eaff (cyan).
+                                                        In this repository cyan means "a quantity obtained by measurement or analysis"
+                                                        (the a–m graph lines of example1, s₁–s₅ of example5,
+                                                        the x–v curve of example7); here "which tick the reading falls on"
+                                                        is the one measured quantity, so the pointer shares its colour.
+         the magnifier ellipse + the leader from the pointer to it .......... #ffb900 (gold),
+                                                        the same as "the arc of the angle θ" in `01 example4.html` and
+                                                        "dimension lines and scales" in example7: explanatory ruler marks
+                                                        are always gold and never compete with the solid lines.
+     · Fonts: tick values and the unit N are always **upright** (Times New Roman lining figures, as with `.tick-num` in example7);
+       this figure has no physical-quantity symbols, so the Georgia italic tier is not used.
+     ★ **The reading must not appear on the figure** — the question is literally "the reading is ___ N", and printing 5.0 on the figure would print the answer.
+       The enlarged view gives only 4 and 6, with the pointer exactly between them; the reading is for the student to identify. */
+  body {
+    background-color: transparent;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    overflow: hidden;
+  }
+  svg {
+    height: 100%;
+    width: auto;
+    max-width: 100%;
+  }
+  /* Solid objects (casing, ring, hook, block): one dark blue for hollow line artwork */
+  .device {
+    fill: none;
+    stroke: #075bff;
+    stroke-width: 3.4;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  /* The vertical line down the middle of the scale plate: one clean line, with the subdivisions growing out on both sides and never through it */
+  .scale-line {
+    fill: none;
+    stroke: #075bff;
+    stroke-width: 3;
+    stroke-linecap: round;
+  }
+  /* Numbered ticks (long) and the 0.5 N subdivisions (short) */
+  .tick-long {
+    fill: none;
+    stroke: #075bff;
+    stroke-width: 3;
+    stroke-linecap: round;
+  }
+  .tick-fine {
+    fill: none;
+    stroke: #075bff;
+    stroke-width: 2.2;
+    stroke-linecap: round;
+  }
+  /* Tick values: upright, lining figures */
+  .num {
+    fill: #075bff;
+    font-family: "Times New Roman", Georgia, serif;
+    font-style: normal;
+    font-size: 26px;
+  }
+  /* The unit N: the same face as the tick values, one size smaller, and it must not sit on the 0 below */
+  .unit {
+    fill: #075bff;
+    font-family: "Times New Roman", Georgia, serif;
+    font-style: normal;
+    font-size: 24px;
+  }
+  /* Tick values in the enlarged view: the same face, with a larger size because the whole enlarged view is scaled 3.75 times */
+  .num-lg {
+    fill: #075bff;
+    font-family: "Times New Roman", Georgia, serif;
+    font-style: normal;
+    font-size: 36px;
+  }
+  /* The pointer: one bright line across the scale plus a diamond at its centre. The main figure and the enlarged view show the same pointer, so there is only this one style */
+  .pointer {
+    fill: none;
+    stroke: #00eaff;
+    stroke-width: 3.6;
+    stroke-linecap: round;
+  }
+  .pointer-dot {
+    fill: #00eaff;
+    stroke: none;
+  }
+  /* The enlarged-reading view: the ellipse frame and the leader, gold, hollow, one step thinner */
+  .zoom {
+    fill: none;
+    stroke: #ffb900;
+    stroke-width: 3.4;
+  }
+  .leader {
+    fill: none;
+    stroke: #ffb900;
+    stroke-width: 2.6;
+    stroke-linecap: round;
+  }
+</style>
+</head>
+<body>
+
+<!-- Pairs with "Example 1" of `02 OverweightAndWeightlessness.md` (2024 National Paper A, Q 3-22): a spring dynamometer hangs inside an elevator with
+     an object on its lower end. While the elevator is at rest the pointer reading is the weight of the object (read 5.0 N); while it moves upward the reading becomes 4.5 N ⇒ weightlessness,
+     a = 1.0 m/s². The figure shows only the at-rest reading; 4.5 N comes from the text, so no second pointer is drawn.
+
+     Geometry (1 unit ≈ 1 layout point):
+       dynamometer axis   x = 200 (ring, casing, scale line, hook and block share this centre line)
+       ring         centre (200, 64), r = 15; the stem (200, 79) → (200, 96)
+       casing         rounded rectangle x = 138 → 262, y = 96 → 596, rx = 18 (124 wide, enough for two columns of tick values)
+       scale line     x = 200, y = 156 → 556
+       ★ Range 0–10 N ↔ y = 156 → 556, i.e. **1 N = 40 units**, y(F) = 156 + 40·F.
+         **Subdivision 0.5 N** (as in the original: between 4 and 6 there are only the three subdivisions 4.5 / 5.0 / 5.5, four steps,
+         and the pointer sits exactly on the 5.0 step) ⇒ adjacent ticks are 20 units apart, which does not crowd:
+           the numbered 0 / 2 / 4 / 6 / 8 / 10: long ticks, left x = 178→198, right x = 202→222
+           the remaining 0.5 N steps (including 1 / 3 / 5 / 7 / 9 and the odd multiples of 0.5): short ticks, left x = 186→198, right x = 202→214
+         ★ Only the **numbered steps** are lengthened — in the original a 1 N tick is as long as a 0.5 N tick,
+           and only the numbered 2 N steps are lengthened; do not lengthen whole newtons on your own, or 4 to 6 would look like it had two extra steps.
+       ★ Why the reading is enlarged: on the main figure one 0.5 N step is only 20 units, a thumbnail; the enlarged view at the right puts 4 → 6 N
+         at 150 units/N (a 3.75-times blow-up, 75 units per step), so which step the pointer sits on is obvious
+         ⇒ 5.0 N (the question asks the reading, so the figure gives only 4 and 6, not the answer).
+       tick values   0 / 2 / 4 / 6 / 8 / 10 in two symmetric columns: left column text-anchor=end at x = 172;
+                    right column start at x = 228; baseline = that tick's y + 9 (half the x-height of a 26 px glyph, for optical centring)
+       unit N        left (172, 124) end, right (228, 124) start — 22 units above the "0" and 11 units below the top of the casing
+       pointer (main)  the bright line at y = 356 (= 5 N), x = 178 → 222; diamond centre (200, 356), half-diagonal 11.
+                    5 N is itself a short tick and the pointer sits exactly on it ⇒ pointer and tick are the same place, not two different stories
+       hook         the stem (200, 596) → (200, 644); the hook is a **3/4 circle**: centre (200, 664), r = 20,
+                    drawn clockwise 270° from directly above (200, 644) to the leftmost point (180, 664),
+                    leaving a 90° opening facing upper left (left end at 180° ↔ top at 270°). The tip of the stem joins the start of the arc exactly —
+                    ★ The hook must leave a quarter-circle opening: drawn as a 330° ring it stops looking like a hook and looks like a suspension ring, and nothing can hang on it
+       block         rectangle x = 178 → 222, y = 684 → 730 (44 × 46), its top edge tangent to the lowest point of the hook at y = 684
+       — the top edge of the block must be tangent to the bottom of the hook: a gap reads as "a block floating in mid air", an overlap as "a pin through the hook",
+          and only tangency reads as "hanging on the hook".
+       enlarged view   ellipse centre (760, 330), rx = 220, ry = 210 (y from 120 to 540, comparable to the height of the dynamometer)
+                    scale line x = 760, y = 150 → 510
+                    range 4 → 6 N ↔ y = 180 → 480, i.e. **1 N = 150 units**, y(F) = 180 + 150·(F − 4)
+                    ticks: one per 0.5 N, five in all — 4 (180) / 4.5 (255) / 5 (330) / 5.5 (405) / 6 (480);
+                          the numbered 4 and 6 are long (left 700→746, right 774→820) and the three in between are short (left 718→746, right 774→802).
+                          **Between 4 and 6 there are only three subdivisions** — that is exactly what the original has, so do not fill it in at 0.2 N
+                    tick values: 4 → left (688, 192) end, right (832, 192) start; 6 → left (688, 492), right (832, 492)
+                    pointer: the bright line at y = 330 (= 5 N) runs across the whole scale plate, x = 700 → 820, diamond centre (760, 330), half-diagonal 15
+                          on the scale line — the pointer sits exactly on the step between 4.5 and 5.5
+       leader       from the right end of the main pointer (226, 356) to the leftmost point of the ellipse (538, 332): both ends lie at "the height of the pointer",
+                    so it is obvious that this is the row being enlarged
+
+     Three traps to avoid when drawing this (each cost a revision):
+       ① the tick lengths on either side of the centre line must not reach the tick-value columns — an early version drew whole-newton ticks 26 long and poked into the right column;
+       ② never write "5.0" in the enlarged view: the point of the question is the reading, and writing it is the answer; give only 4 and 6 and put the pointer in the middle;
+       ③ **the subdivision is 0.5 N, not 0.2 N** — an early version was drawn at 0.2 N, cramming 9 ticks between 4 and 6,
+          which does not match the original (it has exactly five: 4 / 4.5 / 5.0 / 5.5 / 6). Count before changing it back. -->
+
+<svg viewBox="-400 -9 1800 797" xmlns="http://www.w3.org/2000/svg">
+
+  <!-- ═══════════ left: the spring dynamometer in the elevator (main figure, range 0–10 N, 1 N = 40 units) ═══════════ -->
+  <g>
+    <!-- suspension ring + stem -->
+    <circle class="device" cx="200" cy="64" r="15"/>
+    <path class="device" d="M200 79 V96"/>
+
+    <!-- casing -->
+    <rect class="device" x="138" y="96" width="124" height="500" rx="18"/>
+
+    <!-- scale line (one clean line, the ticks on either side never pass through it) -->
+    <path class="scale-line" d="M200 156 V556"/>
+
+    <!-- The 0.5 N subdivisions: 15 of them, y = 156 + 20k (the integers 0, 2, 4, …, 10 are left to the long ticks).
+         The subdivision is 0.5 N — as in the original: between 4 and 6 there are only the three subdivisions 4.5 / 5.0 / 5.5, four steps. -->
+    <path class="tick-fine" d="M186 176.0 H198 M202 176.0 H214 M186 196.0 H198 M202 196.0 H214 M186 216.0 H198 M202 216.0 H214 M186 256.0 H198 M202 256.0 H214 M186 276.0 H198 M202 276.0 H214 M186 296.0 H198 M202 296.0 H214 M186 336.0 H198 M202 336.0 H214 M186 356.0 H198 M202 356.0 H214 M186 376.0 H198 M202 376.0 H214 M186 416.0 H198 M202 416.0 H214 M186 436.0 H198 M202 436.0 H214 M186 456.0 H198 M202 456.0 H214 M186 496.0 H198 M202 496.0 H214 M186 516.0 H198 M202 516.0 H214 M186 536.0 H198 M202 536.0 H214"/>
+
+    <!-- Only the numbered ticks 0 / 2 / 4 / 6 / 8 / 10 are lengthened (y = 156 + 80k).
+         In the original, 1 / 3 / 5 / 7 / 9 are as long as the 0.5 N ticks, so do not lengthen them -->
+    <path class="tick-long" d="M178 156.0 H198 M202 156.0 H222 M178 236.0 H198 M202 236.0 H222 M178 316.0 H198 M202 316.0 H222 M178 396.0 H198 M202 396.0 H222 M178 476.0 H198 M202 476.0 H222 M178 556.0 H198 M202 556.0 H222"/>
+
+    <!-- The unit N (once per tick column; the top of the range, 10 N, is written at the bottom) -->
+    <text class="unit" x="172" y="124" text-anchor="end">N</text>
+    <text class="unit" x="228" y="124">N</text>
+
+    <!-- tick values 0 / 2 / 4 / 6 / 8 / 10: two symmetric columns -->
+    <text class="num" x="172" y="165" text-anchor="end">0</text>
+    <text class="num" x="228" y="165">0</text>
+    <text class="num" x="172" y="245" text-anchor="end">2</text>
+    <text class="num" x="228" y="245">2</text>
+    <text class="num" x="172" y="325" text-anchor="end">4</text>
+    <text class="num" x="228" y="325">4</text>
+    <text class="num" x="172" y="405" text-anchor="end">6</text>
+    <text class="num" x="228" y="405">6</text>
+    <text class="num" x="172" y="485" text-anchor="end">8</text>
+    <text class="num" x="228" y="485">8</text>
+    <text class="num" x="172" y="565" text-anchor="end">10</text>
+    <text class="num" x="228" y="565">10</text>
+
+    <!-- The pointer: at rest it stands on the 5 N row (the reading is identified from the enlarged view; no number is written on the figure) -->
+    <path class="pointer" d="M178 356 H222"/>
+    <path class="pointer-dot" d="M200 345 L211 356 L200 367 L189 356 Z"/>
+
+    <!-- stem + hook: a 3/4 circle (270° arc with a 90° opening towards upper left), the stem joining directly above the start of the arc -->
+    <path class="device" d="M200 596 V644"/>
+    <path class="device" d="M200 644 A20 20 0 1 1 180 664"/>
+
+    <!-- the suspended block: its top edge is tangent to the bottom of the hook at y = 684 -->
+    <rect class="device" x="178" y="684" width="44" height="46" rx="3"/>
+  </g>
+
+  <!-- ═══════════ right: the enlarged reading (the 4 → 6 N detail, 1 N = 150 units, so one 0.5 N step is legible) ═══════════ -->
+  <g>
+    <!-- leader: from the right end of the main pointer to the leftmost point of the ellipse -->
+    <path class="leader" d="M226 356 L538 332"/>
+
+    <!-- the magnifier ellipse -->
+    <ellipse class="zoom" cx="760" cy="330" rx="220" ry="210"/>
+
+    <!-- scale line -->
+    <path class="scale-line" d="M760 150 V510"/>
+
+    <!-- the 0.5 N subdivisions (4.5 / 5.0 / 5.5, three of them), 28 long; long ticks only for the numbered 4 and 6 -->
+    <path class="tick-fine" d="M718 255 H746 M774 255 H802 M718 330 H746 M774 330 H802 M718 405 H746 M774 405 H802"/>
+
+    <!-- the numbered ticks 4 / 6, 46 long (y = 180 / 480), the same rule as the main figure's "only the numbered steps are lengthened" -->
+    <path class="tick-long" d="M700 180 H746 M774 180 H820 M700 480 H746 M774 480 H820"/>
+
+    <!-- tick values: only 4 and 6, in two symmetric columns -->
+    <text class="num-lg" x="688" y="192" text-anchor="end">4</text>
+    <text class="num-lg" x="832" y="192">4</text>
+    <text class="num-lg" x="688" y="492" text-anchor="end">6</text>
+    <text class="num-lg" x="832" y="492">6</text>
+
+    <!-- The same pointer: the diamond exactly fills the gap in the middle of the 5 N tick, and the line crosses the whole scale plate -->
+    <path class="pointer" d="M700 330 H820"/>
+    <path class="pointer-dot" d="M760 315 L775 330 L760 345 L745 330 Z"/>
+  </g>
+
+</svg>
+</body>
+</html>

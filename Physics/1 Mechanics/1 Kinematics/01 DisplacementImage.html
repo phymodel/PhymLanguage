@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Displacement in a one-dimensional coordinate system</title>
+<style>
+  /* Figure-frame conventions: the same set as `01 VelocityImage.html`, `03 VelocityTime.html` and
+     `Physics/8 SolidStatePhysics/HCP_ca.html`.
+     · The page **carries no background colour** — iOS / visionOS use a glass theme, so the figure must let
+       the window material show through. Painting a solid plate inside the page has two consequences: an
+       off-colour block sits on the glass panel; and as soon as the Markdown side recognises that "the author
+       drew a plate" it stops injecting the canvas (MarkdownHtmlFigure.swift `declaresOwnPageBackground`),
+       so the two plates fight each other.
+     · **Size comes from the aspect ratio** — the figure frame takes its shape from this document's own viewBox
+       ratio (the Markdown side reads that ratio and requires it to lie between 0.2 and 5; outside that range
+       the frame degenerates to a fixed height of 240 px), the svg fills the height of the frame, and whatever
+       is left at the sides is empty space. This figure has viewBox = 1200 × 380 → ratio 3.16.
+     · Colours follow the existing figures of this folder: axes / ticks / annotations #ffb900; the displacement
+       (the directed segment) and its end points #0865ff. **Variables** such as `Δx` and `x` are set in Georgia
+       italic, while **numbers / units / operators** (`.up`) are set upright, and the Latin words of the caption
+       get their own Georgia upright tier (Georgia has no CJK glyphs; nothing is stuffed into an italic element
+       here, so the browser cannot fake-slant it). */
+  body {
+    background-color: transparent;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    overflow: hidden;
+  }
+  svg {
+    height: 100%;
+    width: auto;
+    max-width: 100%;
+  }
+  .axis {
+    fill: none;
+    stroke: #ffb900;
+    stroke-width: 2.2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .guide {
+    fill: none;
+    stroke: #ffb900;
+    stroke-width: 1.4;
+    stroke-dasharray: 7 7;
+    stroke-linecap: round;
+  }
+  .disp {
+    fill: none;
+    stroke: #0865ff;
+    stroke-width: 3.2;
+    stroke-linecap: round;
+  }
+  .point {
+    fill: #0865ff;
+  }
+  .label {
+    fill: #ffb900;
+    font-family: Georgia, "Times New Roman", serif;
+    font-style: italic;
+    font-size: 27px;
+  }
+  /* In the formula only **variables** are italic; numbers, units (m) and operators are upright — the same rule as
+     `\text{ m}` in `$x_2 - x_1 = 2 - 10 = -8\text{ m}$` of `01 VelocityFormula.md`.
+     This must come after `.label`: both are single class selectors, so the later one wins (placed before, it would
+     be overridden by `.label`). */
+  .up {
+    font-style: normal;
+  }
+  /* Caption words (English): upright Georgia serif, the same tier as `.car-state` / `.proc` of
+     `3 Dynamics/01 example7.html`; a variable inside the caption uses `.var` (Georgia italic). */
+  .caption {
+    fill: #ffb900;
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 24px;
+  }
+  .var {
+    font-style: italic;
+  }
+  /* Tick values are **upright** (digits are never slanted) — italic is reserved for mathematical symbols such as
+     Δx and x₁.
+     ⚠️ The font must have **lining figures**: Georgia uses **old-style / text figures** — 0 1 2 sit at x-height,
+     6 8 have ascenders that reach higher, and 3 4 5 7 9 have descenders that drop below the baseline. The
+     baselines of the 13 tick values are in fact identical (all written at y = 346), but on a number line, where
+     one reads the values by the tops of the digits, Georgia makes 3 4 5 7 9 look low and 6 8 look high, which is
+     exactly the "1 to 12 are not on one horizontal line" complaint. Georgia has **no** lnum feature and
+     `font-variant-numeric: lining-nums` does nothing for it, so the only cure is another font: the digits of Times
+     New Roman are lining, so it goes in front of Georgia (Georgia stays as the fallback). The same trap applies to
+     the "2 m − 10 m = −8 m" of the formula (see `.up`). */
+  .tick-num {
+    fill: #ffb900;
+    font-family: "Times New Roman", Georgia, serif;
+    font-style: normal;
+    font-size: 22px;
+  }
+  .tick-num-key {
+    fill: #0865ff;
+    font-family: "Times New Roman", Georgia, serif;
+    font-style: normal;
+    font-size: 22px;
+  }
+</style>
+</head>
+<body>
+
+<!-- Pairs with Example 1 of `01 VelocityFormula.md`: in a one-dimensional coordinate system a body moves from
+     x₁ = 10 m to x₂ = 2 m, and Δx is asked for.
+     Scale of the one-dimensional number line: x(m) = 120 + 70·m — 120 is the pixel position of the origin O and
+     1 m = 70 units.
+       · x₁ = 10 m → 820; x₂ = 2 m → 260; the interval of 1 m is 70 on the figure, so the reading comes from the
+         ticks and not from an estimate.
+     Four layers from top to bottom (all inside the 1200 × 380 canvas, with at least 45 / 44 of margin around it):
+       y = 44   caption (one sentence saying what the figure is about)
+       y = 100  Δx = x₂ − x₁ = 2 m − 10 m = −8 m (written directly above the displacement arrow)
+       y = 134  the directed segment of the displacement: 820 → 260, the arrow lands at the 260 end — it points
+                **along the negative direction of the x axis**
+       y = 170  the magnitude / direction note (the displacement is a vector, a bare number is not enough)
+       y = 134→288  two dashed leader lines: they line the two ends of the arrow up with the two points on the axis
+                (stopping at the top of the tick marks)
+       y = 248  the names of the two positions (written on the outside of the leaders, so neither overlays the other)
+       y = 300  the number line itself (the axis line; the tick marks stand only **above** it, y = 288→300, and never
+                cross it; the tick values are at y = 346)
+     The two ends of the arrow are deliberately drawn "directly above x₁ and x₂", so a leader line lands exactly on an
+     end point and the reader is left with no "from where to where" ambiguity. -->
+<svg viewBox="0 0 1200 380" role="img"
+     aria-label="Displacement in a one-dimensional coordinate system: the number line is in metres with the positive direction to the right, the initial position is at x one equals 10 metres and the final position at x two equals 2 metres; the directed segment from the initial position to the final position represents the displacement, its length corresponds to 8 metres, its direction is the negative direction of the x axis, and the displacement equals the final position minus the initial position, that is 2 metres minus 10 metres equals minus 8 metres">
+  <defs>
+    <marker id="arrowOrange" markerWidth="7" markerHeight="7" refX="5.5" refY="3.5" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L6,3.5 L0,7" fill="none" stroke="#ffb900" stroke-width="1.2"/>
+    </marker>
+    <marker id="arrowBlue" markerWidth="7" markerHeight="7" refX="5.5" refY="3.5" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L6,3.5 L0,7" fill="none" stroke="#0865ff" stroke-width="1.2"/>
+    </marker>
+  </defs>
+
+  <!-- Caption -->
+  <text class="caption" x="540" y="44" text-anchor="middle">Displacement is the directed segment from the initial to the final position</text>
+
+  <!-- Displacement formula: written directly above the arrow, so the reading matches the segment one to one -->
+  <text class="label" x="540" y="100" text-anchor="middle">Δx<tspan class="up"> = </tspan>x<tspan class="up" dy="7" font-size="19">2</tspan><tspan class="up" dy="-7"> − </tspan>x<tspan class="up" dy="7" font-size="19">1</tspan><tspan class="up" dy="-7"> = 2 m − 10 m = −8 m</tspan></text>
+
+  <!-- The directed segment of the displacement: from x₁ (10 m) to x₂ (2 m), the arrow landing at the left end =
+       along the negative direction of the x axis -->
+  <path class="disp" d="M820 134 H260" marker-end="url(#arrowBlue)"/>
+
+  <!-- A vector still misses half of itself: the direction -->
+  <text class="caption" x="540" y="170" text-anchor="middle">Magnitude 8 m, directed along the negative <tspan class="var">x</tspan> axis</text>
+
+  <!-- Leader lines: line the two ends of the directed segment up with the two positions on the number line -->
+  <path class="guide" d="M820 134 V288"/>
+  <path class="guide" d="M260 134 V288"/>
+
+  <!-- Names of the two positions: written outside the leaders, so neither overlays the other -->
+  <text class="caption" font-size="22" x="238" y="248" text-anchor="end">final position <tspan class="var">x</tspan><tspan dy="6" font-size="17">2</tspan><tspan dy="-6"> = 2 m</tspan></text>
+  <text class="caption" font-size="22" x="842" y="248">initial position <tspan class="var">x</tspan><tspan dy="6" font-size="17">1</tspan><tspan dy="-6"> = 10 m</tspan></text>
+
+  <!-- Number line: 0 → 12 m, one tick per metre (120 + 70·m).
+       The tick marks grow only **above** the axis line (y = 288 → 300): the axis itself stays a clean straight line,
+       the ticks never cut through it, and the lower half never reaches down to the tick values at y = 346 (a cross
+       tick would chop the number line into cells). -->
+  <path class="axis" d="M120 288V300M190 288V300M260 288V300M330 288V300M400 288V300M470 288V300M540 288V300M610 288V300M680 288V300M750 288V300M820 288V300M890 288V300M960 288V300"/>
+  <path class="axis" d="M45 300 H1145" marker-end="url(#arrowOrange)"/>
+  <!-- Axis name and unit: written **below** the axis arrow (right-aligned with the tip of the arrow) — textbook
+       convention; do not hang it above the arrow -->
+  <text class="label" x="1145" y="346" text-anchor="end">x<tspan class="up"> /m</tspan></text>
+  <text class="label" x="108" y="346" text-anchor="end">O</text>
+  <text class="tick-num" text-anchor="middle">
+    <tspan x="120" y="346">0</tspan>
+    <tspan x="190" y="346">1</tspan>
+    <tspan class="tick-num-key" x="260" y="346">2</tspan>
+    <tspan x="330" y="346">3</tspan>
+    <tspan x="400" y="346">4</tspan>
+    <tspan x="470" y="346">5</tspan>
+    <tspan x="540" y="346">6</tspan>
+    <tspan x="610" y="346">7</tspan>
+    <tspan x="680" y="346">8</tspan>
+    <tspan x="750" y="346">9</tspan>
+    <tspan class="tick-num-key" x="820" y="346">10</tspan>
+    <tspan x="890" y="346">11</tspan>
+    <tspan x="960" y="346">12</tspan>
+  </text>
+
+  <!-- The two position points: drawn last, covering the leader lines and the ticks, so the reading points are
+       visible at a glance -->
+  <circle class="point" cx="820" cy="300" r="9"/>
+  <circle class="point" cx="260" cy="300" r="9"/>
+</svg>
+
+</body>
+</html>

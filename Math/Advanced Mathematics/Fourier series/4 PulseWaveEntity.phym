@@ -1,0 +1,77 @@
+Group()
+.name("PulseFourierPhasors")
+.entity[
+    "PulseSphere[i]",
+    "PulseSphere8",
+    "PulseCircle[i]"
+]
+.position(x: 0, y: 0, z: 0)
+
+Repeat(8) { i in
+    CAD()
+    .name("PulseSphere[i]")
+    .mesh(commands: [
+        "DEF sphere = SOLID_FORMULA 0,0,0 (x/0.006)^2+(y/0.006)^2+(z/0.006)^2-1=0",
+    ])
+    .material(red: 0.67, green: 0.32, blue: 1.0, opacity: 1, roughness: 0.5, metallic: 0.8)
+    .position(x: -0.5 + 0.1/pi * ((i >= 1 ? 1 : 0) + (i >= 2 ? 1 : 0) + (i >= 3 ? 1 : 0) + (i >= 4 ? 1 : 0) + (i >= 5 ? 1 : 0) + (i >= 6 ? 1 : 0) + (i >= 7 ? 1 : 0)), y: 1.5, z: 0.0)
+}
+CAD()
+.name("PulseSphere8")
+.mesh(commands: [
+    "DEF sphere = SOLID_FORMULA 0,0,0 (x/0.006)^2+(y/0.006)^2+(z/0.006)^2-1=0",
+])
+.material(red: 0.67, green: 0.32, blue: 1.0, opacity: 1, roughness: 0.5, metallic: 0.8)
+.position(x: -0.5 + 0.1/pi * 8, y: 1.5, z: 0.0)
+.trail(style: .line, lifeSpan: 3.0, size: 0.002, color: [1.0, 0.1, 0.2], opacity: 0.8)
+Repeat(8) { i in
+    Graph()
+    .name("PulseCircle[i]")
+    .mesh(x: "10/pi*cos(t)", y: "10/pi*sin(t)", z: "0", t: "[0,2*pi]", radius: 0.002)
+    .material(red: 0.46, green: 0.2, blue: 1.0, opacity: 1, roughness: 0.5, metallic: 0.8)
+    .position(x: -0.5 + 0.1/pi * ((i >= 1 ? 1 : 0) + (i >= 2 ? 1 : 0) + (i >= 3 ? 1 : 0) + (i >= 4 ? 1 : 0) + (i >= 5 ? 1 : 0) + (i >= 6 ? 1 : 0) + (i >= 7 ? 1 : 0)), y: 1.5, z: 0.0)
+}
+
+Line()
+.name("PulseConnectLine")
+.mesh(radius: 0.002, through: ["PulseSphere0", "PulseSphere1", "PulseSphere2", "PulseSphere3", "PulseSphere4", "PulseSphere5", "PulseSphere6", "PulseSphere7", "PulseSphere8"])
+.material(red: 0.1, green: 0.9, blue: 0.1, opacity: 1, roughness: 0.5, metallic: 0.8)
+
+Line()
+.name("PulseConnectLinePen")
+.mesh(radius: 0.002, through: ["PulseSphere8", "PulseSpherePen"])
+.material(red: 0.8, green: 0.1, blue: 0.1, opacity: 1.0, roughness: 0.5, metallic: 0.8)
+
+CAD()
+.name("PulseSpherePen")
+.mesh(commands: [
+    "DEF sphere = SOLID_FORMULA 0,0,0 (x/0.01)^2+(y/0.01)^2+(z/0.01)^2-1=0",
+])
+.material(red: 0.9, green: 0.1, blue: 0.1, opacity: 1, roughness: 0.5, metallic: 0.8)
+.position(x: 0, y: 1.5, z: 0.0)
+
+Graph()
+.name("PulseSineY")
+.mesh(x: "0", y: "(10/pi)*(sin(t)+sin(2*t)+sin(3*t)+sin(4*t)+sin(5*t)+sin(6*t)+sin(7*t)+sin(8*t))", z: "0", t: "[0,2*pi]", radius: 0.005)
+.material(red: 0.46, green: 0.2, blue: 1.0, opacity: 0.0, roughness: 0.5, metallic: 0.8)
+.position(x: 0.0, y: 1.5, z: 0.0)
+
+Graph()
+.name("PulseSineWave")
+.mesh(x: "10t", y: "(10/pi)*(sin(t)+sin(2*t)+sin(3*t)+sin(4*t)+sin(5*t)+sin(6*t)+sin(7*t)+sin(8*t))", z: "0", t: "[0,2*pi]", radius: 0.005)
+.material(red: 0.46, green: 0.2, blue: 1.0, opacity: 1, roughness: 0.5, metallic: 0.8)
+.position(x: 0.0, y: 1.5, z: 0.0)
+
+Text()
+.name("PulseTextRun")
+.mesh(text: "运行", extrusionDepth: 0.02, fontSize: 0.1)
+.physic(mass: 0.1, staticFriction: 0.9, dynamicFriction: 0.75, restitution: 0.22, mode: .kinematic)
+.material(red: 0.2, green: 0.8, blue: 1.0, opacity: 1, roughness: 0.5, metallic: 0.8)
+.position(x: -0.2, y: 1.7, z: 0.0)
+
+Text()
+.name("PulseTextBack")
+.mesh(text: "返回", extrusionDepth: 0.02, fontSize: 0.1)
+.physic(mass: 0.1, staticFriction: 0.9, dynamicFriction: 0.75, restitution: 0.22, mode: .kinematic)
+.material(red: 0.2, green: 0.8, blue: 1.0, opacity: 1, roughness: 0.5, metallic: 0.8)
+.position(x: 0.2, y: 1.7, z: 0.0)

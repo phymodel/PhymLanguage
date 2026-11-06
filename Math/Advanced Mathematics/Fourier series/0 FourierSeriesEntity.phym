@@ -1,0 +1,49 @@
+
+Latex()
+.name("text12")
+.mesh(width: 1.2, text: ¥¥
+<center>
+<span style="font-size: 50px;"> 
+$$
+\begin{aligned}
+a_0 &= \frac{1}{\pi}\int_{-\pi}^{\pi} f(x)\,dx \\[4pt]
+a_n &= \frac{1}{\pi}\int_{-\pi}^{\pi} f(x)\cos nx\,dx \quad (n\ge 1)\\[4pt]
+b_n &= \frac{1}{\pi}\int_{-\pi}^{\pi} f(x)\sin nx\,dx \quad (n\ge 1)\\[4pt]
+f(x) &=\frac{a_0}{2}+\sum_{n=1}^{\infty}(a_n\cos\,nx+b_n\sin\,nx),\,x\in C
+\end{aligned}
+$$
+</span>
+</center>
+¥¥
+)
+.material(red: 1.0, green: 1.0, blue: 1.0, opacity: 0.999, roughness: 0.5, metallic: 0.8)
+.physic(mass: 0.1, staticFriction: 0.9, dynamicFriction: 0.75, restitution: 0.22, mode: .kinematic)
+.position(x: 0.0, y: 1.5, z: 0.0)
+
+Text()
+.name("Sawtooth")
+.mesh(text: "锯齿波", extrusionDepth: 0.02, fontSize: 0.1)
+.physic(mass: 0.1, staticFriction: 0.9, dynamicFriction: 0.75, restitution: 0.22, mode: .kinematic)
+.material(red: 0.2, green: 0.8, blue: 1.0, opacity: 1, roughness: 0.5, metallic: 0.8)
+.position(x: -0.6, y: 1.0, z: 0.0)
+
+Text()
+.name("Square")
+.mesh(text: "方波", extrusionDepth: 0.02, fontSize: 0.1)
+.physic(mass: 0.1, staticFriction: 0.9, dynamicFriction: 0.75, restitution: 0.22, mode: .kinematic)
+.material(red: 0.2, green: 0.8, blue: 1.0, opacity: 1, roughness: 0.5, metallic: 0.8)
+.position(x: -0.2, y: 1.0, z: 0.0)
+
+Text()
+.name("Triangle")
+.mesh(text: "三角波", extrusionDepth: 0.02, fontSize: 0.1)
+.physic(mass: 0.1, staticFriction: 0.9, dynamicFriction: 0.75, restitution: 0.22, mode: .kinematic)
+.material(red: 0.2, green: 0.8, blue: 1.0, opacity: 1, roughness: 0.5, metallic: 0.8)
+.position(x: 0.2, y: 1.0, z: 0.0)
+
+Text()
+.name("Pulse")
+.mesh(text: "脉冲波", extrusionDepth: 0.02, fontSize: 0.1)
+.physic(mass: 0.1, staticFriction: 0.9, dynamicFriction: 0.75, restitution: 0.22, mode: .kinematic)
+.material(red: 0.2, green: 0.8, blue: 1.0, opacity: 1, roughness: 0.5, metallic: 0.8)
+.position(x: 0.6, y: 1.0, z: 0.0)

@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The work W done by the pulling force against the coordinate x of the object (two straight segments, bending at x = 2 m)</title>
+<style>
+  /* Figure-frame conventions: the same set as `09 example1.html`, `09 example4-1.html`, `09 example4-2.html`,
+     `01 example1.html`–`01 example7.html` and `11 example1-1.html` in this folder.
+     · The page **carries no background colour** — iOS / visionOS use a glass theme, so the figure must let the window material show through; painting a
+       solid plate inside the page makes the Markdown side recognise that "the author drew a plate" and stop injecting the canvas (MarkdownHtmlFigure.swift
+       `declaresOwnPageBackground`), and the two plates then fight each other. The original (gold axes and a blue line on black) — **do not copy that background**,
+       only the line artwork is carried over into this repository's palette.
+     · **Size comes from the aspect ratio** — the figure frame reads the aspect ratio of this file's viewBox (which must stay within 0.2–5).
+       This is a single W–x graph, naturally squarish: the measured bbox of the artwork is x 88 → 872, y 62 → 575
+       (784 × 513, ratio ≈ 1.53), essentially the 1.50 of the original.
+       viewBox = 20 20 920 600 (x from 20 to 940, y from 20 to 620; 68 units left and right,
+       42 / 45 units above and below) — the artwork takes only 784 / 920 ≈ 85% of the canvas width, so the figure is displayed at 0.85.
+       To make the figure smaller, keep widening the viewBox (write the padding only in the viewBox, never touch any artwork coordinate),
+       but do not exceed the ratio limit of 5 — with height 600 the viewBox width tops out at 3000.
+     · Colours (two colours, using the same swatches as the existing figures here — do not add a third):
+         axes / arrows / dashed grid / all ticks and axis labels ................ #ffb900
+         the W–x polyline ............................................. #075bff
+       Gold = "the frame the problem gives" (axes, grid and ticks are the ruler for reading the graph and never move), dark blue = "the line the graph itself contributes".
+       The one thing to be read here is that blue line (its slope = the pulling force F); paint the grid blue as well and the line sinks into it and the bend cannot be found;
+       conversely, blue axes with a gold line would make the reader take an axis for "another plotted curve".
+     · Fonts: W and x are physical quantities and use Georgia italic; the units J, m and the `/` are always upright (Times New Roman);
+       **the numeric ticks on the axes are always upright** (6 / 12 / 18 and 1 / 2 / 3 / 4 — digits are not variables and are never italicised),
+       the origin is marked with the **digit 0** (not the letter O — the original uses 0), sharing the same `.tick` class and lettering as the other ticks;
+       all upright text in the figure falls back from "Times New Roman" to Georgia.
+       **The size is written in each <text>'s font-size attribute** (never in the class, or CSS would override the attribute). */
+  body {
+    background-color: transparent;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    overflow: hidden;
+  }
+  svg {
+    height: 100%;
+    width: auto;
+    max-width: 100%;
+  }
+  /* The two axes: the heaviest "frame" of this figure — neither the grid nor the polyline may cross them */
+  .axis {
+    fill: none;
+    stroke: #ffb900;
+    stroke-width: 3;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  /* The dashed grid: one step thinner with long dashes, a ruler only, so it does not compete with the blue line */
+  .grid {
+    fill: none;
+    stroke: #ffb900;
+    stroke-width: 1.8;
+    stroke-dasharray: 8 8;
+    stroke-linecap: round;
+  }
+  /* The W–x polyline: the only "data" in the figure and the heaviest layer; the bend is a hard corner (stroke-linejoin: round only trims the burr, it does not change the angle) */
+  .curve {
+    fill: none;
+    stroke: #075bff;
+    stroke-width: 4;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  /* Tick digits: all gold, in the colour of their own axis; **upright** (a digit is a reading, not a variable, and is not slanted along with W / x).
+     The 0 at the origin is a digit too (**not the letter O**), so it shares the class and lettering of the other ticks and gets no style of its own. */
+  .tick {
+    fill: #ffb900;
+    font-family: "Times New Roman", Georgia, serif;
+    font-style: normal;
+  }
+  .var {
+    fill: #ffb900;
+    font-family: Georgia, "Times New Roman", serif;
+    font-style: italic;
+  }
+  /* Units and the slash: upright */
+  .up {
+    font-family: "Times New Roman", Georgia, serif;
+    font-style: normal;
+  }
+</style>
+</head>
+<body>
+
+<!-- Pairs with "Example 6" of `09 KineticEnergyTheorem.md` (2023 National New Curriculum Paper, Q 2-20, multiple choice):
+     an object of mass m = 1 kg starts from rest on horizontal ground under a horizontal pulling force and moves along the x axis; the work W done by the force against x is as shown;
+     the coefficient of kinetic friction is μ = 0.4 and g is taken as 10 m/s². Options A/B/C/D have to be read off the graph at x = 1 m, at x = 4 m, over 0–2 m and over 0–4 m
+     — this is the only figure of that problem, and nothing is added beyond "axes + grid + one polyline".
+
+     The one fact this figure must convey:
+       the **slope of the W–x graph = the pulling force F** (W = Fx ⇒ F = W/x, segment by segment),
+       and the polyline **bends once** at x = 2 m: the 0–2 m segment is steeper (F = 6 N) and the 2–4 m segment shallower (F = 3 N).
+       The bend must fall **exactly on the intersection of the vertical grid line x = 2 m with the horizontal grid line W = 12 J** —
+       "the force drops from 6 N to 3 N at x = 2 m" can only be read if that intersection is there;
+       move the bend a little and the fact that option D turns on — "the speed is greatest at x = 2 m" — vanishes from the figure.
+       Likewise the polyline must pass exactly through the grid intersection (1 m, 6 J) at x = 1 m (option A needs W₁ = 6 J to compute P = Fv),
+       and must end exactly on the grid corner (4 m, 18 J) at x = 4 m (option B needs W₄ = 18 J).
+
+     Geometry (1 unit ≈ 1 layout point):
+       origin 0        (140, 520)
+       x axis          from the origin right to x = 860 (arrow at 860), i.e. 720 units right of the origin
+       W axis          from the origin up to y = 70 (arrow at 70), i.e. 450 units above the origin
+       ★ Scales (the two axes are independent, as in the original; differing horizontal and vertical scales do not affect reading the slope = force):
+           horizontal 1 m  ↔ 155 units: x = 1 / 2 / 3 / 4 m → 295 / 450 / 605 / 760
+           vertical 6 J  ↔ 135 units: W = 6 / 12 / 18 J → 385 / 250 / 115
+         The on-screen slope of the W = Fx polyline is therefore
+           the 0–2 m segment (F = 6 N): 270 / 310 ≈ 0.87
+           the 2–4 m segment (F = 3 N): 135 / 310 ≈ 0.44
+         the two are exactly in the ratio 2 : 1, matching "6 N : 3 N" one to one — precisely the "steep then shallow" drawing of the original.
+         If the problem changes (other W–x data), recompute the positions of the 4 vertical and 3 horizontal grid lines from these two scales,
+         then move the ends and the bend of the polyline together — never the polyline alone.
+       dashed grid      four vertical lines (x = 1 / 2 / 3 / 4 m) from the x axis y = 520 up to y = 115 (the W = 18 J line);
+                     three horizontal lines (W = 6 / 12 / 18 J) from the W axis x = 140 out to x = 760 (the x = 4 m line).
+                     The grid covers only up to the last cell: the polyline stops at (4 m, 18 J) and the grid stops there too, leaving the upper right blank,
+                     so the reader does not think there is more graph beyond.
+       polyline      140,520 → 450,250 → 760,115 (two straight segments, one hard corner)
+       ticks          the vertical axis 18 / 12 / 6 right-aligned at x = 120 (20 off the axis); the horizontal axis 1 / 2 / 3 / 4 centred at
+                     y = 558 (38 off the axis); the origin 0 at (120, 552) right-aligned — the same rule as the original, "numbers hug the outside of the axis
+                     and never sit on it", so the grid lines need not be interrupted by the ticks and can run right up to the axis
+       axis labels          W/J at (164, 96) (upper right of the vertical arrow); x/m at (845, 558) (below the horizontal arrow, right of the tick 4)
+
+     Things the figure does not show, and **should not** show:
+       · the friction F_f = 4 N, the net force, the acceleration: the chain here is "read the slope → get the force → subtract friction → get the net work",
+         and drawing F_f as a line too (even with a single number on it) turns this W–x graph into a free-body diagram,
+         while the slope of no line in the figure **is** the friction.
+       · curves of v, E_k or p against time or against x: they are all derived, and drawing them writes the option answers onto the figure.
+       · the slope values 6 N / 3 N and the intermediate results W₁ = 6 J, W₂ = 12 J, W₄ = 18 J: numbers belong to the analysis,
+         and the figure keeps only the two tick sets 6 / 12 / 18 and 1 / 2 / 3 / 4 (which are conditions the original itself gives).
+       · any "emphasis" on the bend (a dot, a drop line, brackets): the original has none, and the hard corner of the blue line on the grid intersection
+         is conspicuous enough; extra marks would suggest an additional physical event at that point.
+       · wording such as "horizontal pulling force" or "μ = 0.4": that belongs to the text and is never written on the figure.
+
+     The quantitative relations behind the reading (recorded here so a later edit can check them; they do not appear in the figure):
+       · 0–2 m: F₁ = 12 J / 2 m = 6 N (on-screen slope 0.87); 2–4 m: F₂ = (18 − 12) J / 2 m = 3 N (0.44)
+       · F_f = μmg = 0.4 × 1 × 10 = 4 N
+       · 0~1 m：W₁ = 6 J ⇒ ½mv₁² = 6 − 4 × 1 = 2 J ⇒ v₁ = 2 m/s ⇒ P = F₁v₁ = 6 × 2 = 12 W
+         (A claims 6 W and is wrong — the figure must have W = 6 J at x = 1 m, or the whole chain fails)
+       · 0–4 m: ½mv₄² = 18 − 4 × 4 = 2 J ⇒ E_k4 = 2 J (B correct)
+       · 0–2 m: the work done against friction is 4 × 2 = 8 J (C correct)
+       · net force: 6 − 4 = 2 N over 0–2 m (accelerating) and 3 − 4 = −1 N over 2–4 m (decelerating)
+         ⇒ speed and momentum are greatest at x = 2 m:
+           ½mv₂² = 12 − 4 × 2 = 4 J ⇒ v₂ = 2√2 m/s ⇒ p_max = 2√2 kg·m/s (D says 2 and is wrong)
+       ⇒ the bend (at x = 2 m) is where the net force changes sign — the physical reason the bend has to sit on the 2 m grid line. -->
+
+<svg viewBox="-300 20 1600 600" xmlns="http://www.w3.org/2000/svg" role="img"
+     aria-label="Graph of the work W done by the pulling force against the coordinate x of the object: the vertical axis is W in joules with ticks 6, 12, 18; the horizontal axis is x in metres, with the origin marked 0 and ticks 1, 2, 3, 4. The blue polyline starts at the origin, steep at first and shallower later, bending once at 2 metres and 12 joules — the 0 to 2 metre segment has the larger slope and the 2 to 4 metre segment the smaller — and ends at 4 metres and 18 joules. A gold dashed grid marks the lines for 1, 2, 3, 4 metres and 6, 12, 18 joules, and the bend falls exactly on the grid intersection of 2 metres and 12 joules.">
+
+  <defs>
+    <!-- Axis arrows: same convention as the existing figures in this folder (7×7, scaled by strokeWidth); only the axes need arrows here -->
+    <marker id="arrow" markerWidth="7" markerHeight="7" refX="5.5" refY="3.5"
+            orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L6,3.5 L0,7" fill="none" stroke="#ffb900" stroke-width="1.2"/>
+    </marker>
+  </defs>
+
+  <!-- ═══════════ the two axes (drawn first; both the grid and the polyline sit above them) ═══════════ -->
+
+  <path class="axis" d="M140 520 V70" marker-end="url(#arrow)"/>
+  <path class="axis" d="M140 520 H860" marker-end="url(#arrow)"/>
+
+  <!-- ═══════════ the dashed grid: vertical x = 1/2/3/4 m, horizontal W = 6/12/18 J ═══════════ -->
+  <!-- The vertical lines run from the horizontal axis up to the W = 18 J line, and the horizontal lines from the vertical axis out to the x = 4 m line:
+       grid and polyline both stop at (4 m, 18 J), leaving the upper right blank. -->
+
+  <path class="grid" d="M295 520 V115 M450 520 V115 M605 520 V115 M760 520 V115"/>
+  <path class="grid" d="M140 385 H760 M140 250 H760 M140 115 H760"/>
+
+  <!-- ═══════════ the W–x polyline: slope = the pulling force, the bend at (2 m, 12 J) where the net force changes sign ═══════════ -->
+
+  <path class="curve" d="M140 520 L450 250 L760 115"/>
+
+  <!-- ═══════════ ticks and axis labels: all outside the axes, never on the axis lines ═══════════ -->
+
+  <text class="tick" x="120" y="124" font-size="26" text-anchor="end">18</text>
+  <text class="tick" x="120" y="259" font-size="26" text-anchor="end">12</text>
+  <text class="tick" x="120" y="394" font-size="26" text-anchor="end">6</text>
+  <text class="tick" x="120" y="552" font-size="26" text-anchor="end">0</text>
+
+  <text class="tick" x="295" y="558" font-size="26" text-anchor="middle">1</text>
+  <text class="tick" x="450" y="558" font-size="26" text-anchor="middle">2</text>
+  <text class="tick" x="605" y="558" font-size="26" text-anchor="middle">3</text>
+  <text class="tick" x="760" y="558" font-size="26" text-anchor="middle">4</text>
+
+  <text class="var" x="164" y="96" font-size="28" text-anchor="start">W<tspan class="up">/J</tspan></text>
+  <text class="var" x="845" y="558" font-size="28" text-anchor="middle">x<tspan class="up">/m</tspan></text>
+
+</svg>
+
+</body>
+</html>
