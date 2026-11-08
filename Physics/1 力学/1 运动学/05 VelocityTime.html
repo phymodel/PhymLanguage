@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>列车通过隧道的速度-时间图</title>
+<style>
+  /* 图框口径：与同目录 `VelocityFormulaImage.html`、`Physics/5 原子物理/HCP_ca.html` 同一套。
+     · 页面**不上底色** —— iOS / visionOS 是玻璃主题，图要让窗口材质透出来。自己糊一块实色底板
+       会有两个后果：玻璃面板上留一块异色方块；而且 Markdown 侧一认出「作者画了底板」就不注入画布
+       （见 MarkdownHtmlFigure.swift `declaresOwnPageBackground`），里外两块底互相打架。
+     · **由高度定尺** —— 图框形状由图文档自己的 viewBox 比例给出（Markdown 侧读的就是这个比例，
+       要求落在 0.2–5 之间，超了会退化成固定 240px 高），svg 占满图框高度，左右多出来的就是真空格。
+       本图 viewBox = 1200 × 300 → 比例 4.0。
+     · 配色沿用同目录既有图：坐标轴 / 标注 #ffb900，图线与运动体 #0865ff；
+       汉字另给一套字体栈（Georgia 没有汉字，必须落到 PingFang SC / 雅黑）。 */
+  body {
+    background-color: transparent;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    overflow: hidden;
+  }
+  svg {
+    height: 100%;
+    width: auto;
+    max-width: 100%;
+  }
+  .axis {
+    fill: none;
+    stroke: #ffb900;
+    stroke-width: 2.2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .guide {
+    fill: none;
+    stroke: #ffb900;
+    stroke-width: 1.4;
+    stroke-dasharray: 6 6;
+    stroke-linecap: round;
+  }
+  .dim {
+    fill: none;
+    stroke: #ffb900;
+    stroke-width: 1.6;
+    stroke-linecap: round;
+  }
+  .curve {
+    fill: none;
+    stroke: #0865ff;
+    stroke-width: 2.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .train {
+    fill: none;
+    stroke: #0865ff;
+    stroke-width: 2.5;
+    stroke-linejoin: round;
+  }
+  .label {
+    fill: #ffb900;
+    font-family: Georgia, "Times New Roman", serif;
+    font-style: italic;
+    font-size: 23px;
+  }
+  .label-sm {
+    fill: #ffb900;
+    font-family: Georgia, "Times New Roman", serif;
+    font-style: italic;
+    font-size: 21px;
+  }
+  .caption {
+    fill: #ffb900;
+    font-family: -apple-system, "PingFang SC", "Heiti SC", "Microsoft YaHei", sans-serif;
+    font-size: 23px;
+    text-anchor: middle;
+  }
+</style>
+</head>
+<body>
+
+<!-- 配 `05 速度时间关系式.md` 的「真题」（2022 全国甲卷第 2-15 题）：
+     列车长 l、隧道长 L，减速 2a / 加速 a，求从开始减速到回到 v0 的最短时间。
+     （a）场景 —— 车头刚到隧道口，此刻速率已降到上限 v；隧道内要走的距离是 L + l（车头进到车尾出）。
+     （b）v-t 图 —— 三段折线：减速段斜率 -2a（时长 t1）、隧道内斜率 0（时长 t2 = (L+l)/v）、
+     加速段斜率 a（时长 t3）。两段变速的 Δv 相同，故 t3 = 2t1。
+     折线的像素比刻意画成与题目条件一致（减速段 55×55，加速段 110×55，斜率比 2:1），
+     改比例就与「加速 a、减速 2a」打架。 -->
+<svg viewBox="0 20 1200 300" role="img"
+     aria-label="（a）列车通过隧道示意：隧道长 L、车长 l，车头刚到隧道口，隧道内速率不超过 v，隧道内行驶的距离为 L 加 l；（b）列车的速度时间图像：减速段斜率为负 2a，隧道内斜率为 0，加速段斜率为 a，三段时长分别为 t1、t2、t3，其中 t2 等于 (L 加 l) 除以 v，且 t3 等于 2 倍 t1">
+  <defs>
+    <marker id="arrow" markerWidth="7" markerHeight="7" refX="5.5" refY="3.5" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L6,3.5 L0,7" fill="none" stroke="#ffb900" stroke-width="1.2"/>
+    </marker>
+    <marker id="arrowRev" markerWidth="7" markerHeight="7" refX="0" refY="3.5" orient="auto" markerUnits="strokeWidth">
+      <path d="M6,0 L0,3.5 L6,7" fill="none" stroke="#ffb900" stroke-width="1.2"/>
+    </marker>
+  </defs>
+
+  <!-- ═══════════ （a）列车通过隧道 ═══════════ -->
+  <text class="caption" x="290" y="50">（a）列车通过隧道：隧道内速率不超过 v</text>
+
+  <!-- 地面 y = 250；隧道：左墙 x = 170（口）、右墙 x = 450（L = 280）、顶棚 y = 140 -->
+  <path class="axis" d="M30 250 H560"/>
+  <path class="axis" d="M170 250 V140 H450 V250"/>
+
+  <!-- 列车：车长 l = 130（车尾 x = 40，车头 x = 170），车头此刻刚到隧道口 -->
+  <path class="train" d="M40 190 H156 Q170 190 170 204 V218 Q170 232 156 232 H40 Z"/>
+  <path class="train" d="M60 200 H76 V214 H60 Z"/>
+  <path class="train" d="M90 200 H106 V214 H90 Z"/>
+  <path class="train" d="M120 200 H136 V214 H120 Z"/>
+  <circle class="train" cx="64" cy="240" r="10"/>
+  <circle class="train" cx="146" cy="240" r="10"/>
+
+  <!-- 隧道内的速率上限 v -->
+  <path class="axis" d="M52 180 H150" marker-end="url(#arrow)"/>
+  <text class="label" x="101" y="171" text-anchor="middle">v</text>
+
+  <!-- 隧道长 L：量在顶棚上方 -->
+  <path class="guide" d="M170 140 V95"/>
+  <path class="guide" d="M450 140 V95"/>
+  <path class="dim" d="M170 95 H450" marker-start="url(#arrowRev)" marker-end="url(#arrow)"/>
+  <text class="label" x="310" y="86" text-anchor="middle">L</text>
+
+  <!-- 车长 l（左延长线一路下去，与下面的 L + l 共用） -->
+  <path class="guide" d="M40 240 V308"/>
+  <path class="guide" d="M170 250 V280"/>
+  <path class="dim" d="M40 280 H170" marker-start="url(#arrowRev)" marker-end="url(#arrow)"/>
+  <text class="label" x="105" y="273" text-anchor="middle">l</text>
+
+  <!-- 隧道内实际行驶的距离：车头进 → 车尾出，即 L + l -->
+  <path class="guide" d="M450 250 V308"/>
+  <path class="dim" d="M40 308 H450" marker-start="url(#arrowRev)" marker-end="url(#arrow)"/>
+  <text class="label" x="330" y="298" text-anchor="middle">L + l</text>
+
+  <!-- ═══════════ （b）列车 v-t 图 ═══════════ -->
+  <text class="caption" x="900" y="50">（b）列车 v–t 图：三段斜率依次为 −2a、0、a</text>
+
+  <!-- 坐标轴：原点 (700, 250)，v 轴到 y = 62，t 轴到 x = 1150 -->
+  <path class="axis" d="M700 250 V62" marker-end="url(#arrow)"/>
+  <path class="axis" d="M700 250 H1150" marker-end="url(#arrow)"/>
+  <text class="label" x="712" y="78">v</text>
+  <text class="label" x="1140" y="276" text-anchor="middle">t</text>
+  <text class="label" x="688" y="276" text-anchor="end">O</text>
+
+  <!-- 两条速率水平线：v0 = 90（正常行驶）、v = 145（隧道内上限）。
+       刻度线只长在 v 轴**右侧**（x = 700 → 712）—— 与下面的 t 轴刻度同一口径：
+       竖轴是一根干净直线，刻度不越过它；去掉左半截后，轴左侧只剩 v0 / v 标注。
+       长度取 12，与 t 轴刻度等高。 -->
+  <path class="axis" d="M700 90 H712"/>
+  <path class="axis" d="M700 145 H712"/>
+  <text class="label-sm" x="686" y="97" text-anchor="end">v<tspan dy="5" font-size="15">0</tspan></text>
+  <text class="label-sm" x="686" y="152" text-anchor="end">v</text>
+
+  <!-- 正常行驶段（虚线）：减速前、以及加速回到 v0 之后；起笔收在 v 轴刻度的右端 x = 712 -->
+  <path class="guide" d="M712 90 H770"/>
+  <path class="guide" d="M1085 90 H1140"/>
+
+  <!-- 折线三段：减速（斜率 −2a，t1）→ 隧道内匀速 v（斜率 0，t2）→ 加速（斜率 a，t3） -->
+  <path class="curve" d="M770 90 L825 145"/>
+  <path class="curve" d="M825 145 H975"/>
+  <path class="curve" d="M975 145 L1085 90"/>
+
+  <!-- 三个转折时刻的引线与 t 轴刻度。
+       引线（虚线）收在刻度线顶端 y = 238，刻度线（实线）只长在轴线**之上** y = 238 → 250 ——
+       与同目录 `DisplacementImage.html` 同一口径：轴线是一根干净直线，刻度不穿透它，
+       下半截也不伸向 y = 276 的时刻标注。 -->
+  <path class="guide" d="M770 90 V238"/>
+  <path class="guide" d="M825 145 V238"/>
+  <path class="guide" d="M975 145 V238"/>
+  <path class="guide" d="M1085 90 V238"/>
+  <path class="axis" d="M770 238 V250"/>
+  <path class="axis" d="M825 238 V250"/>
+  <path class="axis" d="M975 238 V250"/>
+  <path class="axis" d="M1085 238 V250"/>
+  <text class="label-sm" x="798" y="276" text-anchor="middle">t<tspan dy="5" font-size="14">1</tspan></text>
+  <text class="label-sm" x="900" y="276" text-anchor="middle">t<tspan dy="5" font-size="14">2</tspan></text>
+  <text class="label-sm" x="1030" y="276" text-anchor="middle">t<tspan dy="5" font-size="14">3</tspan></text>
+
+  <!-- 隧道内匀速段的时长：t2 = (L + l)/v -->
+  <path class="guide" d="M900 138 V145"/>
+  <text class="label-sm" x="900" y="128" text-anchor="middle">t<tspan dy="5" font-size="15">2</tspan><tspan dy="-5"> = (L + l)/v</tspan></text>
+
+  <!-- 两段变速的 Δv 相同，而 a3 = a = ½·2a，故 t3 = 2t1（写在加速段下方的空格里） -->
+  <text class="label-sm" x="1030" y="205" text-anchor="middle">t<tspan dy="5" font-size="15">3</tspan><tspan dy="-5"> = 2t</tspan><tspan dy="5" font-size="15">1</tspan></text>
+</svg>
+
+</body>
+</html>

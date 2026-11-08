@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>物块 P 经定滑轮悬挂砝码盘的 a-m 图像（四选项）</title>
+<style>
+  /* 图框口径：与 `1 运动学/09 example1.html`、`3 动力学/11 example1-1.html` 同一套。
+     · 页面**不上底色** —— iOS / visionOS 是玻璃主题，图要让窗口材质透出来；自己在页面里糊一块
+       实色底板，Markdown 侧会认出「作者画了底板」而不再注入画布（MarkdownHtmlFigure.swift
+       `declaresOwnPageBackground`），里外两块底互相打架。
+     · **由比例定尺** —— 图框形状读的就是本文件 viewBox 的比例，须落在 0.2–5 之间。本题图是
+       「一件装置 + 四张小坐标系」横向并排，画幅天生很宽（图元占 x = 30 → 935），所以上下各留
+       30～40 单位真空格：viewBox = 980 × 240，比例 ≈ 4.08。想让图再小一点就继续加宽 viewBox
+       （留白只写在 viewBox 里，不碰任何图元坐标），注意别超过 5 的比例上限。
+     · 配色：
+         桌面 / 坐标轴 / 轴名 ................. #ffb900
+         细绳 / 定滑轮 / 物块 P / 砝码盘 / 选项字母 #075bff
+         a-m 图线 ............................ #00eaff（g 的虚线 #075bff）
+       图线**不能**与虚线同色：四条候选图线都是「一路涨上去、却又压不过 g」，始终贴着那条 g
+       虚线走，同色就分不清「哪条是候选曲线、哪条是 a 的上界」。 */
+  body {
+    background-color: transparent;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    overflow: hidden;
+  }
+  svg {
+    height: 100%;
+    width: auto;
+    max-width: 100%;
+  }
+  /* 坐标轴：细一号，让同一张图里的四组坐标系看着一样重 */
+  .axis {
+    fill: none;
+    stroke: #ffb900;
+    stroke-width: 2.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  /* 桌面：主视面（粗）+ 板厚（细）+ 桌腿（双线） */
+  .rigid {
+    fill: none;
+    stroke: #ffb900;
+    stroke-width: 5;
+    stroke-linecap: round;
+  }
+  .rigid-thin {
+    fill: none;
+    stroke: #ffb900;
+    stroke-width: 2.4;
+    stroke-linecap: round;
+  }
+  /* 绳 / 滑轮 / 物块 / 砝码盘：同一支「可动件」的深蓝 */
+  .part {
+    fill: none;
+    stroke: #075bff;
+    stroke-width: 3;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  /* g 的水平虚线（a 的上界） */
+  .dashed {
+    fill: none;
+    stroke: #075bff;
+    stroke-width: 2.6;
+    stroke-dasharray: 8 6;
+    stroke-linecap: round;
+  }
+  /* a-m 图线 */
+  .curve {
+    fill: none;
+    stroke: #00eaff;
+    stroke-width: 3.2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  /* 轴名 a / g / m / O：物理量走斜体 */
+  .axis-name {
+    fill: #ffb900;
+    font-family: Georgia, "Times New Roman", serif;
+    font-style: italic;
+    font-size: 22px;
+  }
+  /* 图上的元件名 P / m（题面给的记号，不是单位） */
+  .part-label {
+    fill: #075bff;
+    font-family: Georgia, "Times New Roman", serif;
+    font-style: italic;
+    font-size: 24px;
+  }
+  /* 选项字母 A～D：正体、居中 */
+  .option {
+    fill: #075bff;
+    font-family: "Times New Roman", Georgia, serif;
+    font-style: normal;
+    font-size: 24px;
+    text-anchor: middle;
+  }
+  /* 数字与单位一律正体（Times New Roman 等高数字） */
+  .up {
+    font-style: normal;
+  }
+</style>
+</head>
+<body>
+
+<!-- 配 `01 牛顿第二定律.md` 的「真题 1」（2024 全国甲卷第 2-15 题）：
+     物块 P 放在粗糙水平桌面上，轻绳跨过桌右缘的光滑定滑轮，另一端挂轻盘 + 砝码（总质量 m 可变）；
+     改变 m 测 P 的加速度 a，问 a-m 图像哪个可能正确。图 = 装置 + A/B/C/D 四张候选图。
+
+     装置的几何口径（1 单位 ≈ 1 画面点）：
+       · 桌面          主视棱 y = 60（x = 30→210，粗线），板厚 y = 70（细线）
+       · 桌腿          双线 x = 150/158 与 x = 196/204，自 y = 70 落到 y = 186
+       · 物块 P        矩形 (70, 26)–(116, 60)（底面正好坐在桌面上），绳系在右面 y = 39
+       · 定滑轮        圆心 (218, 48)、r = 9，跨出桌右缘；短支杆 (218, 57)→(218, 60) 落在桌面上
+       · 细绳          水平段 (116, 39)→(209, 39) 与滑轮顶相切；竖直段 (227, 48)→(227, 132)
+                       与滑轮右侧相切，两段合起来就是「绕过定滑轮」的样子
+       · 砝码盘        盘沿 (213, 133)–(241, 133)，盘身二次曲线 M213 133 Q227 152 241 133
+
+     四张坐标系的几何口径（每张原点 O 为 (x₀, 145)，横轴到 x₀+125，纵轴到 y = 25）：
+       · x₀ = 330 / 490 / 650 / 810，选项字母居中写在 x₀+55、y = 190
+       · g 的水平虚线 y = 52（= 纵轴高度的满量程），左端对齐纵轴，右端收到 x₀+118 不顶到箭头
+       · 纵轴 145→25 共 120 单位，即 g 对应 93 单位；下面各图线的终止高度都**低于** y = 52，
+         这正是本题的判读点：m→∞ 时 a→g，任何图线都不许穿过、更不许压过那条虚线。
+       · A 直线 y = 145 → 66（正比于 m，无摩擦时的样子）——错，P 与桌面有摩擦
+       · B 曲线 145 → 渐近 76（≈0.74g，起始很陡、过早饱和）——错：从原点出发，等于当作没有摩擦
+       · C 直线 从横轴 x₀+26 起 → 78（要先有 m > μM 才动得起来，但之后不是直线）——错
+       · D 曲线 与 B **同形**（三个控制点的增量完全一致，只是整组 +16 右移）：起点落在横轴
+         x₀+16 上而不是原点，对应 a = g(m − μM)/(M+m) 里 m ≤ μM 时 a = 0 的那一段 ——对
+         判读点有两个：① 曲线不过原点（有摩擦，这才是 A、B 与 D 的分野）；② 上凸、有水平渐近线
+         （不是 A、C 那样的直线）。图中只画到「看趋势」为止，不必画出 m = μM 前完全水平的平台。 -->
+<svg viewBox="-10 -12 980 240" xmlns="http://www.w3.org/2000/svg" role="img"
+     aria-label="左图是实验装置：物块 P 放在水平桌面上，细绳水平跨过桌右缘的定滑轮后竖直下垂，悬挂一个砝码盘，盘中砝码总质量 m 可变。右图是四个 a 随 m 变化的候选图像，四张坐标系的纵轴 a 上方都有一条水平的 g 虚线作为加速度上界。A 是一条从原点出发的直线，始终低于 g；B 是从原点出发、很快饱和的曲线，只升到约四分之三 g；C 是一条从横轴正半轴某点出发的直线；D 的曲线与 B 的形状完全相同，只是整体向右平移了一小段，起点落在横轴 O 点右侧、不在原点上。">
+     
+  <defs>
+    <!-- 坐标轴箭头：与同目录既有图同口径（7×7、按 strokeWidth 缩放） -->
+    <marker id="arrow" markerWidth="7" markerHeight="7" refX="5.5" refY="3.5"
+            orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L6,3.5 L0,7" fill="none" stroke="#ffb900" stroke-width="1.2"/>
+    </marker>
+  </defs>
+
+  <!-- ═══════════════════ 左：实验装置 ═══════════════════ -->
+  <g>
+    <!-- 桌面（主视棱 + 板厚）与桌腿（双线） -->
+    <path class="rigid" d="M30 60 H210"/>
+    <path class="rigid-thin" d="M30 70 H210"/>
+    <path class="rigid-thin" d="M196 70 V186 M204 70 V186"/>
+
+    <!-- 物块 P：底面坐在桌面上 -->
+    <rect class="part" x="70" y="22" width="46" height="34" rx="2"/>
+    <text class="part-label" x="93" y="51" text-anchor="middle">P</text>
+
+    <!-- 细绳：水平段与滑轮顶相切 -->
+    <path class="part" d="M116 39 H219"/>
+
+    <!-- 定滑轮：跨出桌右缘，短支杆落在桌面上 -->
+    <circle class="part" cx="218" cy="48" r="9"/>
+
+    <!-- 细绳：竖直段与滑轮右侧相切，下垂到砝码盘 -->
+    <path class="part" d="M227 48 V132"/>
+
+    <!-- 砝码盘：盘沿 + 盘身，盘中砝码总质量 m -->
+    <path class="part" d="M213 133 H241"/>
+    <path class="part" d="M213 133 Q227 152 241 133"/>
+    <text class="part-label" x="250" y="141">m</text>
+  </g>
+
+  <!-- ═══════════════════ 右：A / B / C / D 四张候选 a-m 图 ═══════════════════ -->
+
+  <!-- ───────── A：正比于 m 的直线（无摩擦的错项） ───────── -->
+  <g>
+    <path class="axis" d="M330 145 V25" marker-end="url(#arrow)"/>
+    <path class="axis" d="M330 145 H455" marker-end="url(#arrow)"/>
+    <path class="dashed" d="M330 52 H448"/>
+    <path class="curve" d="M330 145 L422 66"/>
+    <text class="axis-name" x="324" y="34" text-anchor="end">a</text>
+    <text class="axis-name" x="324" y="60" text-anchor="end">g</text>
+    <text class="axis-name" x="322" y="163" text-anchor="end">O</text>
+    <text class="axis-name" x="450" y="136" text-anchor="end">m</text>
+    <text class="option" x="385" y="190">A</text>
+  </g>
+
+  <!-- ───────── B：起始很陡、过早饱和于 ≈0.74g 的曲线 ───────── -->
+  <g>
+    <path class="axis" d="M490 145 V25" marker-end="url(#arrow)"/>
+    <path class="axis" d="M490 145 H615" marker-end="url(#arrow)"/>
+    <path class="dashed" d="M490 52 H608"/>
+    <path class="curve" d="M490 145 C512 96 538 78 582 76"/>
+    <text class="axis-name" x="484" y="34" text-anchor="end">a</text>
+    <text class="axis-name" x="484" y="60" text-anchor="end">g</text>
+    <text class="axis-name" x="482" y="163" text-anchor="end">O</text>
+    <text class="axis-name" x="610" y="136" text-anchor="end">m</text>
+    <text class="option" x="545" y="190">B</text>
+  </g>
+
+  <!-- ───────── C：从横轴正半轴起步的直线（有摩擦但线性，错项） ───────── -->
+  <g>
+    <path class="axis" d="M650 145 V25" marker-end="url(#arrow)"/>
+    <path class="axis" d="M650 145 H775" marker-end="url(#arrow)"/>
+    <path class="dashed" d="M650 52 H768"/>
+    <path class="curve" d="M666 145 L768 68"/>
+    <text class="axis-name" x="644" y="34" text-anchor="end">a</text>
+    <text class="axis-name" x="644" y="60" text-anchor="end">g</text>
+    <text class="axis-name" x="642" y="163" text-anchor="end">O</text>
+    <text class="axis-name" x="770" y="136" text-anchor="end">m</text>
+    <text class="option" x="705" y="190">C</text>
+  </g>
+
+  <!-- ───────── D：与 B 同形，整体右移（有摩擦 → 过 m = μM 才动得起来，正确项） ───────── -->
+  <g>
+    <path class="axis" d="M810 145 V25" marker-end="url(#arrow)"/>
+    <path class="axis" d="M810 145 H935" marker-end="url(#arrow)"/>
+    <path class="dashed" d="M810 52 H928"/>
+    <!-- 与 B 的 M490 145 C512 96 538 78 582 76 逐点平行：x 全部 +336（其中 +320 是坐标系平移，
+         +16 才是本条图线的右移量）——形状一样、只差一个平移，差别只在「过原点 / 不过原点」 -->
+    <path class="curve" d="M826 145 C848 96 874 78 918 76"/>
+    <text class="axis-name" x="804" y="34" text-anchor="end">a</text>
+    <text class="axis-name" x="804" y="60" text-anchor="end">g</text>
+    <text class="axis-name" x="802" y="163" text-anchor="end">O</text>
+    <text class="axis-name" x="930" y="136" text-anchor="end">m</text>
+    <text class="option" x="865" y="190">D</text>
+  </g>
+
+</svg>
+
+</body>
+</html>

@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>电梯上楼过程中的 a-t 图线（超重与失重）</title>
+<style>
+  /* 图框口径：与同目录 `02 example1.html`、`01 example1.html`～`01 example7.html`、
+     `11 example1-1.html`，以及 `1 力学/1 运动学/09 example1.html`（唯一带网格的图）同一套。
+     · 页面**不上底色** —— iOS / visionOS 是玻璃主题，图要让窗口材质透出来；自己在页面里糊一块
+       实色底板，Markdown 侧会认出「作者画了底板」而不再注入画布（MarkdownHtmlFigure.swift
+       `declaresOwnPageBackground`），里外两块底互相打架。原稿是黑底网格，**不照抄那个底色**，
+       只把坐标系与图线搬进本仓这套配色。
+     · **由比例定尺** —— 图框形状读的就是本文件 viewBox 的比例（须落在 0.2–5 之间）。
+       本题图是一张「横 10 s × 纵 5 m·s⁻²」的方格纸坐标系，图元占
+       x = 138 → 1263（纵轴左侧的读数列左边到 t 轴箭头右边）、y = 226.6 → 795.6（轴名顶到横轴读数行），
+       本身偏宽（1125 × 569 ≈ 1.98），故 viewBox 取 1200 × 606（比例 = 1.980，
+       与 `1 力学/1 运动学/06 example6.html` 那一档的宽幅同量级）：
+       x 从 100 到 1300（左右各留 38 / 37），y 从 208 到 814（上下各留 18.6 / 18.4）。
+       图元形心 (700.5, 511.1) 与 viewBox 的中心 (700, 511) 重合。
+       想让图再小一点就继续加宽 viewBox（留白只写在 viewBox 里，不碰任何图元坐标），
+       注意别超过 5 的比例上限 —— 高 606 时 viewBox 宽最多 3030。
+     · 配色（三色，别再加第四种）：
+         坐标轴 / 轴名 a、t / 原点读数 / 全部刻度值 ................. #ffb900（金色）。
+                                   本仓这支金色的语义是「说明性的尺规」，同 `02 example1.html` 的
+                                   放大镜椭圆与引线、`01 example4.html` 的夹角弧、example7 的尺寸线。
+         方格纸的细网格 ............................................ #075bff（深蓝，虚线）。
+                                   与 `1 力学/1 运动学/09 example1.html` 的 `.grid` 同口径。
+         a-t 图线 .................................................. #00eaff（青色）。
+                                   本仓这支青色的语义是「由测量 / 解析得来的量」（example1 的
+                                   a–m 图线、example5 的 s₁～s₅、example7 的 x–v 曲线、
+                                   运动学/09 的两条 v-t 直线）：本题里 a(t) 正是那个被测之量。
+                                   ★ 网格不能与图线同色 —— 本题图线有一段正好压在 a = 0 这一行上，
+                                     与网格同色就分不清「哪一段是图线、哪一段是格子线」。
+     · 字体：a、t、O 这类数学记号走 Georgia 斜体；刻度值与单位（m、s、数字）一律**正体**
+       （Times New Roman 等高数字，同 09 example1 的 `.tick-num`），故每个轴名里都把单位
+       包进 `.up` 的 tspan，别让单位跟着变量一起斜。
+     ★ **图上不许标出极值点** —— 本题问的就是「何时压力最大 / 最小」，在 t = 2 s、t = 8.5 s 处
+       拉虚线、写 aₘ = 2 / −3 等于把判读点抹掉。图上只留方格纸、两根轴、刻度和一条 a(t) 曲线，
+       峰、谷的横坐标由学生自己在网格上认（纵轴 -3～2 的刻度值本来就要给，那是读数口径）。 */
+  body {
+    background-color: transparent;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    overflow: hidden;
+  }
+  svg {
+    height: 100%;
+    width: auto;
+    max-width: 100%;
+  }
+  /* 坐标轴：细一号，让网格线不抢轴的分量 */
+  .axis {
+    fill: none;
+    stroke: #ffb900;
+    stroke-width: 2.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  /* 方格纸：虚线细网格（竖线每 1 s 一条、横线每 1 m·s⁻² 一条），a = 0 那一行就是 t 轴本身，不另画 */
+  .grid {
+    fill: none;
+    stroke: #075bff;
+    stroke-width: 2;
+    stroke-dasharray: 8 8;
+    stroke-linecap: round;
+  }
+  /* a-t 图线 */
+  .curve {
+    fill: none;
+    stroke: #00eaff;
+    stroke-width: 3.4;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  /* 轴名 a / t：变量走 Georgia 斜体 */
+  .axis-name {
+    fill: #ffb900;
+    font-family: Georgia, "Times New Roman", serif;
+    font-style: italic;
+    font-size: 26px;
+  }
+  /* 轴名里只有**变量**斜体；数字、单位（m、s）与运算符都用正体 —— 必须排在 `.axis-name`
+     之后：同为类选择器，靠后的一条胜出（放前面会被压掉）。 */
+  .up {
+    font-style: normal;
+  }
+  /* 刻度值：正体、等高数字。
+     ⚠️ 这里**不写** text-anchor —— CSS 的优先级高于元素上的表现属性（text-anchor="end"），
+     一旦在类里写死 middle，纵轴那几个右对齐的读数就会被拉回居中、右端越过去压住竖轴。
+     对齐方式一律交给各 <text> 自己的属性。 */
+  .tick-num {
+    fill: #ffb900;
+    font-family: "Times New Roman", Georgia, serif;
+    font-style: normal;
+    font-size: 26px;
+  }
+</style>
+</head>
+<body>
+
+<!-- 配 `02 超重和失重两公式.md` 的「真题 2」（2015 江苏省第 2-6 题）：一人乘电梯上楼，
+     竖直上升过程中加速度 a 随时间 t 变化的图线；以竖直向上为 a 的正方向，问何时人对地板的压力
+     最大 / 最小。图 = 一张 a-t 方格纸 + 一条先正后负、中间还平了一段零的曲线。图不写答案。
+
+     几何口径（1 单位 ≈ 1 画面点）：
+       · 原点 (t = 0, a = 0)   (180, 480)     t 轴向右（px = 180 + 100·t），a 轴向上（py = 480 − 90·a）
+       · 坐标纸范围            t = 0 → 10 s（px = 180 → 1180），a = 2 → −3 m·s⁻²（py = 300 → 750）
+                               即每小格 1 s × 1 m·s⁻²；纵向 5 格、横向 10 格，与题图一致
+       · 竖网格线              t = 1…10（px = 280 / 380 / … / 1180），y = 300 → 750；
+                               **t = 0 那一条不画虚线** —— 它就是 a 轴本身
+       · 横网格线              a = 2 / 1 / −1 / −2 / −3（py = 300 / 390 / 570 / 660 / 750），x = 180 → 1180；
+                               **a = 0 那一条不画虚线** —— 它就是 t 轴本身
+       · 坐标轴                a 轴 x = 180，y = 775 → 268（箭头在上方）；t 轴 y = 480，x = 180 → 1255
+                               a 轴往下多伸 25（越过 a = −3 那一行），t 轴往右多伸 75（越过 t = 10
+                               那一列）—— 与题图一致：轴要长过最外一条格子线，箭头才不顶着网格
+       · 纵轴读数 2 / 1 / 0 / −1 / −2 / −3   右对齐 x = 166、基线 = 该刻度 y + 9（26 px 字的半个 x 高度，
+                               视觉居中）；其中「0」正对 a = 0 那一行，是纵轴的读数
+       · 横轴读数 0 / 2 / 4 / 6 / 8 / 10     ★ 落在**坐标纸最下一行格子线的下沿**（基线 y = 790），
+                               居中在各自的竖网格线正下方 —— 这是方格纸坐标系的老规矩：横轴穿过纸面
+                               中央，读数却排在下沿，把中间的格子留干净。早先把它们排在 a = 0 轴
+                               下方（y = 514），结果每个数字都被一条竖网格线从中间划穿，且与下半个
+                               纸面的格子互相干扰，故改到纸外一行。
+                               「0」例外：右对齐 x = 168（它底下正是 a 轴那道竖线，居中会被劈开），
+                               压在纵轴「−3」的下一行 —— 题图左下角本来就是上下两个 0，别合并成一个
+
+     a(t) 曲线的五段形状（题面只给「上升过程」这一段，故曲线从 t = 0 起、到 t = 10 止）：
+       ① 0 → 2 s   a 由 0 平滑升到 +2（峰），两端切线水平 —— 电梯启动时的「向上加速」段，
+                  此刻 a 最大、压力最大（超重，F_N = m(g + a)）；
+       ② 2 → 4 s   a 由 +2 平滑落回 0，两端切线水平；
+       ③ 4 → 7 s   a ≡ 0 的平段 —— 匀速上升，F_N = mg（既不超重也不失重）；
+       ④ 7 → 8.5 s a 由 0 平滑落到 −3（谷），两端切线水平 —— 减速上升段。谷比峰**更深也更陡**
+                  （谷 270 单位 / 150 单位宽，峰 180 / 200），题图就是这个不对称的样子：向下的
+                  最大加速度 3 m·s⁻² 大于向上的 2 m·s⁻²，故 t = 8.5 s 时压力最小；
+       ⑤ 8.5 → 10 s a 由 −3 平滑回到 0 —— 减速结束、电梯停稳。
+       四段曲线都用「两端切线水平」的三次贝塞尔 —— 加速度图线在这几处是**可导**的，
+       画成尖角（折线）会让学生以为加速度突变。曲线在 t = 4 s 之后与 a = 0 那一段**严格重合**，
+       所以第 ④ 段必须从 x = 880（t = 7 s）才离开横轴，早一点离轴就与题图对不上。 -->
+
+<svg viewBox="-200 208 1800 606" xmlns="http://www.w3.org/2000/svg" role="img"
+     aria-label="加速度随时间变化的图象：纵轴是加速度 a，单位米每二次方秒，正方向竖直向上，刻度从负 3 到 2；横轴是时间 t，单位秒，从 0 到 10；方格每小格代表 1 秒和 1 米每二次方秒。曲线从 t 等于 0、a 等于 0 出发，到 t 等于 2 秒时升到最大正值 2，随后回落到 t 等于 4 秒时为零，并沿横轴保持为零到 t 等于 7 秒；之后转为负值，到 t 等于 8.5 秒时达到最小值负 3，再回升，到 t 等于 10 秒时回到零。">
+
+  <defs>
+    <!-- 坐标轴箭头：与同目录既有图同口径（7×7、按 strokeWidth 缩放） -->
+    <marker id="arrow" markerWidth="7" markerHeight="7" refX="5.5" refY="3.5"
+            orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L6,3.5 L0,7" fill="none" stroke="#ffb900" stroke-width="1.2"/>
+    </marker>
+  </defs>
+
+  <!-- ═══════════ 方格纸：竖线 t = 1…10，横线 a = 2 / 1 / −1 / −2 / −3 ═══════════
+       （a = 0 与 t = 0 那两条不画：它们就是两根轴本身） -->
+  <path class="grid" d="M280 300 V750 M380 300 V750 M480 300 V750 M580 300 V750 M680 300 V750 M780 300 V750 M880 300 V750 M980 300 V750 M1080 300 V750 M1180 300 V750"/>
+  <path class="grid" d="M180 300 H1180 M180 390 H1180 M180 570 H1180 M180 660 H1180 M180 750 H1180"/>
+
+  <!-- ═══════════ 坐标轴（画在网格之上，保持 a 轴、t 轴是干净实线） ═══════════ -->
+  <path class="axis" d="M180 775 V268" marker-end="url(#arrow)"/>
+  <path class="axis" d="M180 480 H1255" marker-end="url(#arrow)"/>
+
+  <!-- 轴名：纵轴 a /(m·s⁻²) 写在箭头右上方；横轴 t /s 贴着箭头、右对齐 -->
+  <text class="axis-name" x="200" y="252">a<tspan class="up"> /(m·s</tspan><tspan class="up" dy="-10" font-size="17">−2</tspan><tspan class="up" dy="10">)</tspan></text>
+  <text class="axis-name" x="1240" y="452" text-anchor="end">t<tspan class="up"> /s</tspan></text>
+
+  <!-- ═══════════ 纵轴读数：2 / 1 / 0 / −1 / −2 / −3，右对齐在 a 轴左侧 ═══════════ -->
+  <text class="tick-num" x="166" y="309" text-anchor="end">2</text>
+  <text class="tick-num" x="166" y="399" text-anchor="end">1</text>
+  <text class="tick-num" x="166" y="489" text-anchor="end">0</text>
+  <text class="tick-num" x="166" y="579" text-anchor="end">−1</text>
+  <text class="tick-num" x="166" y="669" text-anchor="end">−2</text>
+  <text class="tick-num" x="166" y="759" text-anchor="end">−3</text>
+
+  <!-- ═══════════ 横轴读数：0 / 2 / 4 / 6 / 8 / 10，排在坐标纸最下一行格子线的下沿
+       （「0」右对齐到纵轴左侧：它底下正是 a 轴那道竖线，居中会被劈开） ═══════════ -->
+  <text class="tick-num" x="168" y="790" text-anchor="end">0</text>
+  <text class="tick-num" x="380" y="790" text-anchor="middle">2</text>
+  <text class="tick-num" x="580" y="790" text-anchor="middle">4</text>
+  <text class="tick-num" x="780" y="790" text-anchor="middle">6</text>
+  <text class="tick-num" x="980" y="790" text-anchor="middle">8</text>
+  <text class="tick-num" x="1180" y="790" text-anchor="middle">10</text>
+
+  <!-- ═══════════ a-t 图线：起于原点 → t = 2 s 峰 (+2) → t = 4 s 归零 → 平到 t = 7 s
+       → t = 8.5 s 谷 (−3) → t = 10 s 归零。四段曲线两端切线都水平（加速度可导，不是折线） ═══════════ -->
+  <path class="curve" d="M180 480
+                         C246 480 314 300 380 300
+                         C446 300 514 480 580 480
+                         H880
+                         C930 480 980 750 1030 750
+                         C1080 750 1140 480 1180 480"/>
+
+</svg>
+</body>
+</html>

@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>图(b) 的答案：v-t 图</title>
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+body {
+    background-color: transparent;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    overflow: hidden;
+}
+svg {
+    height: 100%;
+    width: auto;
+    max-width: 100%;
+}
+.axis {
+    stroke: #ffb900;
+    stroke-width: 3.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    fill: none;
+}
+.tick {
+    stroke: #ffb900;
+    stroke-width: 3;
+    stroke-linecap: round;
+}
+.dashed {
+    stroke: #075bff;
+    stroke-width: 3;
+    stroke-dasharray: 7 6;
+}
+.curve {
+    stroke: #00eaff;
+    stroke-width: 3;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    fill: none;
+}
+.yellow {
+    fill: #ffb900;
+    font-family: "Times New Roman", "KaiTi", serif;
+    font-style: italic;
+}
+.blue {
+    fill: #075bff;
+    font-family: "Times New Roman", "KaiTi", serif;
+}
+.upright {
+    font-style: normal;
+}
+</style>
+</head>
+<body>
+<!-- 配 `11 动量定理.md`「真题 1」第（1）问（2019 全国 II 卷第 3-25 题）：定性画 v-t 图。
+
+     这张图就是题目里的「图 (b)」原样复制一份（坐标系、刻度、t₁ / t₂ 两条竖直虚线、v / O / t/s /
+     1.0 / 2.0 标注一个字没改），只在框里补上答案要的那条**青色图线**：
+
+       0 ~ t₁  水平段 —— 反应时间内阻力为零，汽车仍以 v₁ 匀速行驶，斜率 0；
+       t₁ ~ t₂ 曲线段 —— 刹车系统启动，阻力由 0 线性增到 f₁，a = f/m 由 0 逐渐变大，
+                图线切线由水平逐渐变陡（开口向下），t₂ 时刻落到 v₂；
+       t₂ 之后 直线段 —— 阻力恒为 f₁，a 恒定，斜率不变；到 2.0 s 时车远未停下，
+                图线在竖直方向仍明显高于 t 轴，直接出图框右缘（收在 x = 696）。
+
+     **图线不许碰 t 轴。** v₂ = 28 m/s、a = 8 m/s²，从 t₂ = 1.3 s 起还要 3.5 s，t = 4.8 s 才停；
+     横轴只标到 2.0 s，「与 t 轴相交」这件事根本不在本框内：2.0 s 时刻 v = 28 − 8 × 0.7 = 22.4 m/s，
+     约为 0.75 v₁。题目第（1）问也只要求画到「刹车系统稳定工作后」，本不必画到停止。
+     （旧版本一路画到 (678,187) 落在 t 轴上，等于声明 t ≈ 2.08 s 就停了，与 4.8 s 矛盾；已改。）
+
+     只画「定性」的形，不标数字：横轴刻度只到 2.0 s，而车其实 4.8 s 才停，所以框里的减速段
+     被压缩画陡了、出图框右缘时才降到约 0.35 v₁（真实 2.0 s 处还有 0.75 v₁）。也正因为横向被压缩，
+     v₁ → v₂ 那点降幅在框里画成 18 个单位（真实比例只有 30 → 28，即 8.7 个单位，6.7%），否则曲线段
+     会缩成一个几乎看不见的折角 —— 放大约 2.06 倍；末段斜率按**同一倍率**放大（真实 0.281 → 0.578），
+     所以形状与真实图形同类，只是横向被压缩。三段之间的斜率仍然连续（曲线段终点切线 = 直线段斜率）：
+       水平段 (419,56) → (521,56)；曲线段 Q(548.8 56) → (580,74)；直线段 → (696,141)，
+       直线段斜率 (141 − 74)/(696 − 580) = 67/116 ≈ 0.578，正是 `Q` 控制点取 548.8 = 580 − 18/0.578 的由来。
+     末段终点 (696,141) 距 t 轴还有 46 个单位，并从 `t/s` 标注上方约 26 个单位处掠过（不压字）。
+     曲线段用二次贝塞尔，形状与 v = v₁ − ½a(t − t₁)² 同类（起点切线水平、终点切线接直线段）。
+     （组坐标 translate(90 0) 沿用原图，改坐标系时两边一起挪。）
+
+     图框口径（与同目录 `11 example1-1.html`、`05 VelocityTime.html` 同一套）：
+       · 页面不上底色 —— 图要让窗口材质透出来；Markdown 侧一旦认出「作者画了底板」就不注入画布
+         （见 MarkdownHtmlFigure.swift `declaresOwnPageBackground`）；
+       · **由高度定尺** —— 图框形状由图文档自己的 viewBox 比例给出（要求落在 0.2–5 之间，
+         超了退化成固定 240px 高），svg 占满图框高度、左右多出来的就是真空格；
+       · 因此「左右留大空白」只能写在 viewBox 里：图本身的横向范围只有 x 484 ~ 793（宽约 309），
+         这里把左右边界各外推到 131 / 1146 —— 两侧各留 353 个单位，是图形宽度的 1.14 倍
+         （原来是左 230 / 右 1046，各留 254、即 0.82 倍；这一档左右各再加约 100，横向内容
+         中心 638.5 不动、两边等量外扩，图形不会被推向一侧）；
+         纵向只留上下各 20（y 从 −3 到 287，刚好把 17 ~ 267 的内容居中），
+         不让留白把图压小。比例 1015 / 290 = 3.5（原 816 / 290 ≈ 2.81），与同目录
+         `11 example1-1.html`（946 / 270 ≈ 3.5）取同一个图框形状。再放宽要注意 viewBox 比例
+         上限 5（`doc.html` 的 `figureDocumentAspect`，超了退化成固定 240px 高），还要留住余量：
+         比例越大图框越扁、框内图形整体越小。 -->
+<svg viewBox="131 -3 1015 290" role="img"
+     aria-label="在图 b 的坐标系中画出的速度-时间图线：0 到 t1 为水平段，表示匀速行驶；t1 到 t2 为斜率由零逐渐变陡的曲线，表示阻力线性增大、车速由 v1 降到 v2；t2 之后为斜率恒定的倾斜直线，表示匀减速（汽车要到 t 约 4.8 秒才停止，故图线在 2.0 秒处仍在时间轴上方，未与横轴相交）">
+
+    <g transform="translate(90 0)">
+        <path class="axis" d="M419 187 V30 M419 187 H696"/>
+        <path class="axis" d="M411 39 L419 29 L426 39 M686 179 L696 187 L686 194"/>
+
+        <!-- 横轴刻度 -->
+        <path class="tick" d="M477 180 V187 M543 180 V187 M608 180 V187 M668 180 V187"/>
+
+        <!-- 竖直蓝色虚线 -->
+        <path class="dashed" d="M521 56 V187 M580 56 V187"/>
+
+        <!-- 坐标轴文字 -->
+        <text class="yellow" x="394" y="43" font-size="29">v</text>
+        <text class="yellow" x="402" y="216" font-size="30">O</text>
+        <text class="yellow" x="679" y="174" font-size="25">t<tspan class="upright">/s</tspan></text>
+        <text class="yellow upright" x="650" y="217" font-size="29">2.0</text>
+
+        <!-- t1、t2 标记 -->
+        <text class="blue" x="506" y="214" font-size="26" font-style="italic">t<tspan font-size="19" dy="5" font-style="normal">1</tspan></text>
+        <text class="yellow upright" x="529" y="215" font-size="27">1.0</text>
+        <text class="blue" x="574" y="214" font-size="26" font-style="italic">t<tspan font-size="19" dy="5" font-style="normal">2</tspan></text>
+
+        <!-- 答案图线：水平（匀速）→ 抛物线（a 由 0 渐增）→ 直线（a 恒定，出框时仍未到 t 轴） -->
+        <path class="curve" d="M419 86 H521 Q548.8 86 580 96 L696 141"/>
+
+        <!-- 图名 -->
+        <text class="blue" x="536" y="261" font-size="27">图(b)</text>
+    </g>
+
+</svg>
+</body>
+</html>

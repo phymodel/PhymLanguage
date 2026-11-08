@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>汽车驶向路口：距停车线 18 m，绿灯将熄</title>
+<style>
+  /* 图框口径：与同目录 `06 example5.html`、`05 VelocityTime.html`、`06 example2.html` 同一套。
+     · 页面**不上底色** —— iOS / visionOS 是玻璃主题，图要让窗口材质透出来。自己糊一块实色底板
+       （题图原稿是黑底）会有两个后果：玻璃面板上留一块异色方块；而且 Markdown 侧一认出
+       「作者画了底板」就不注入画布（见 MarkdownHtmlFigure.swift `declaresOwnPageBackground`），
+       里外两块底互相打架。
+     · **由高度定尺** —— 图框形状由图文档自己的 viewBox 比例给出（Markdown 侧读的就是这个比例，
+       要求落在 0.2–5 之间，超了会退化成固定 240px 高），svg 占满图框高度，左右多出来的就是真空格。
+       本图 viewBox = 1800 × 490 → 比例约 3.67。
+       画幅**故意比图元宽出很多**：帧宽取文档流宽度、帧高 = 帧宽 ÷ 比例，所以把 viewBox 左右各放出
+       490 单位真空格（内容仍占 x = 40 → 860），图元就按 900/1800 = 0.50 缩小显示 —— 想让图再小一点
+       就继续加宽 viewBox（如 -750 → 2400 宽，比例 4.90，图元缩到 0.375，注意别超过 5 的比例上限），
+       只动这里，不碰图内坐标。
+     · 配色：路面、尺寸线与「18 m」「停车线」标注用 #0865ff（同图线 / 运动体口径）；
+       车身、轮胎与信号灯壳用 #ffb900 / #ff8a00（暖色运动体）；三盏灯用 #ff1111 / #ffe23d / #00ff12。
+     · 汉字另给一套字体栈（Georgia 没有汉字，必须落到 PingFang SC / 雅黑）。 */
+  body {
+    background-color: transparent;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    overflow: hidden;
+  }
+  svg {
+    height: 100%;
+    width: auto;
+    max-width: 100%;
+  }
+  .road, .stopline, .tick, .dim, .pole {
+    fill: none;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .road     { stroke: #0865ff; stroke-width: 5; }                     /* 路面（一条平直线） */
+  .stopline { stroke: #ffb900; stroke-width: 4.6; stroke-dasharray: 15 13; } /* 停车线（竖直虚线） */
+  .tick     { stroke: #0865ff; stroke-width: 3.4; }                   /* 尺寸线两端的端线 */
+  .dim      { stroke: #0865ff; stroke-width: 3.4; }                   /* 18 m 尺寸线 */
+  .pole     { stroke: #ffb900; stroke-width: 4.6; }                   /* 信号灯悬吊杆 */
+  .body     { fill: #ffb900; stroke: #ffb900; stroke-width: 3; stroke-linejoin: round; }
+  .glass    { fill: #ff8a00; }
+  .part     { fill: none; stroke: #ffb900; stroke-width: 3; stroke-linecap: round; }
+  .tyre     { fill: #ff8a00; }
+  .hub      { fill: #ffb900; }
+  .head-lamp { fill: #ff8a00; }                                        /* 大灯（车头朝右的标记） */
+  .case     { fill: #ff8a00; stroke: none; }
+  .lamp     { stroke: none; }
+  .lamp-on  { fill: none; stroke: #00ff12; stroke-width: 3; }         /* 绿灯正在亮：加一圈亮环 */
+  text {
+    font-family: -apple-system, "PingFang SC", "Heiti SC", "Microsoft YaHei", sans-serif;
+    fill: #0865ff;
+    text-anchor: middle;
+  }
+  /* 字号按「图元缩到帧宽 50%」后仍要读得清来定：40 → 在 640 px 宽的文档流里约 14 px，
+     26 的字（停车线）约 9 px，再小就糊了。 */
+  .len  { font-size: 44px; }
+  .note { font-size: 28px; }
+</style>
+</head>
+<body>
+
+<!-- 配 `06 位移时间关系式.md` 的「真题 6」（2009 江苏）：以 8 m/s 匀速行驶的汽车即将通过路口，
+     绿灯还有 2 s 将熄灭，此刻汽车距停车线 18 m。
+
+     几何口径（x 方向 1 单位 ≈ 6.2 cm；车画得比真车大，与题图一样只求「看得清车、量得清 18 m」）：
+       画布         x = -450 → 1350（图元只占 x = 40 → 860，左右各多出 490 单位真空格，
+                    用来把整幅图缩到帧宽的 50% 显示；见 <style> 里「由高度定尺」那段）
+       路面         y = 380，x = 40 → 860（一条平直线，车就压在线上）
+       车身         尾门 x = 94、车头 x = 270，车底 y = 352，车顶 y = 288
+       车轮         圆心 (126, 360) 与 (232, 360)，r = 20 ⇒ 轮底 y = 380 正好落在路面上
+       车头朝向     朝右（驶向停车线）：尾门近乎竖直、后悬 32 短；前端是「斜风挡 + 长机罩 + 大灯」，
+                    三点合起来一眼可辨，不会再被看成倒着开。
+       停车线       x = 560 的竖直虚线，y = 380（路面）→ 150
+       18 m 尺寸    端线 x = 270（车头正下方）/ x = 560（停车线正下方），y = 390 → 428；
+                    尺寸线 y = 418，两端箭头朝外顶住端线，标注写在两线中点 x = 415、基线 y = 458
+       信号灯       悬吊杆 x = 760，y = 8 → 118（往上穿出画面）；灯壳 x = 726 → 794、y = 118 → 288，
+                    圆角 18；三盏灯圆心 (760,152) / (760,203) / (760,254)，r = 20，绿灯加亮环
+     改比例只影响观感，不影响「18 m」这一处标注的含义。 -->
+<svg viewBox="-450 0 1800 490" xmlns="http://www.w3.org/2000/svg" role="img"
+     aria-label="平直公路上的一辆汽车正在匀速向右行驶，车头正前方 18 米处是路口停车线，停车线外侧立着一组信号灯，此刻绿灯亮着">
+
+  <defs>
+    <!-- 尺寸线箭头：朝外的两个箭头（左端向左、右端向右），颜色与尺寸线同口径 -->
+    <marker id="arrow" markerWidth="7" markerHeight="7" refX="5.5" refY="3.5"
+            orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L6,3.5 L0,7" fill="none" stroke="#0865ff" stroke-width="1.2"/>
+    </marker>
+    <marker id="arrowRev" markerWidth="7" markerHeight="7" refX="0" refY="3.5"
+            orient="auto" markerUnits="strokeWidth">
+      <path d="M6,0 L0,3.5 L6,7" fill="none" stroke="#0865ff" stroke-width="1.2"/>
+    </marker>
+  </defs>
+
+  <!-- ═══════════ 路面：一条平直线，车与停车线都立在它上面 ═══════════ -->
+  <path class="road" d="M40 380 H860"/>
+
+  <!-- ═══════════ 停车线：车头前方的竖直虚线（穿出路面一截，与题图一致） ═══════════ -->
+  <path class="stopline" d="M560 380 V150"/>
+  <text class="note" x="560" y="132">停车线</text>
+
+  <!-- ═══════════ 汽车（车头朝右，正匀速驶向停车线） ═══════════ -->
+  <g id="car">
+    <!-- 车身轮廓，从左往右读：竖直尾门 → 车顶 → 斜度较大的前风挡 → 发动机罩 → 圆滑车头。
+         尾门竖直、后悬短（32），前悬长（38）且有长机罩，方向不会读反。 -->
+    <path class="body"
+          d="M94 352
+             L94 306 Q94 288 110 288
+             L180 288
+             L226 320
+             L254 324 Q270 327 270 344
+             L270 352 Z"/>
+
+    <!-- 侧窗：窗带顺着车顶走向，右端斜边与前风挡同向，中间用 B 柱断开 -->
+    <path class="glass"
+          d="M112 316
+             L116 297 Q117 296 120 296
+             L170 296 Q173 296 175 299
+             L194 316 Z"/>
+    <path class="part" d="M150 296 V316"/>
+
+    <!-- 大灯：只长在车头上，把「朝右」再钉一次 -->
+    <rect class="head-lamp" x="248" y="328" width="16" height="9" rx="4"/>
+
+    <!-- 车轮：轮底 y = 380，正好压在路面上 -->
+    <circle class="tyre" cx="126" cy="360" r="20"/>
+    <circle class="hub"  cx="126" cy="360" r="8"/>
+    <circle class="tyre" cx="232" cy="360" r="20"/>
+    <circle class="hub"  cx="232" cy="360" r="8"/>
+  </g>
+
+  <!-- ═══════════ 车头到停车线的距离：18 m ═══════════ -->
+  <!-- 两端端线：车头正下方 x = 270、停车线正下方 x = 560 -->
+  <path class="tick" d="M270 390 V428"/>
+  <path class="tick" d="M560 390 V428"/>
+  <!-- 尺寸线：两端箭头朝外顶住端线 -->
+  <path class="dim" d="M270 418 H560" marker-start="url(#arrowRev)" marker-end="url(#arrow)"/>
+  <text class="len" x="415" y="458">18 m</text>
+
+  <!-- ═══════════ 信号灯：悬吊在停车线外侧的路口上方 ═══════════ -->
+  <path class="pole" d="M760 8 V118"/>
+  <rect class="case" x="726" y="118" width="68" height="170" rx="18"/>
+  <circle class="lamp" style="fill:#ff1111" cx="760" cy="152" r="20"/>
+  <circle class="lamp" style="fill:#ffe23d" cx="760" cy="203" r="20"/>
+  <circle class="lamp" style="fill:#00ff12" cx="760" cy="254" r="20"/>
+  <circle class="lamp-on" cx="760" cy="254" r="27"/>
+
+</svg>
+
+</body>
+</html>

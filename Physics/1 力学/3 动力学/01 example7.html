@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>刹车过程：反应过程（匀速）+ 减速过程（匀减速），及减速阶段的 x–v 曲线</title>
+<style>
+  /* 图框口径：与同目录 `01 example1.html`～`01 example6-2.html`、`1 力学/1 运动学/06 example6.html`
+     同一套。
+     · 页面**不上底色** —— iOS / visionOS 是玻璃主题，图要让窗口材质透出来；自己在页面里糊一块
+       实色底板，Markdown 侧会认出「作者画了底板」而不再注入画布（MarkdownHtmlFigure.swift
+       `declaresOwnPageBackground`），里外两块底互相打架。题图原稿是黑底蓝线金曲线，**不照抄那个
+       底色**，只把线稿搬进本仓这套配色。
+     · **由比例定尺** —— 图框形状读的就是本文件 viewBox 的比例（须落在 0.2–5 之间）。
+       本题图是「一件装置（甲：平直路面 + 三个车时刻）+ 一张坐标系（乙：x–v 曲线）」横向并排，
+       画幅天生很宽：图元实测 bbox 为 x = 20 → 995.8、y = 130.1 → 475.9（浏览器 getBBox）。
+       画幅**故意比图元宽**：viewBox = 1400 × 465（比例 ≈ 3.011，x 从 −200 到 1200、
+       y 从 70 到 535），左右各留 220 / 204.2 单位真空格 —— 图元只占画幅宽度的
+       975.8 / 1400 ≈ 70%，整幅图按 0.70 缩小显示，玻璃面板里不至于顶满；上下各留约 60 / 59，
+       仍按图元垂直居中对齐。想让图再小一点就继续加宽 viewBox（留白只写在 viewBox 里，
+       不碰任何图元坐标），注意别超过 5 的比例上限 —— 高 465 时 viewBox 宽最多 2325。
+     · 配色（三色分工，别再加第四种）：
+         路面主视棱 / 路面斜线 / 尺寸线与端线 / 坐标轴 / 轴名与刻度数字 /
+         甲乙 │ 反应过程 · 减速过程 ... #ffb900（同 `01 example4.html` 的「不动的装置 + 几何标注」口径）
+         三辆车与它的车窗、车轮 .......... #075bff（同 example1 的「可动件」口径）
+         三处车状态名（发现情况 / 开始减速 / 汽车停止）... #075bff（记号跟自己的图元同色：
+                                                          这三个名字说的是「车此刻处在什么状态」，
+                                                          随车走，不随尺规走）
+         x–v 曲线 ....................... #00eaff（同 example1 的 a-m 图线、example5 的 s₁～s₅：
+                                                      「由测量 / 解析得来的结果」才用这支青色）
+       金 = 尺规（路面、尺寸线、坐标轴），深蓝 = 车，青 = 图线。本题的判读点恰好就是
+       「图线上读出一个数（25 m）」，用青色把它从金线里拎出来，读者一眼知道那是「给的是曲线、不是坐标」。
+     · 字体：x、v 是物理量，走 Georgia 斜体；25、72 与单位 /m、/(km/h) 一律正体（Times New Roman）；
+       「发现情况」「反应过程」「甲」「乙」是汉字（不是变量），另给一套汉字字体栈 + 正体 ——
+       Georgia 没有汉字，不换栈会掉字（同 `01 example4.html` 的 `.device-rigid`）。 */
+
+  body {
+    background-color: transparent;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    overflow: hidden;
+  }
+  svg {
+    height: 100%;
+    width: auto;
+    max-width: 100%;
+  }
+  /* 路面主视棱：一条粗平线，三辆车都压在它上面 */
+  .rigid {
+    fill: none;
+    stroke: #ffb900;
+    stroke-width: 5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  /* 路面斜线：粗面记号，细一号，不跟主视棱抢 */
+  .hatch {
+    fill: none;
+    stroke: #ffb900;
+    stroke-width: 2.4;
+    stroke-linecap: round;
+  }
+  /* 车：车身轮廓与车轮，同一支「可动件」的深蓝，空心线稿（与 example1 的物块 P 同口径） */
+  .car {
+    fill: none;
+    stroke: #075bff;
+    stroke-width: 3.2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  /* 侧窗：实心深蓝 —— 车身只有一层轮廓，留一块实心窗，整车才不会被读成「带两个轮子的方箱」 */
+  .glass {
+    fill: #075bff;
+    stroke: none;
+  }
+  /* 尺寸线（反应过程 / 减速过程）与两端的端线：尺规，金、细 */
+  .dim {
+    fill: none;
+    stroke: #ffb900;
+    stroke-width: 2.6;
+    stroke-linecap: round;
+  }
+  .dim-tick {
+    fill: none;
+    stroke: #ffb900;
+    stroke-width: 2.2;
+    stroke-linecap: round;
+  }
+  /* 坐标轴与轴上的刻度短划 */
+  .axis {
+    fill: none;
+    stroke: #ffb900;
+    stroke-width: 2.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .axis-tick {
+    fill: none;
+    stroke: #ffb900;
+    stroke-width: 2.4;
+    stroke-linecap: round;
+  }
+  /* 减速过程的 x–v 曲线 */
+  .curve {
+    fill: none;
+    stroke: #00eaff;
+    stroke-width: 3.2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  /* 轴名 x/m、v/(km/h) 与原点 O：物理量走斜体 */
+  .axis-name {
+    fill: #ffb900;
+    font-family: Georgia, "Times New Roman", serif;
+    font-style: italic;
+    font-size: 26px;
+  }
+  /* 单位与数字段：一律正体（Times New Roman 等高数字） */
+  .up {
+    font-style: normal;
+  }
+  /* 轴上的刻度数字 25 / 72：正体 */
+  .tick-num {
+    fill: #ffb900;
+    font-family: "Times New Roman", Georgia, serif;
+    font-style: normal;
+    font-size: 24px;
+  }
+  /* 车状态名（发现情况 / 开始减速 / 汽车停止）：汉字，正体，随车走 → 深蓝 */
+  .car-state {
+    fill: #075bff;
+    font-family: -apple-system, "PingFang SC", "Heiti SC", "Microsoft YaHei", sans-serif;
+    font-style: normal;
+    font-size: 26px;
+    text-anchor: middle;
+  }
+  /* 尺寸线名（反应过程 / 减速过程）：汉字，正体，随尺规走 → 金 */
+  .proc {
+    fill: #ffb900;
+    font-family: -apple-system, "PingFang SC", "Heiti SC", "Microsoft YaHei", sans-serif;
+    font-style: normal;
+    font-size: 26px;
+    text-anchor: middle;
+  }
+  /* 分图名 甲 / 乙 */
+  .panel {
+    fill: #ffb900;
+    font-family: -apple-system, "PingFang SC", "Heiti SC", "Microsoft YaHei", sans-serif;
+    font-style: normal;
+    font-size: 34px;
+    text-anchor: middle;
+  }
+</style>
+</head>
+<body>
+
+<!-- 配 `01 牛顿第二定律.md` 的「真题 7」（2014 山东省第 23 题）：志愿者饮酒后驾车，以
+     v₀ = 72 km/h 匀速行驶，从「发现情况」到「汽车停止」共行驶 L = 39 m；图甲把这段路程拆成
+     「反应过程（发现情况 → 开始减速，仍是 20 m/s 匀速）」与「减速过程（开始减速 → 汽车停止，
+     匀减速）」两段；图乙给出减速过程中位移 x 与速度 v 的关系曲线。
+
+     几何口径（1 单位 ≈ 1 画面点）：
+       画布         图元实测 bbox：x = 20 → 995.8、y = 130.1 → 475.9（见 <style> 里「由比例定尺」一段）
+       路面主视棱   y = 300，x = 20 → 450（一条粗平线，三辆车都压在它上面）
+       路面斜线     15 道，间距 28（x = 36 → 428），自主视棱向下左斜 16 × 26
+       车（局部坐标，路面 y = 0 为车底基准，车头朝右）：
+                   车身轮廓 尾门 x = 6（竖直）→ 车顶 y = −40（x = 12 → 34）→ 前风挡斜下到
+                   (46, −24) → 机罩到 (78, −24) → 圆滑收口 (86, −18)，再沿车底边 y = −18 回到尾门；
+                   侧窗 (15,−29)-(18,−37)-(31,−37)-(33,−29) 实心；
+                   车轮 圆心 (22,−9) / (68,−9)、r = 9 ⇒ 轮底 y = 0 落在路面上、轮顶 y = −18 与车底边相切。
+                   **三个时刻是同一辆车**，只用 <g id="car"> 画一次、三处 <use> 复用 —— 手画三遍
+                   迟早会有一辆大一圈或朝向不同，那就不再是「同一辆车的三个时刻」了。
+       车的三个位置（translate 的 x）：40 / 138 / 313，对应**车头**（局部 x = 86 → 绝对 126 / 224 / 399）
+       ★ 比例：1 m ↔ 7 单位。于是
+           反应过程 = 14 m → 98 单位（126 → 224）
+           减速过程 = 25 m → 175 单位（224 → 399）
+           全程     = 39 m → 273 单位（126 → 399）
+         这两个数（14 m、25 m）不是随手取的：25 m 是图乙读出的减速位移，14 m = L − 25 m 是反应
+         过程的位移 ⇒ 图甲两段长度之比 98 : 175 与题给数据严格一致（14 : 25），
+         改车位置时按 7 单位 / m 重算，别让「图上一量」和「答案」打架。
+       ★ 尺寸量的是**车头**：箭头从车头量到车头 —— 同一辆车、同一个点（车头）在两个时刻之间的距离
+         才是车的位移；量车尾也一样，但两段必须取同一个点，不能一段量车头、一段量车尾。
+       尺寸线       y = 372（在路面斜线之下）；端线 x = 126 / 224 / 399，y = 332 → 384；
+                   两段各有左右两个箭头，中间在 x = 224 处**尖对尖**接上（链条式标注的常规画法），
+                   共用一根端线 ⇒ 一眼看出「减速过程这一段是从 224 起算的」。
+       尺寸名       反应过程 (175, 408) / 减速过程 (311.5, 408)，各自居中于自己那一段
+       车状态名     竖向两行（原稿也是两行），第一行基线 y = 208、第二行 y = 238，
+                   字心对准各自车的水平中心 x = 86 / 184 / 359（车顶 y = 260，第二行下缘 246.9，
+                   离车顶 13 单位，不压车；相邻两条的名字左右各占 52 单位，间距 98 也不叠字）
+       甲乙         甲 (235, 464)、乙 (794, 464)：各居中于自己那半幅（甲幅 20 → 450 心在 235；
+                   乙幅 593 → 995.8 心在 794.4），且都在尺寸名「反应过程」的下缘 416.9 之下 11 单位
+
+     乙（x–v 曲线）的几何口径：整幅**比图甲低 60 单位**（横轴 y = 360、轴顶 y = 160）——
+       题图原稿里曲线顶点就落在「发现情况」那一行字的高度上，两幅并不共享基线；
+       早先让两幅横轴共用 y = 300，乙便比甲高出 110 单位，整幅图头重脚轻（现记于此，别再改回去）：
+       · 原点 O (620, 360)；纵轴 x 到 y = 160（箭头），横轴 v 到 x = 880（箭头）
+       · 刻度 25 m ↔ 180 单位（y = 180）、72 km/h ↔ 220 单位（x = 840）
+       · 曲线 M620 180 Q730 180 840 360：起点 (0, 25)、终点 (72, 0)
+       ★ 为什么这条二次 Bézier 恰好是抛物线：题给 x = (v₀² − v²)/(2a) ⇒ x 是 v 的二次函数，
+         图线必须是一条**顶点在 v = 0 处的抛物线**（起始平缓、向右越来越陡）。
+         把 v/72 记为 u，则 x = 25(1 − u²)；取 px = 620 + 220u、py = 180 + 180u²，
+         代入二次 Bézier 的 py(t) = (1−t)²·180 + 2t(1−t)·c + t²·360 并要求它等于 180 + 180t²，
+         解出控制点高度 c = 180（t¹ 项 −360 + 2c = 0）—— 即**控制点与起点等高**、横坐标取中点 730。
+         所以这条曲线不是「看着像」，是解析解；改刻度时照这条重解一次 c，别随手挪控制点。
+       · 25 写在纵轴左侧（x = 608，右对齐）；72 写在横轴下方（x = 840，居中），
+         各自贴着自己那一处刻度短划，两个数都不压在轴线上
+
+     图上没有画、也**不该**画的东西：
+       · 不标 v₀ = 20 m/s、不标 L = 39 m、不标 x = 25 m 的来历、不标 t₀ = 0.4 s 与 0.7 s：
+         题面给的是 72 km/h、39 m 与 0.4 s，20 m/s、25 m、0.7 s、8 m/s² 全是**要求的答案**，
+         一旦落到图上就等于替读者把结果写出来了（同 `01 example4.html` 不写 30° / 60° 的理由）。
+         图乙只保留题面给的两个读数（25 与 72），其余留给解析。
+       · 不画 a 的方向箭头、不画志愿者的受力图：本题第（3）问才涉及受力，图甲只是「两段路程」，
+         一画箭头，装置的读法立刻变成受力图，反而看不出这两段是在问什么。
+       · 不画速度—时间图：题面图乙给的是 x–v，换成 v–t 就把「给的条件」换掉了。
+       · 不把三个时刻画成同一位置（或三个位置挤在一起）：两段长度是本题第一、二问的入口，
+         挤在一起就量不出 14 : 25。
+
+     判读用的定量关系（写在这里，方便以后改图时对账，图上不出现）：
+       · 图乙读出 v = 0 时 x = 25 m ⇒ 减速位移 25 m；又 v₀ = 72 km/h = 20 m/s
+         ⇒ a = v₀²/(2x) = 400/50 = 8 m/s²、t = v₀/a = 2.5 s
+       · 反应过程匀速 ⇒ 反应位移 = L − 25 = 14 m ⇒ 饮酒后反应时间 = 14/20 = 0.7 s，
+         比一般人（0.4 s）多 0.3 s
+       · 自洽核验：图甲两段 98 : 175 = 0.560，题给 14 : 25 = 0.560 ✓；
+         全程 273 单位 ↔ 39 m、1 单位 ↔ 0.1429 m ✓ 与「1 m ↔ 7 单位」互为倒数
+       · 第（3）问：志愿者随车减速，水平方向 ma、竖直方向 mg 都由车（座椅 / 安全带）提供
+         ⇒ F = m√(a² + g²) = m√164，F/(mg) = √164/10 = √41/5 ≈ 1.28 -->
+
+<svg viewBox="-300 70 1600 465" xmlns="http://www.w3.org/2000/svg" role="img"
+     aria-label="图甲：平直路面上同一辆汽车在三个时刻的位置——最左为发现情况，中间为开始减速，最右为汽车停止；从发现情况到开始减速的一段标为反应过程，从开始减速到汽车停止的一段标为减速过程。图乙：减速过程中汽车位移随速度变化的曲线，纵轴是位移 x，单位米，最高处标 25；横轴是速度 v，单位千米每时，轴上标 72；曲线从速度为零、位移 25 米处出发，起始平缓，向右越来越陡，终止于速度 72 千米每时、位移为零处。">
+
+  <defs>
+    <!-- 坐标轴 / 尺寸线箭头：与同目录既有图同口径（7×7、按 strokeWidth 缩放） -->
+    <marker id="arrow" markerWidth="7" markerHeight="7" refX="5.5" refY="3.5"
+            orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L6,3.5 L0,7" fill="none" stroke="#ffb900" stroke-width="1.2"/>
+    </marker>
+    <!-- 反方向箭头：尺寸线左端用（`01 运动学/06 example6.html` 同法） -->
+    <marker id="arrowRev" markerWidth="7" markerHeight="7" refX="0" refY="3.5"
+            orient="auto" markerUnits="strokeWidth">
+      <path d="M6,0 L0,3.5 L6,7" fill="none" stroke="#ffb900" stroke-width="1.2"/>
+    </marker>
+
+    <!-- ═══════════ 车：同一辆车的三个时刻，只画一次、三处复用 ═══════════ -->
+    <!-- 局部坐标：车底基准线 y = 0（贴路面），向上为负；车头朝右。
+         车身 尾门 x = 6 竖直 → 车顶 y = −40 → 前风挡斜下 → 机罩 y = −24 → 圆滑车头 (86, −18)，
+         最后沿车底边 y = −18 收回尾门（Z 自动连线）。 -->
+    <g id="car">
+      <path class="car" d="M6 -18 L6 -34 Q6 -40 12 -40 L34 -40 L46 -24 L78 -24 Q86 -24 86 -18 Z"/>
+      <!-- 侧窗：实心，落在车顶与前风挡之间 -->
+      <path class="glass" d="M15 -29 L18 -37 L31 -37 L33 -29 Z"/>
+      <!-- 车轮：轮顶 y = −18 与车底边相切，轮底 y = 0 落回路面 -->
+      <circle class="car" cx="22" cy="-9" r="9"/>
+      <circle class="car" cx="68" cy="-9" r="9"/>
+    </g>
+  </defs>
+
+  <!-- ═══════════════════════════ 甲：路面与三个车时刻 ═══════════════════════════ -->
+
+  <!-- 路面主视棱：三辆车都压在 y = 300 这条线上 -->
+  <path class="rigid" d="M20 300 H450"/>
+  <!-- 路面斜线：15 道，间距 28（x = 36 → 428），自主视棱向下左斜 16 × 26 -->
+  <path class="hatch" d="M36 300 L20 326 M64 300 L48 326 M92 300 L76 326 M120 300 L104 326 M148 300 L132 326 M176 300 L160 326 M204 300 L188 326 M232 300 L216 326 M260 300 L244 326 M288 300 L272 326 M316 300 L300 326 M344 300 L328 326 M372 300 L356 326 M400 300 L384 326 M428 300 L412 326"/>
+
+  <!-- 时刻一：发现情况（车头 x = 126） -->
+  <use href="#car" transform="translate(40 300)"/>
+  <!-- 时刻二：开始减速（车头 x = 224），即反应过程结束 -->
+  <use href="#car" transform="translate(138 300)"/>
+  <!-- 时刻三：汽车停止（车头 x = 399），即减速过程结束 -->
+  <use href="#car" transform="translate(313 300)"/>
+
+  <!-- 车状态名：两行，字心对准各自车的水平中心（86 / 184 / 359） -->
+  <text class="car-state" x="86" y="208"><tspan x="86">发现</tspan><tspan x="86" dy="30">情况</tspan></text>
+  <text class="car-state" x="184" y="208"><tspan x="184">开始</tspan><tspan x="184" dy="30">减速</tspan></text>
+  <text class="car-state" x="359" y="208"><tspan x="359">汽车</tspan><tspan x="359" dy="30">停止</tspan></text>
+
+  <!-- ═══════════ 两段路程：端线 + 箭头，量的是「车头 → 车头」 ═══════════ -->
+  <!-- 端线：从路面斜线下方一直落到尺寸线下面一点，把尺寸线的量点与车头对上 -->
+  <path class="dim-tick" d="M126 332 V384 M224 332 V384 M399 332 V384"/>
+
+  <!-- 反应过程：14 m ↔ 98 单位（126 → 224） -->
+  <path class="dim" d="M126 372 H224" marker-start="url(#arrowRev)" marker-end="url(#arrow)"/>
+  <!-- 减速过程：25 m ↔ 175 单位（224 → 399）；左端与上一段的右端在 x = 224 处尖对尖 -->
+  <path class="dim" d="M224 372 H399" marker-start="url(#arrowRev)" marker-end="url(#arrow)"/>
+
+  <text class="proc" x="175" y="408">反应过程</text>
+  <text class="proc" x="311.5" y="408">减速过程</text>
+
+  <text class="panel" x="235" y="464">甲</text>
+
+  <!-- ═══════════════════════════ 乙：x–v 曲线 ═══════════════════════════ -->
+
+  <!-- 乙整幅比图甲低了 60 单位（横轴 y = 360、轴顶 y = 160），题图原稿也是这个分寸：
+       曲线顶点正好落在「发现情况」那一行字的高度上，而不是顶出画面。
+       早先的版本让两幅的横轴共用 y = 300 一条基线，结果乙比甲高出 110 单位——整幅图头重脚轻，
+       读者先看到的是一条悬在半空的坐标轴。分图之间本来没有共基线的要求（题图原稿也没有），
+       下移 60 之后两幅的分量才配得上；再要微调，只改本段这十来个 y，别动甲。 -->
+
+  <!-- 坐标轴：原点 (620, 360)；纵轴到 y = 160（箭头），横轴到 x = 880（箭头） -->
+  <path class="axis" d="M620 360 V160" marker-end="url(#arrow)"/>
+  <path class="axis" d="M620 360 H880" marker-end="url(#arrow)"/>
+
+  <!-- 减速过程的 x–v 曲线：顶点在 v = 0 的抛物线（控制点与起点等高，解析见文件头注释） -->
+  <path class="curve" d="M620 180 Q730 180 840 360"/>
+
+  <!-- 刻度短划：纵轴 y = 180（25 m）、横轴 x = 840（72 km/h） -->
+  <path class="axis-tick" d="M612 180 H620"/>
+  <path class="axis-tick" d="M840 360 V368"/>
+
+  <!-- 轴名与刻度数字 -->
+  <text class="axis-name" x="632" y="154"><tspan>x</tspan><tspan class="up">/m</tspan></text>
+  <text class="axis-name" x="886" y="370"><tspan>v</tspan><tspan class="up">/(km/h)</tspan></text>
+  <text class="axis-name" x="612" y="382" text-anchor="end">O</text>
+  <text class="tick-num" x="608" y="188" text-anchor="end">25</text>
+  <text class="tick-num" x="840" y="394" text-anchor="middle">72</text>
+
+  <text class="panel" x="794" y="464">乙</text>
+
+</svg>
+
+</body>
+</html>

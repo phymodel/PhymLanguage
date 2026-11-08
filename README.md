@@ -13,7 +13,7 @@ PhyModel_Web（浏览器）读取的文档库：`.md` 既是说明书，也是�
 | [`Entity/`](./Entity) | 实体参考：几何、材质、物理，以及 `CAD()` 的命令栈 | 10 类实体 · 14 条 CAD 命令 |
 | [`Beh_Actions/`](./Beh_Actions) | 动作参考：动画、位移、物理力、声音、场景跳转 | 15 个动作 |
 | [`Beh_Triggers/`](./Beh_Triggers) | 触发器参考：点、碰、近、滑、拖、抛 | 6 个触发器 |
-| [`Physics/`](./Physics) | 按教材章节组织的物理场景库（公式推导 + 可运行场景） | 8 章 · 61 篇 `.md` · 29 张 `.html` 图 |
+| [`Physics/`](./Physics) | 按教材章节组织的物理场景库（公式推导 + 可运行场景） | 8 章 · 63 篇 `.md` · 29 张 `.html` 图 |
 | [`Math/`](./Math) | 数学场景库（傅里叶级数等） | 4 个波形场景 |
 | [`EmbodiedIntelligence/`](./EmbodiedIntelligence) | 工程样例：用 phym 当 3D 打印件的**源文件** | MicroDuck 零件 |
 
@@ -183,14 +183,14 @@ Behavior()
 
 | 章 | 目录 | 覆盖 |
 |---|---|---|
-| 1 | [`1 Mechanics/`](./Physics/1%20Mechanics) | 运动学 · 静力学 · 动力学（牛顿定律、抛体、圆周运动、动量与能量、简谐振动…） |
-| 2 | [`2 Thermodynamics/`](./Physics/2%20Thermodynamics) | 玻意耳 / 查理 / 盖-吕萨克定律、热力学第一定律、基本方程 |
-| 3 | [`3 Optics/`](./Physics/3%20Optics) | 折射定律、球面折射、薄透镜 |
-| 4 | [`4 Electromagnetism/`](./Physics/4%20Electromagnetism) | 电荷到场、电路、磁场、电磁感应、交流电与变压器（21 篇） |
-| 5 | [`5 MathematicalMethodsOfPhysics/`](./Physics/5%20MathematicalMethodsOfPhysics) | 傅里叶变换 |
-| 6 | [`6 AtomicPhysics/`](./Physics/6%20AtomicPhysics) | 半衰期、质能方程 |
-| 7 | [`7 QuantumMechanics/`](./Physics/7%20QuantumMechanics) | 能量量子、光电效应、光子动量、频率条件 |
-| 8 | [`8 SolidStatePhysics/`](./Physics/8%20SolidStatePhysics) | 六方最密堆积（配 `.html` 交互图） |
+| 1 | [`1 力学/`](./Physics/1%20力学) | 运动学 · 静力学 · 动力学（牛顿定律、抛体、圆周运动、动量与能量、简谐振动…） |
+| 2 | [`2 热学/`](./Physics/2%20热学) | 玻意耳 / 查理 / 盖-吕萨克定律、热力学第一定律、基本方程 |
+| 3 | [`3 光学/`](./Physics/3%20光学) | 折射定律、球面折射、薄透镜 |
+| 4 | [`4 电磁学/`](./Physics/4%20电磁学) | 电荷到场、电路、磁场、电磁感应、交流电与变压器（21 篇） |
+| 5 | [`5 数学物理方法/`](./Physics/5%20数学物理方法) | 傅里叶变换 |
+| 6 | [`6 原子物理/`](./Physics/6%20原子物理) | 半衰期、质能方程 |
+| 7 | [`7 量子力学/`](./Physics/7%20量子力学) | 能量量子、光电效应、光子动量、频率条件 |
+| 8 | [`8 固体物理/`](./Physics/8%20固体物理) | 六方最密堆积（配 `.html` 交互图） |
 
 `Math/` 目前有[傅里叶级数](./Math/Advanced%20Mathematics/Fourier%20series)：锯齿波、方波、三角波、脉冲波的
 分解与合成，公式推导与波形实体放在同一个目录里。

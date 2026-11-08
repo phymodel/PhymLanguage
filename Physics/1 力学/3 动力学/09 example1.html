@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>小物块从左端滑上长木板：木板长 l，物块初速度 v₀</title>
+<style>
+  /* 图框口径：与同目录 `01 example1.html`～`01 example7.html`、`11 example1-1.html` 同一套。
+     · 页面**不上底色** —— iOS / visionOS 是玻璃主题，图要让窗口材质透出来；自己在页面里糊一块
+       实色底板，Markdown 侧会认出「作者画了底板」而不再注入画布（MarkdownHtmlFigure.swift
+       `declaresOwnPageBackground`），里外两块底互相打架。
+     · **由比例定尺** —— 图框形状读的就是本文件 viewBox 的比例（须落在 0.2–5 之间）。
+       本题是「一件装置（地面 + 木板 + 物块）＋ 一条板上方的长度标注 l」，画幅天生偏宽：
+       图元实测 bbox 为 x = 40 → 660、y = 62 → 406（620 × 344，比例 ≈ 1.80）。
+       viewBox = 800 × 440（x 从 −50 到 750、y 从 14 到 454），左右各留 90 单位、上下各留
+       48 单位真空格 —— 图元只占画幅宽度的 620 / 800 ≈ 78%，整幅按 0.78 缩小显示，玻璃面板里
+       不至于顶满。想让图再小一点就继续加宽 viewBox（留白只写在 viewBox 里，不碰任何图元坐标），
+       注意别超过 5 的比例上限 —— 高 440 时 viewBox 宽最多 2200。
+     · 配色（三色分工，别再加第四种）：
+         地面主视棱 / 地面排线 / 木板 / 记号 M ........ #ffb900（不动的装置：同 `01 example4.html`
+                                                      的「铁架台 + 平板 + 挡板」口径）
+         物块 m / v₀ 箭头与记号 / l 的尺寸线与记号 ..... #075bff（可动件 + 随它走的初速度）
+       金 = 装置，深蓝 = 会动的东西。木板本体是金色，物块（连同它的 v₀）是蓝色，一眼就分得开
+       「谁在动、谁不动」—— 本题要判的正是「物块走了多远、木板走了多远」，这两笔必须异色。
+       l 的尺寸线用蓝（题图原稿就是这么标的）：它悬在木板上方 195 个单位，与金色木板之间隔着
+       整片留白，不会跟金线混读；反过来若把 l 也涂成金色，它就会与木板、地面连成同一层「装置」，
+       读者容易把这条标注读成板上的又一根棱。
+     · 字体：m、M、l、v 是物理量，走 Georgia 斜体；下标 0 与单位一律正体（Times New Roman）。 */
+  body {
+    background-color: transparent;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    overflow: hidden;
+  }
+  svg {
+    height: 100%;
+    width: auto;
+    max-width: 100%;
+  }
+  /* 不动的装置：地面主视棱、木板轮廓（同一支粗线，装置是一整件刚体） */
+  .rigid {
+    fill: none;
+    stroke: #ffb900;
+    stroke-width: 5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  /* 地面排线：粗面记号，细一号，不跟主视棱抢 */
+  .hatch {
+    fill: none;
+    stroke: #ffb900;
+    stroke-width: 2.4;
+    stroke-linecap: round;
+  }
+  /* 物块：可动件，空心线稿（与 `01 example1.html` 的物块 P 同口径） */
+  .part {
+    fill: none;
+    stroke: #075bff;
+    stroke-width: 3.2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  /* 尺寸线（l）与两端的端线 */
+  .dim {
+    fill: none;
+    stroke: #075bff;
+    stroke-width: 2.6;
+    stroke-linecap: round;
+  }
+  .dim-tick {
+    fill: none;
+    stroke: #075bff;
+    stroke-width: 2.2;
+    stroke-linecap: round;
+  }
+  /* 记号（题面给的符号 m / M / l / v₀）：斜体，跟随自己所属图元的颜色。
+     **字号写在每个 <text> 的 font-size 属性上**（类里不写 font-size，否则 CSS 会盖掉属性）。 */
+  .sym {
+    font-family: Georgia, "Times New Roman", serif;
+    font-style: italic;
+    text-anchor: middle;
+  }
+  .sym-gold {
+    fill: #ffb900;
+  }
+  .sym-blue {
+    fill: #075bff;
+  }
+  /* 下标、数字与单位：正体 */
+  .up {
+    font-style: normal;
+  }
+</style>
+</head>
+<body>
+
+<!-- 配 `09 动能定理.md` 的「真题 1」（2023 全国乙卷第 2-21 题，多选）：
+     质量 m 的小物块（可视为质点）从质量 M、长 l 的木板的**左端**以 v₀ 向右滑上木板；
+     木板静止在光滑水平桌面上，物块与木板之间的滑动摩擦力大小为 f。
+     题问的是「物块从木板右端离开时，木板与物块的动能」，所以图上只需要给三样东西：
+     **物块站在木板左端、v₀ 的方向朝右、木板长 l**。除此之外一律不画（见文末「不该画的东西」）。
+
+     几何口径（1 单位 ≈ 1 画面点）：
+       画布         图元实测 bbox：x = 40 → 660、y = 62 → 406（见 <style> 里「由比例定尺」一段）
+       地面主视棱   y = 380，x = 40 → 660（一条粗平线，木板与排线都压在它上面）
+       地面排线     18 道，间距 34（x = 60 → 638），自主视棱向下左斜 18 × 26
+       木板         矩形 x = 100 → 580、y = 285 → 380（长 480 单位 ↔ l，厚 95），
+                    底边正落在地面主视棱 y = 380 上
+       物块         正方形 x = 100 → 170、y = 215 → 285（边长 70），
+                    底边坐在木板上表面 y = 285，**左边与木板左端 x = 100 齐平**
+                    （题面「从木板上的左端开始运动」；方块底边那一段与木板上表面共线，
+                     后画的蓝色底边压住金线 —— 与题图原稿一致：物块落脚处这一段是蓝的）
+       v₀ 箭头      y = 250（物块竖向中线），x = 178 → 262，箭头朝右，起点离物块右面 8 单位
+       记号 v₀      (220, 234)：居中写在箭头正上方，与箭头留 16 单位空当；下标 0 略下沉
+       记号 m       物块中心 (135, 262)；记号 M 写在木板中心 (340, 346)
+       长度标注     尺寸线 y = 90；两端端线 x = 100 / 580、y = 62 → 118（各跨尺寸线上下 28）；
+                    左段 M100 90 H300 只在左端画朝左的箭头，右段 M380 90 H580 只在右端画朝右的
+                    箭头，中间 300 → 380 这段留空写记号 l (340, 102)
+                    —— 链条式长度标注的常规画法：箭头尖顶在端线上，记号坐在两段之间的空当里
+       ★ 比例：480 单位 ↔ l ⇒ 1 单位 ↔ l/480。图上只有这一个定量约定，
+         改木板长度时按它重算（同时把端线、尺寸线两端、物块左端一起挪，别只挪木板）。
+
+     图上没有画、也**不该**画的东西：
+       · 摩擦力 f 的箭头：一画，这张「装置 + 初速度」的示意图立刻被读成受力图，
+         而本题要的是「位移 → 功 → 动能」这条链，不是牛顿第二定律的链条。
+       · 物块末速度 v、木板末速度 v′：它们是答案里才出现的量，落到图上就等于替读者把结果写了一半。
+       · 位移箭头 x_m / x_M：题面没给，且是解题的中介量（见下）；画上去反而让人以为「已知」。
+       · 「光滑水平桌面」的字样、地面之外的第二层台面：桌面在本图里只是一条主视棱，
+         它「光滑」与否是文字条件，不是图元。
+       · 木板右端之外再补一段地面排线到此为止 —— 排线只铺到 x = 638，别越过木板右端太远，
+         免得读成「物块离开后还要走一段」。
+
+     判读用的定量关系（写在这里，方便以后改图时对账，图上不出现）：
+       · 相对滑动距离恰为 l（物块从左端滑到右端）⇒ 位移关系 x_m = x_M + l
+         ⇒ x_m > l、x_M < l（严格小于：全程 v_物 > v_板，即 ∫v_物 dt > ∫v_板 dt 的量级压不过 l）。
+         ★ 方块边长 70 **不是**「物块的长度」：题面把物块当质点，相对位移量的就是
+           「木板左端 → 木板右端」这一整段，即图里那条 l 的尺寸线；别拿方块的边去量。
+       · 对木板：f x_M = ½Mv′² − 0，配 x_M < l ⇒ ½Mv′² < fl（B 对、A 错）
+       · 对物块：−f x_m = ½mv² − ½mv₀²，配 x_m > l ⇒ ½mv² < ½mv₀² − fl（D 对、C 错）
+       · 两个不等号都**只用到了「x_M < l < x_m」**这一条几何事实 —— 这正是本图必须把
+         「物块站在木板最左端、木板长 l」画准的原因：图画歪一点，这条几何事实就看不出来了。 -->
+
+<svg viewBox="-600 14 1800 440" xmlns="http://www.w3.org/2000/svg" role="img"
+     aria-label="装置示意图：一条水平的地面主视棱，地面下方画着排线；地面上放着一块厚木板，木板右端标出长度 l。木板的最左端放着一个很小的方形物块，方块上标着质量 m，方块右边的水平箭头表示它的初速度 v₀，方向向右。木板上除了物块没有别的东西。">
+
+  <defs>
+    <!-- 箭头：与同目录既有图同口径（7×7、按 strokeWidth 缩放）；本题的箭头都属「深蓝」这一层 -->
+    <marker id="arrow" markerWidth="7" markerHeight="7" refX="5.5" refY="3.5"
+            orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L6,3.5 L0,7" fill="none" stroke="#075bff" stroke-width="1.2"/>
+    </marker>
+    <!-- 反方向箭头：链条式标注的左端用 -->
+    <marker id="arrowRev" markerWidth="7" markerHeight="7" refX="0" refY="3.5"
+            orient="auto" markerUnits="strokeWidth">
+      <path d="M6,0 L0,3.5 L6,7" fill="none" stroke="#075bff" stroke-width="1.2"/>
+    </marker>
+  </defs>
+
+  <!-- ═══════════════════════════ 地面：主视棱 + 排线 ═══════════════════════════ -->
+
+  <path class="rigid" d="M40 380 H660"/>
+  <path class="hatch" d="M60 380 L42 406 M94 380 L76 406 M128 380 L110 406 M162 380 L144 406 M196 380 L178 406 M230 380 L212 406 M264 380 L246 406 M298 380 L280 406 M332 380 L314 406 M366 380 L348 406 M400 380 L382 406 M434 380 L416 406 M468 380 L450 406 M502 380 L484 406 M536 380 L518 406 M570 380 L552 406 M604 380 L586 406 M638 380 L620 406"/>
+
+  <!-- ═══════════════════════════ 木板 M：长 480 单位 ↔ l ═══════════════════════════ -->
+
+  <rect class="rigid" x="100" y="285" width="480" height="95" rx="6"/>
+  <text class="sym sym-gold" x="340" y="346" font-size="40">M</text>
+
+  <!-- ═══════════ 长度 l：木板左端 → 右端（链条式标注，记号坐在空当里） ═══════════ -->
+
+  <path class="dim-tick" d="M100 62 V118 M580 62 V118"/>
+  <path class="dim" d="M100 90 H300" marker-start="url(#arrowRev)"/>
+  <path class="dim" d="M380 90 H580" marker-end="url(#arrow)"/>
+  <text class="sym sym-blue" x="340" y="102" font-size="34">l</text>
+
+  <!-- ═══════════ 物块 m：站在木板最左端，v₀ 朝右 ═══════════ -->
+  <!-- 后画：方块底边压住木板上表面那一段金线，与题图原稿「落脚处是蓝的」一致 -->
+
+  <rect class="part" x="100" y="215" width="70" height="70" rx="3"/>
+  <text class="sym sym-blue" x="135" y="262" font-size="34">m</text>
+
+  <path class="part" d="M178 250 H262" marker-end="url(#arrow)"/>
+  <text class="sym sym-blue" x="220" y="234" font-size="30">v<tspan class="up" font-size="21" dy="5">0</tspan></text>
+
+</svg>
+
+</body>
+</html>

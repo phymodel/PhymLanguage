@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>P 点小环的受力：重力 mg 分解为指向圆心的 mg cosθ 与切向的 mg sinθ</title>
+<style>
+  /* 图框口径：与同目录 `10 example1-2.html`（本题的题图）、`09 example4-2.html`（受力分析图）
+     同一套。
+     · 页面**不上底色** —— iOS / visionOS 是玻璃主题，图要让窗口材质透出来。
+     · **由比例定尺** —— 图框形状读的就是本文件 viewBox 的比例。本题图的骨架（大圆环）与题图
+       `10 example1-2.html` **一模一样**：圆心 O(300, 300)、半径 R = 210，小环半径也照旧 r = 22
+       （本图不画小环本体，见下方 ★）。两个图**并排出现在同一道真题里**，若各按自己的图元 bbox
+       去裁 viewBox，同一枚大圆环会在前后两张图上显示成两种大小 —— 故本图直接沿用题图的图框
+       宽度 1565、高度 555（viewBox = -460 23 1565 555），两图的比例尺相同，翻页时环的大小不动。
+       本图图元实测 bbox = x 86.75 → 560.15、y 86.75 → 513.25（473 × 427，含大圆环 6.5 线宽、
+       P/Q 两个 8 半径的点与四个记号），居中落在上述图框里：左右各留 547 / 545 单位、
+       上下各留 64 / 65 单位 —— 大留白是「两图同尺」的代价，不是没量准。
+     · 配色（三色分工，别再加第四种）：
+         大圆环（装置）＋ 竖直 / 半径两条虚线、θ 的弧与记号 ............ #ffb900（金）
+         P、Q 两个位置点与记号，以及作用在小环上的重力 mg ............. #075bff（深蓝）
+         由 mg 分解出来的两个分量、以及补完平行四边形的两条虚线 ........ #00eaff（青）
+       这条分工与 `09 example4-2.html` 同口径：**金 = 纯几何**（轴、半径、弧、角名）、
+       **蓝 = 真正作用在物体上的力**（本题 P 点弹力恰为零，蓝的只有 mg 一支）、
+       **青 = 解析里分解出来的量**（分量与补形线都不是题面给的东西，是解出来的）。
+       本图另有蓝的 P、Q 两点 —— 与题图 `10 example1-2.html` 里 Q 点用蓝同一口径
+       （「小环这条故事线」走蓝：它现在所在的 P、它要去的 Q、它受的力 mg）。
+       反过来的错法：把分量涂成蓝 —— 图上就出现「三支力都作用在小环上」，读者会把
+       mg cosθ、mg sinθ 当成两个独立的力，写出三元方程；把半径虚线涂成青 ——
+       半径（几何）与径向分量（分解量）就糊成一条，看不出「分量落在半径方向上」这件事。
+
+     ★ 这张图为什么能只画 mg 一支力（图上不写，写在这里）：本题 P 点的定义就是「弹力为零」的位置
+       —— 由 mg cosθ − F_N = m v²/R 与 ½mv² = mgR(1 − cosθ) 联立得 F_N = mg(3cosθ − 2)，
+       cosθ = 2/3 时 F_N = 0。故 P 点处大圆环对小环**没有**作用力，小环只受重力；
+       重力的径向分量 mg cosθ 正好全部充当向心力（这就是解析里 mg cosθ = m v²/R 那一式），
+       切向分量 mg sinθ 使小环继续加速下滑。图上若在 P 点画一支 F_N，就与「P 点」的定义自相矛盾。
+
+     几何口径（1 单位 ≈ 1 画面点，与题图同一坐标系）：
+       大圆环 圆心 O(300, 300)、半径 R = 210；顶端 (300, 90)、最右点 (510, 300) 即 Q
+       P 点   取 cosθ = 2/3 的**精确位置**：P = O + R(sinθ, −cosθ)，sinθ = √5/3
+              → P = (300 + 210×0.745356, 300 − 210×0.666667) = (456.52, 160)
+              ★ 不按 θ = 48.2° 取整去摆 —— 取整会让平行四边形闭合不上（差 0.4 单位），
+                读者量出来的分量长度就不再严格等于 mg·cosθ、mg·sinθ。
+              ★ 只画一个实心小点（半径 8，同题图的 Q 点），**不画小环本体**：四支箭头 / 辅助线
+                都从 P 出发，画上 r = 22 的环线会把它们的起点全埋掉；小环的样子题图已经画过。
+       θ       竖直虚线 O → 顶端 (300, 96)：θ 从**竖直方向**量起，故虚线从 O 向上画、直达环内壁；
+               半径虚线 O → P；弧 圆心 O、半径 48，自 (300, 252) 顺时针转到 (335.78, 268)，跨 48.19°
+               记号 θ 在角平分线附近、r ≈ 76 处 → (325, 228)；再往弧边挪就顶到半径虚线，再往外就出环
+       重力 mg 自 P 竖直向下，长 120 单位；与它**同一支标度**（1 单位 = 1 份 mg/120）：
+                 mg ................ 120 单位 = mg
+                 mg cosθ（径向）..... 80 单位 = 120 × 2/3        → 尖端 (396.90, 213.33)，指向圆心
+                 mg sinθ（切向）..... 89.44 单位 = 120 × √5/3    → 尖端 (516.15, 226.67)，指向 Q 那一侧
+               两分量严格闭合：(396.90, 213.33) + 89.44×(cosθ, sinθ) = (456.52, 280) = mg 的尖端 ✓
+                               (516.15, 226.67) + 80×(−sinθ, cosθ) = (456.52, 280) = mg 的尖端 ✓
+               ⇒ 两支青箭头与 mg 张成一个**严格闭合的矩形**（径向 ⊥ 切向，边长就是 mg·cosθ 与 mg·sinθ）
+       补形虚线（青、细 2.2、虚线）：径向尖端 → mg 尖端、切向尖端 → mg 尖端。
+               ★ 这两条必须画：四个分量各自为边才自成一图（`09 example4-2.html` 那样），
+                 本图只有两条分量，缺了它们就看不出「mg 是这两个分量的合」。
+               ★ 但要比分量箭头细一档（2.2 < 3.2）并走虚线 —— 否则读者数出「四条青色箭头」。
+       记号位置（四个；浏览器实测 getBBox 后算的净距，最紧的一处是 Q 与它自己的点，10.0 ——
+       与题图 `10 example1-2.html` 的 Q 记号同一口径。改字号或挪箭头请重测）：
+           P (487.8, 132) 斜体 44 ....... P 点外侧（右上），离 P 点 17.3、整块落在环外
+           Q (528, 314)   斜体 44 ....... 与题图 `10 example1-2.html` 的 Q 记号同位，离 Q 点 10.0
+           mg (425, 308)  斜体 34 ....... mg 尖端的外侧（左下），离补形虚线 21.3
+           θ  (325, 228)  斜体 34 ....... 角平分线附近、弧外 18，离竖直虚线 15.6、离半径虚线 24.8
+       字号写在每个 <text> 的 font-size 属性上，类里不写 font-size（否则 CSS 会盖掉属性）。
+
+     图上没有画、也不该画的东西：
+       · 小环本体（r = 22 的蓝环）：见上 ★，会把 P 点的四支箭头起点埋掉。
+       · 速度 v 的箭头：v 的方向与切向分量 mg sinθ 同为 P 点的切线方向，两支箭头会叠在一条线上；
+         速率的式子（v² = 2gR(1 − cosθ)）属解析。
+       · 弹力 F_N：P 点恰为零，画上去就否掉了「P 点」的定义（见上 ★）。
+       · 数值 48.2°、cosθ = 2/3、v² = ⋯ 与答案：图上只留符号，数值属题面与解答。
+       · 大圆环之外的其余位置（顶端的小环、下滑的轨迹弧）：题图 `10 example1-2.html` 已画全。
+
+     判读用的定量关系（写在这里方便以后改图时对账，图上不出现）：
+       · 径向：mg cosθ − F_N = m v²/R，P 点 F_N = 0 ⇒ mg cosθ = m v²/R
+       · 能量：½ m v² = mgR(1 − cosθ) ⇒ v² = 2gR(1 − cosθ)
+       · 联立 ⇒ cosθ = 2/3、θ = 48.19°；图上 mg 的 120 单位里，径向那支 80 = 120×2/3 ✓
+       · 一般位置：F_N = mg(3cosθ − 2) ⇒ F(作用力) = mg|3cosθ − 2|：顶端 mg → P 点 0 → 底端 5mg
+       · 判读方向：切向那一支必须**指向 Q 那一侧（沿下滑方向）** —— 速率在增大，切向加速度
+         与速度同向；若把它画成指向顶端一侧，就是画反了。 */
+
+  body {
+    background-color: transparent;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    overflow: hidden;
+  }
+  svg {
+    height: 100%;
+    width: auto;
+    max-width: 100%;
+  }
+  /* 大圆环：一根金圈，空心、无填充（环是铁丝，不是圆盘） */
+  .hoop {
+    fill: none;
+    stroke: #ffb900;
+    stroke-width: 6.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  /* 竖直 / 半径两条辅助虚线：最细，只交代 θ 是从哪两条线之间量出来的 */
+  .guide {
+    fill: none;
+    stroke: #ffb900;
+    stroke-width: 2.2;
+    stroke-dasharray: 10 8;
+    stroke-linecap: round;
+  }
+  /* 夹角弧：几何标注，与虚线同口径 */
+  .angle-arc {
+    fill: none;
+    stroke: #ffb900;
+    stroke-width: 2.8;
+    stroke-linecap: round;
+  }
+  /* 圆心：实心小点，标出 θ 的顶点 */
+  .o-dot {
+    fill: #ffb900;
+    stroke: none;
+  }
+  /* P、Q 两个位置点：实心、与小环同色（「小环这条故事线」走深蓝） */
+  .pos-dot {
+    fill: #075bff;
+    stroke: none;
+  }
+  /* 作用在小环上的重力：本图唯一一支真实的力，粗一号 */
+  .force {
+    fill: none;
+    stroke: #075bff;
+    stroke-width: 4.2;
+    stroke-linecap: round;
+  }
+  /* 两个分量：细一号，是分解出来的量，不抢真力 */
+  .comp {
+    fill: none;
+    stroke: #00eaff;
+    stroke-width: 3.2;
+    stroke-linecap: round;
+  }
+  /* 补完平行四边形的两条虚线：比分量更细、走虚线，免得被数成第三、第四支分量 */
+  .comp-close {
+    fill: none;
+    stroke: #00eaff;
+    stroke-width: 2.2;
+    stroke-dasharray: 9 7;
+    stroke-linecap: round;
+  }
+  /* 记号：斜体衬线；金 = 几何，蓝 = 力与位置点 */
+  .geo-label {
+    fill: #ffb900;
+    font-family: Georgia, "Times New Roman", "KaiTi", serif;
+    font-style: italic;
+  }
+  .pos-label {
+    fill: #075bff;
+    font-family: Georgia, "Times New Roman", "KaiTi", serif;
+    font-style: italic;
+  }
+  .force-label {
+    fill: #075bff;
+    font-family: Georgia, "Times New Roman", "KaiTi", serif;
+    font-style: italic;
+  }
+</style>
+</head>
+<body>
+
+<!-- 配 `10 机械能守恒定律.md` 的「真题 1」（2024 全国甲卷第 2-17 题）**解析里的第二张图**：
+     `10 example1-2.html` 画的是题面那个装置（大圆环 + 顶端的静止小环 + Q 这个位置），
+     本图画的是解析的第一步 ——「小环在 P 点只受重力，把 mg 沿径向、切向分解」：
+     径向那一支 80 单位 = mg cosθ 指向圆心（全部充当向心力），
+     切向那一支 89.44 单位 = mg sinθ 沿下滑方向（使小环继续加速）。
+     第 (2) 问的 mg cosθ = m v²/R 与「先减小后增大」的数学依据都从这张图上一眼读出来。 -->
+
+<svg viewBox="-500 23 1800 555" xmlns="http://www.w3.org/2000/svg" role="img"
+     aria-label="竖直平面内固定的光滑大圆环，圆心为 O。小环下滑到 P 点，P 点的位置由半径 OP 与竖直方向的夹角 θ 标出，cosθ 等于三分之二。P 点处大圆环对小环的弹力恰好为零，小环只受重力 mg（竖直向下的一支蓝色箭头）。把 mg 沿径向与切向分解：径向分量 mg 乘以余弦 θ 沿半径指向圆心 O（青色箭头，占 mg 长度约三分之二），切向分量 mg 乘以正弦 θ 沿环指向 Q 那一侧（青色箭头，沿下滑方向）；两条青色虚线与两支分量箭头把 mg 补成平行四边形，mg 正是这两条分量的对角线。Q 为大圆环最右点，即竖直线与大圆环的切点。">
+
+  <defs>
+    <!-- 每支箭头各要一支箭头（7×7、按 strokeWidth 缩放），描边跟各自箭头同色 -->
+    <marker id="arrowForce" markerWidth="7" markerHeight="7" refX="5.5" refY="3.5"
+            orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L6,3.5 L0,7" fill="none" stroke="#075bff" stroke-width="1.2"/>
+    </marker>
+    <marker id="arrowComp" markerWidth="7" markerHeight="7" refX="5.5" refY="3.5"
+            orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L6,3.5 L0,7" fill="none" stroke="#00eaff" stroke-width="1.2"/>
+    </marker>
+  </defs>
+
+  <!-- ═══════════ 装置：与题图同一坐标系、同一半径（两图同比例尺） ═══════════ -->
+
+  <circle class="hoop" cx="300" cy="300" r="210"/>
+
+  <!-- ═══════════ 几何：竖直虚线、半径虚线（先画，被箭头压住） ═══════════ -->
+
+  <!-- 竖直方向：θ 是从这条线量起的，自 O 向上直达环内壁 -->
+  <path class="guide" d="M300 300 V96"/>
+  <!-- 半径 OP：θ 的另一条边；后半段被径向分量压住（分量正落在半径方向上，这是本图的判读点之一） -->
+  <path class="guide" d="M300 300 L456.52 160"/>
+
+  <!-- ═══════════ 夹角弧与圆心 ═══════════ -->
+
+  <path class="angle-arc" d="M300 252 A48 48 0 0 1 335.78 268"/>
+  <circle class="o-dot" cx="300" cy="300" r="5"/>
+
+  <!-- ═══════════ 补完平行四边形的两条虚线（比分量细，别数成四条分量） ═══════════ -->
+
+  <path class="comp-close" d="M396.90 213.33 L456.52 280"/>
+  <path class="comp-close" d="M516.15 226.67 L456.52 280"/>
+
+  <!-- ═══════════ 两个分量：与 mg 同一支标度 ═══════════ -->
+
+  <!-- mg cosθ：120 × 2/3 = 80，自 P 沿半径指向圆心 O -->
+  <path class="comp" d="M456.52 160 L396.90 213.33" marker-end="url(#arrowComp)"/>
+  <!-- mg sinθ：120 × √5/3 = 89.44，自 P 沿切线指向 Q 那一侧（下滑方向） -->
+  <path class="comp" d="M456.52 160 L516.15 226.67" marker-end="url(#arrowComp)"/>
+
+  <!-- ═══════════ 真实的力：P 点弹力为零，只剩重力 ═══════════ -->
+
+  <!-- mg：竖直向下，长 120 单位（本图的标度基准） -->
+  <path class="force" d="M456.52 160 V280" marker-end="url(#arrowForce)"/>
+
+  <!-- ═══════════ 位置点：P（本图的分析点）与 Q（题面的切点） ═══════════ -->
+
+  <circle class="pos-dot" cx="456.52" cy="160" r="8"/>
+  <circle class="pos-dot" cx="510" cy="300" r="8"/>
+
+  <!-- ═══════════ 记号 ═══════════ -->
+
+  <text class="pos-label" x="487.8" y="132" font-size="44" text-anchor="middle">P</text>
+  <text class="pos-label" x="528" y="314" font-size="44" text-anchor="start">Q</text>
+  <text class="force-label" x="425" y="308" font-size="34" text-anchor="end">mg</text>
+  <text class="geo-label" x="325" y="228" font-size="34" text-anchor="middle">θ</text>
+
+</svg>
+
+</body>
+</html>

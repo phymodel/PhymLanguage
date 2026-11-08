@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>四种曲线图</title>
+<style>
+  /* 图框口径：与 `Physics/5 原子物理/HCP_ca.html` 同一套。
+     · 页面**不上底色** —— iOS / visionOS 是玻璃主题，图要让窗口材质透出来。
+       自己糊一块实色底板（原来这里是 background:#000）会有两个后果：玻璃面板上留一块异色方块；
+       而且 Markdown 侧认出「作者画了底板」就不注入画布（见 MarkdownHtmlFigure.swift
+       `declaresOwnPageBackground`），里外两块底互相打架。
+     · **由高度定尺** —— 图框形状由图文档自己的 viewBox 比例给出（Markdown 侧读的就是这个比例，
+       要求落在 0.2–5 之间，超了会退化成固定 240px 高），svg 占满图框高度，
+       左右多出来的就是真空格。 */
+  body {
+    background-color: transparent;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    overflow: hidden;
+  }
+  svg {
+    height: 100%;
+    width: auto;
+    max-width: 100%;
+  }
+  .axis {
+    fill: none;
+    stroke: #ffb900;
+    stroke-width: 2.2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .curve {
+    fill: none;
+    stroke: #0865ff;
+    stroke-width: 2.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .label {
+    fill: #ffb900;
+    font-family: Georgia, "Times New Roman", serif;
+    font-style: italic;
+    font-size: 20px;
+  }
+  .panel-label {
+    fill: #ffb900;
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 27px;
+    text-anchor: middle;
+  }
+</style>
+</head>
+<body>
+
+<!-- 画布：viewBox 比例 = 1160 / 250 ≈ 4.64（落在 Markdown 侧认的 0.2–5 内，图框才拿得到比例）；
+     内容四周留 18–33 个单位白边，A/B/C/D 与轴上的 x / v、t、O 全都在框内 ——
+     原来的 `0 0 1280 245` 比例 5.22 已被判为「不是图画」，图框退化成固定 240px 高，
+     而且面板字母写在 y=246（框外）上是切掉的。 -->
+<svg viewBox="30 20 1160 250" role="img"
+     aria-label="四幅曲线图 A、B、C、D：A、B 为 x-t 图，C、D 为 v-t 图">
+  <defs>
+    <marker id="arrow" markerWidth="7" markerHeight="7" refX="5.5" refY="3.5" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L6,3.5 L0,7" fill="none" stroke="#ffb900" stroke-width="1.2"/>
+    </marker>
+  </defs>
+
+  <!-- A：x-t -->
+  <g transform="translate(0,0)">
+    <path class="axis" d="M71 190 V45" marker-end="url(#arrow)"/>
+    <path class="axis" d="M71 190 H220" marker-end="url(#arrow)"/>
+    <text class="label" x="77" y="53">x</text>
+    <text class="label" x="210" y="211">t</text>
+    <text class="label" x="59" y="208">O</text>
+    <path class="curve" d="M72 189 C95 180,123 167,137 148 C151 130,123 126,116 114 C109 101,139 76,160 63"/>
+    <text class="panel-label" x="141" y="246">A</text>
+  </g>
+
+  <!-- B：x-t -->
+  <g transform="translate(312,0)">
+    <path class="axis" d="M71 190 V45" marker-end="url(#arrow)"/>
+    <path class="axis" d="M71 190 H220" marker-end="url(#arrow)"/>
+    <text class="label" x="77" y="53">x</text>
+    <text class="label" x="210" y="211">t</text>
+    <text class="label" x="59" y="208">O</text>
+    <path class="curve" d="M73 188 C91 147,126 105,159 84 C184 68,202 76,196 99 C192 113,183 129,174 143"/>
+    <text class="panel-label" x="141" y="246">B</text>
+  </g>
+
+  <!-- C：v-t -->
+  <g transform="translate(624,0)">
+    <path class="axis" d="M71 190 V45" marker-end="url(#arrow)"/>
+    <path class="axis" d="M71 190 H220" marker-end="url(#arrow)"/>
+    <text class="label" x="80" y="53">v</text>
+    <text class="label" x="210" y="211">t</text>
+    <text class="label" x="59" y="208">O</text>
+    <path class="curve" d="M73 188 C89 151,108 115,127 108 C143 102,145 124,153 132 C165 145,187 127,207 107 C215 99,220 91,226 85"/>
+    <text class="panel-label" x="141" y="246">C</text>
+  </g>
+
+  <!-- D：v-t -->
+  <g transform="translate(936,0)">
+    <path class="axis" d="M71 190 V45" marker-end="url(#arrow)"/>
+    <path class="axis" d="M71 190 H220" marker-end="url(#arrow)"/>
+    <text class="label" x="80" y="53">v</text>
+    <text class="label" x="210" y="211">t</text>
+    <text class="label" x="59" y="208">O</text>
+    <path class="curve" d="M72 188 C103 171,139 148,170 124 C197 102,216 80,187 73 C166 68,127 80,105 90"/>
+    <text class="panel-label" x="141" y="246">D</text>
+  </g>
+</svg>
+
+</body>
+</html>

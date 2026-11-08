@@ -1,0 +1,128 @@
+
+Behavior()
+.name("tapInitial")
+.trigger{
+    Tap(){
+        objects: ["textInitial"]
+    }
+}
+.actions{
+    Speak(1){
+        object: "textInitial",
+        volume: 0.5,
+        text: "时刻指的是某一瞬间，在时间轴上用点来表示。这是初时刻，表示过程的开始。"
+    }
+    Emphasize(1){
+        objects: ["textInitial", "initial"],
+        motionType: .pulse,
+        duration: 1
+    }
+    Show(1){
+        objects: ["initial"]
+        motionType: .pop
+        duration: 1.5
+    }
+    Wait(2){
+        duration: 7.0
+    }
+    Hide(2){
+        objects: ["initial"]
+        motionType: .scale
+        duration: 0.5
+    }
+}
+
+Behavior()
+.name("tapFinal")
+.trigger{
+    Tap(){
+        objects: ["textFinal"]
+    }
+}
+.actions{
+    Speak(1){
+        object: "textFinal",
+        volume: 0.5,
+        text: "时刻指的是某一瞬间，在时间轴上用点来表示。这是末时刻，表示过程的结束。"
+    }
+    Emphasize(1){
+        objects: ["textFinal", "final"],
+        motionType: .pulse,
+        duration: 1
+    }
+    Show(1){
+        objects: ["final"]
+        motionType: .pop
+        duration: 1.5
+    }
+    Wait(2){
+        duration: 7.0
+    }
+    Hide(2){
+        objects: ["final"]
+        motionType: .scale
+        duration: 0.5
+    }
+}
+
+Behavior()
+.name("tapText12")
+.trigger{
+    Tap(){
+        objects: ["text12"]
+    }
+}
+.actions{
+    Emphasize(1){
+        objects: ["text12", "TimeInterval"],
+        motionType: .pulse,
+        duration: 0.5
+    }
+    Speak(1){
+        object: "text12",
+        volume: 0.5,
+        text: "时间间隔（简称时间）指的是两个时刻之间的间隔，在时间轴上用线段来表示。"
+    }
+    Show(1){
+        objects: ["initial", "final"]
+        motionType: .pop
+        duration: 0.5
+    }
+    Wait(1){
+        duration: 1
+    }
+    Show(2){
+        objects: ["TimeInterval"]
+        motionType: .pop
+        duration: 0.5
+    }
+    Wait(3){
+        duration: 5
+    }
+    Hide(4){
+        objects: ["TimeInterval", "initial", "final"]
+        motionType: .scale
+        duration: 0.5
+    }
+}
+
+Behavior()
+.name("formulaTap")
+.trigger{
+    Tap(){
+        objects: ["textFormula"]
+    }
+}
+.actions{
+    Emphasize(1){
+        objects: ["textFormula"],
+        motionType: .pulse,
+        duration: 1
+    }
+    Speak(1){
+        object: "textFormula",
+        volume: 0.5,
+        text: "时间公式：时间间隔等于末时刻减去初时刻。"
+    }
+    
+}

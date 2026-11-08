@@ -1,0 +1,125 @@
+
+Latex()
+.name("textInitial")
+.mesh(width: 0.5, text: ¥¥
+<center>
+<span style="font-size: 60px;">初位置 $x_1 = 5 \,{\rm m}$</span>
+</center>
+¥¥
+)
+.material(red: 1.0, green: 1.0, blue: 1.0, opacity: 0.999, roughness: 0.5, metallic: 0.8)
+.physic(mass: 0.1, staticFriction: 0.9, dynamicFriction: 0.75, restitution: 0.22, mode: .kinematic)
+.position(x: 0.6, y: 1.6, z: 0.0)
+
+CAD()
+.name("initial")
+.mesh(commands: [
+    "DEF sphere = SOLID_FORMULA 0,0,0 (x/0.03)^2+(y/0.03)^2+(z/0.03)^2-1=0",
+])
+.physic(mass: 0.6, staticFriction: 0.6, dynamicFriction: 0.4, restitution: 0.2, mode: .kinematic)
+.material(red: 0.47, green: 0.83, blue: 0.3, opacity: 1, roughness: 0.5, metallic: 0.8)
+.position(x: 0.6, y: 1.5, z: 0.0)
+.isEnabled(false)
+
+Latex()
+.name("textFinal")
+.mesh(width: 0.5, text: ¥¥
+<center>
+<span style="font-size: 60px;">末位置 $x_2 = 2 \,{\rm m}$</span>
+</center>
+¥¥
+)
+.material(red: 1.0, green: 1.0, blue: 1.0, opacity: 0.999, roughness: 0.5, metallic: 0.8)
+.physic(mass: 0.1, staticFriction: 0.9, dynamicFriction: 0.75, restitution: 0.22, mode: .kinematic)
+.position(x: 0.0, y: 1.6, z: 0.0)
+
+CAD()
+.name("final")
+.mesh(commands: [
+    "DEF sphere = SOLID_FORMULA 0,0,0 (x/0.03)^2+(y/0.03)^2+(z/0.03)^2-1=0",
+])
+.physic(mass: 0.6, staticFriction: 0.6, dynamicFriction: 0.4, restitution: 0.2, mode: .kinematic)
+.material(red: 0.47, green: 0.83, blue: 0.3, opacity: 1, roughness: 0.5, metallic: 0.8)
+.position(x: 0.0, y: 1.5, z: 0.0)
+.isEnabled(false)
+
+Latex()
+.name("text12")
+.mesh(width: 1.2, text: ¥¥
+<center>
+<span style="font-size: 60px;"> 位移 $\Delta x = x_2 - x_1 = 2 \,{\rm m} - 5 \,{\rm m} = -3 \,{\rm m}$
+</span>
+</center>
+¥¥
+)
+.material(red: 1.0, green: 1.0, blue: 1.0, opacity: 0.999, roughness: 0.5, metallic: 0.8)
+.physic(mass: 0.1, staticFriction: 0.9, dynamicFriction: 0.75, restitution: 0.22, mode: .kinematic)
+.position(x: 0.35, y: 1.3, z: 0.0)
+
+CAD()
+.name("TimeInterval")
+.mesh(commands: [
+    "DEF arrow = PATH_OPEN 0,0,0 Z 0.6,0 0.6,0.01 0.1,0.01 0.1,0.04 0,0 REV X 360"
+])
+.material(red: 1.0, green: 0.0, blue: 0.0, opacity: 1, roughness: 0.3, metallic: 0.9)
+.physic(mass: 0.5, staticFriction: 0.6, dynamicFriction: 0.4, restitution: 0.2, mode: .kinematic)
+.position(x: 0.0, y: 1.5, z: 0.0)
+.isEnabled(false)
+
+// 打组系统（坐标系）
+Group()
+.name("CoordinateSystem")
+.entity[
+    "CoordinateSystemBodyArrow",
+    "unitLength",
+    "unit",
+    "CoordinateSystemEllipsoid[i]",
+    "CoordinateSystemText[i]"
+]
+.position(x: 0.0, y: 1.5, z: 0.0)
+
+// 坐标系主体
+
+    CAD()
+.name("CoordinateSystemBodyArrow")
+.mesh(commands: [
+    "DEF arrow = PATH_OPEN 0,0,0 Z 2.0,0 1.9,-0.03 1.9,-0.005 0,-0.005 0,0  REV X 360"
+])
+.material(red: 0.5, green: 0.5, blue: 0.5, opacity: 1, roughness: 0.3, metallic: 0.9)
+.physic(mass: 0.5, staticFriction: 0.6, dynamicFriction: 0.4, restitution: 0.2, mode: .kinematic)
+.position(x: -1.0, y: 0.0, z: 0.0)
+
+Text()
+.name("unitLength")
+.mesh(text: "x", extrusionDepth: 0.001, font: "Times New Roman Italic", fontSize: 0.05)
+.material(red: 0.9, green: 0.1, blue: 0.3, opacity: 1, roughness: 0.5, metallic: 0.8)
+.physic(mass: 0.3, staticFriction: 0.6, dynamicFriction: 0.4, restitution: 0.2, mode: .kinematic)
+.position(x: 0.9, y: -0.08, z: 0.0)
+
+Text()
+.name("unit")
+.mesh(text: "/m", extrusionDepth: 0.001, font: "Times New Roman", fontSize: 0.05)
+.material(red: 0.9, green: 0.1, blue: 0.3, opacity: 1, roughness: 0.5, metallic: 0.8)
+.physic(mass: 0.3, staticFriction: 0.6, dynamicFriction: 0.4, restitution: 0.2, mode: .kinematic)
+.position(x: 0.94, y: -0.08, z: 0.0)
+
+// 批量生成元素（刻度）
+Repeat(8) { i in
+    CAD()
+    .name("CoordinateSystemEllipsoid[i]")
+    .mesh(commands: [
+        "DEF sphere = SOLID_FORMULA 0,0,0 (x/0.02)^2+(y/0.02)^2+(z/0.02)^2-1=0",
+    ])
+    .physic(mass: 0.6, staticFriction: 0.6, dynamicFriction: 0.4, restitution: 0.2, mode: .kinematic)
+    .material(red: 0.67, green: 0.32, blue: 1.0, opacity: 1, roughness: 0.5, metallic: 0.8)
+    .position(x: -0.8 + i * 0.2, y: 0.0, z: 0.0)
+}
+
+Repeat(8) { i in
+    Text()
+    .name("CoordinateSystemText[i]")
+    .mesh(text: "[i-2]", extrusionDepth: 0.001, font: "Times New Roman", fontSize: 0.05)
+    .material(red: 0.9, green: 0.1, blue: 0.3, opacity: 1, roughness: 0.5, metallic: 0.8)
+    .physic(mass: 0.3, staticFriction: 0.6, dynamicFriction: 0.4, restitution: 0.2, mode: .kinematic)
+    .position(x: -0.8 + i * 0.2, y: -0.08, z: 0.0)
+}

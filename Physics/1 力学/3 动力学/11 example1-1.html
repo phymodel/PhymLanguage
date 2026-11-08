@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>函数图像</title>
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+body {
+    background-color: transparent;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    overflow: hidden;
+}
+svg {
+    height: 100%;
+    width: auto;
+    max-width: 100%;
+}
+.axis {
+    stroke: #ffb900;
+    stroke-width: 3.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    fill: none;
+}
+.tick {
+    stroke: #ffb900;
+    stroke-width: 3;
+    stroke-linecap: round;
+}
+.dashed {
+    stroke: #075bff;
+    stroke-width: 3;
+    stroke-dasharray: 7 6;
+}
+.curve {
+    stroke: #00eaff;
+    stroke-width: 3;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    fill: none;
+}
+.yellow {
+    fill: #ffb900;
+    font-family: "Times New Roman", "KaiTi", serif;
+    font-style: italic;
+}
+.blue {
+    fill: #075bff;
+    font-family: "Times New Roman", "KaiTi", serif;
+}
+.upright {
+    font-style: normal;
+}
+</style>
+</head>
+<body>
+<!-- 图框形状 = 本文件 viewBox 的比例（MarkdownHtmlFigure / doc.html 读的就是这个比例），
+     帧宽 = 文档流宽度，所以「留白」只能写在 viewBox 里：
+       · 左右：viewBox 左边界放到 -60，右边界放到 886 → 两侧各留约 100 单位空白（原来左 39 / 右 72）；
+       · 两图之间：图 (b) 整组 translate(90 0)，间距由 49 单位加到 139 单位。
+     内容坐标不动，只压缩「画布外圈」——宽高比 946/270 ≈ 3.5，仍在 0.2–5 的有效区间内。 -->
+<svg viewBox="-60 0 946 270" xmlns="http://www.w3.org/2000/svg">
+
+    <!-- 图 (a) 左侧坐标系 -->
+    <g>
+        <path class="axis" d="M68 190 V30 M68 190 H345"/>
+        <path class="axis" d="M60 39 L68 29 L75 39 M335 182 L345 190 L335 197"/>
+
+        <!-- 横轴刻度 -->
+        <path class="tick" d="M127 183 V190 M198 183 V190 M260 183 V190 M324 183 V190"/>
+
+        <!-- 竖直蓝色虚线 -->
+        <path class="dashed" d="M173 61 V190 M233 61 V190"/>
+
+        <!-- 函数折线：0~t₁ 阻力为 0，图线与横轴重合（青色）→ t₁~t₂ 上升 → t₂ 之后水平 -->
+        <path class="curve" d="M68 190 H173 L233 84 H331"/>
+
+        <!-- 坐标轴文字 -->
+        <text class="yellow" x="39" y="49" font-size="29">f</text>
+        <text class="yellow" x="48" y="218" font-size="30">O</text>
+        <text class="yellow" x="329" y="175" font-size="25">t<tspan class="upright">/s</tspan></text>
+        <text class="yellow upright" x="304" y="218" font-size="29">2.0</text>
+
+        <!-- t1、t2 标记 -->
+        <text class="blue" x="155" y="216" font-size="26" font-style="italic">t<tspan font-size="19" dy="5" font-style="normal">1</tspan></text>
+        <text class="yellow upright" x="181" y="217" font-size="27">1.0</text>
+        <text class="blue" x="228" y="216" font-size="26" font-style="italic">t<tspan font-size="19" dy="5" font-style="normal">2</tspan></text>
+
+        <!-- 图名 -->
+        <text class="blue" x="182" y="261" font-size="27">图(a)</text>
+    </g>
+
+    <!-- 图 (b) 右侧坐标系（整组右移 90，拉开与图 (a) 的间距） -->
+    <g transform="translate(90 0)">
+        <path class="axis" d="M419 187 V30 M419 187 H696"/>
+        <path class="axis" d="M411 39 L419 29 L426 39 M686 179 L696 187 L686 194"/>
+
+        <!-- 横轴刻度 -->
+        <path class="tick" d="M477 180 V187 M543 180 V187 M608 180 V187 M668 180 V187"/>
+
+        <!-- 竖直蓝色虚线 -->
+        <path class="dashed" d="M521 56 V187 M580 56 V187"/>
+
+        <!-- 坐标轴文字 -->
+        <text class="yellow" x="394" y="43" font-size="29">v</text>
+        <text class="yellow" x="402" y="216" font-size="30">O</text>
+        <text class="yellow" x="679" y="174" font-size="25">t<tspan class="upright">/s</tspan></text>
+        <text class="yellow upright" x="650" y="217" font-size="29">2.0</text>
+
+        <!-- t1、t2 标记 -->
+        <text class="blue" x="506" y="214" font-size="26" font-style="italic">t<tspan font-size="19" dy="5" font-style="normal">1</tspan></text>
+        <text class="yellow upright" x="529" y="215" font-size="27">1.0</text>
+        <text class="blue" x="574" y="214" font-size="26" font-style="italic">t<tspan font-size="19" dy="5" font-style="normal">2</tspan></text>
+
+        <!-- 图名 -->
+        <text class="blue" x="536" y="261" font-size="27">图(b)</text>
+    </g>
+
+</svg>
+</body>
+</html>

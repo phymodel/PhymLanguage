@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>甲、乙两物体的 F-a 图线（同一桌面，动摩擦因数不同）</title>
+<style>
+  /* 图框口径：与同目录 `01 example1.html`、`11 example1-1.html`、
+     `1 力学/1 运动学/09 example1.html` 同一套。
+     · 页面**不上底色** —— iOS / visionOS 是玻璃主题，图要让窗口材质透出来；自己在页面里糊一块
+       实色底板，Markdown 侧会认出「作者画了底板」而不再注入画布（MarkdownHtmlFigure.swift
+       `declaresOwnPageBackground`），里外两块底互相打架。
+     · **由比例定尺** —— 图框形状读的就是本文件 viewBox 的比例，须落在 0.2–5 之间。
+       本图 viewBox = 1600 × 380 → 比例 ≈ 4.21（与 `11 example1-1.html`、`运动学/09 example1.html`
+       同一档的偏宽画幅）。图元本身只占 x = 432 → 882、y = 40 → 355（水平中心 657），左右两侧的
+       空格子全靠 viewBox 放宽给出：本版 viewBox 取 x = −143 → 1457，两侧各留 575 单位空白
+       （上一版 1200 × 380、两侧各 377，图在文档里显得顶满帧宽，故左右各再放 198 单位）。
+       想让图更小就继续对称加宽 —— 只动 viewBox 的 x 与 width（保持 x₀ + width/2 = 657），
+       不碰任何图元坐标；注意别超过 5 的比例上限（本图上限约 viewBox 宽 1900）。
+     · 配色：
+         坐标轴 / 轴名 F、a / 原点 O ................ #ffb900
+         F-a 图线与「甲」「乙」二字 ................. #00eaff
+       两条线同色是刻意的：本题的判读点是「斜率不同、截距相同」，靠斜率和右端的甲 / 乙二字区分，
+       不靠颜色；本图没有辅助虚线，所以也不会出现「图线与虚线同色」的问题。
+     · 字体：F、a、O 是数学记号，走 Georgia 斜体；「甲」「乙」是题面给的物体名（不是变量），
+       走汉字字体栈并保持正体 —— Georgia 没有汉字，不换栈会掉字。 */
+  body {
+    background-color: transparent;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    overflow: hidden;
+  }
+  svg {
+    height: 100%;
+    width: auto;
+    max-width: 100%;
+  }
+  /* 坐标轴：细一号，与同目录几张坐标系图看着一样重 */
+  .axis {
+    fill: none;
+    stroke: #ffb900;
+    stroke-width: 2.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  /* F-a 图线：甲、乙两条直线 */
+  .curve {
+    fill: none;
+    stroke: #00eaff;
+    stroke-width: 3.2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  /* 轴名 F / a 与原点 O：物理量走斜体 */
+  .axis-name {
+    fill: #ffb900;
+    font-family: Georgia, "Times New Roman", serif;
+    font-style: italic;
+    font-size: 26px;
+  }
+  /* 「甲」「乙」：题面给的物体名，汉字字体栈 + 正体 */
+  .body-label {
+    fill: #00eaff;
+    font-family: -apple-system, "PingFang SC", "Heiti SC", "Microsoft YaHei", sans-serif;
+    font-style: normal;
+    font-size: 30px;
+  }
+</style>
+</head>
+<body>
+
+<!-- 配 `01 牛顿第二定律.md` 的「真题 2」（2023 全国甲卷第 2-19 题）：
+     甲、乙两物体在同一水平桌面上由静止被水平拉力拉直运动，拉 − 加速度图线如图，问质量与
+     动摩擦因数的大小关系。
+
+     图线为什么这么画（本题的全部判读点都在几何里）：
+       · 对每个物体：F − μmg = ma ⇒ F = ma + μmg，是 a 的一次函数。
+         斜率 = m（质量），纵轴截距 = μmg（滑动摩擦力），横轴交点 = −μg（题图不画负半轴）。
+       · 两条线**纵轴截距相同** —— 甲的滑动摩擦力与乙相等；
+       · 甲的**斜率更大** —— m甲 > m乙；
+       · 截距相等而 m甲 > m乙 ⇒ μ甲m甲g = μ乙m乙g 里 μ甲 < μ乙。
+       所以两线必须从 F 轴**同一个点**出发，甲更陡 —— 少了「同一起点」这条，D 就错判成对了。
+
+     几何口径（1 单位 ≈ 1 画面点，内容区 x = 430→880、y = 40→355）：
+       · 原点 O        (470, 330)；F 轴 470 → y = 40（箭头），a 轴 470 → x = 880（箭头）
+       · 公共截距点    (470, 268) —— 落在 F 轴正半轴上，为纵轴满量程（290 单位）的约 21%，
+                       题图里截距也不画得高，留出两条线各自的斜率差异
+       · 甲            (470, 268) → (845, 112)，斜率 ≈ 0.42 画面单位
+       · 乙            (470, 268) → (845, 181)，斜率 ≈ 0.23 画面单位 —— 约为甲的 0.55，
+                       与题图「甲陡、乙缓」的观感一致；两线只共起点、不共终点
+       · 甲 / 乙二字   (852, 118) / (852, 187) —— 各自贴在自己那条线的右端外侧，不压线、不互叠
+       · 轴上不标刻度：题目只让读斜率和截距的大小关系，任何数值刻度都是原文没有的信息。 -->
+<svg viewBox="-143 10 1600 380" xmlns="http://www.w3.org/2000/svg" role="img"
+     aria-label="拉力随加速度变化的图象：纵轴是拉力 F，横轴是加速度 a。甲、乙两条图线都从纵轴正半轴上的同一个点出发，说明两者所受的滑动摩擦力大小相等；甲的图线更陡，斜率更大，说明甲的质量比乙大；又因两者摩擦力相等而甲的质量更大，所以甲的动摩擦因数比乙小。">
+
+  <defs>
+    <!-- 坐标轴箭头：与同目录既有图同口径（7×7、按 strokeWidth 缩放） -->
+    <marker id="arrow" markerWidth="7" markerHeight="7" refX="5.5" refY="3.5"
+            orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L6,3.5 L0,7" fill="none" stroke="#ffb900" stroke-width="1.2"/>
+    </marker>
+  </defs>
+
+  <!-- ───────── 坐标轴 ───────── -->
+  <path class="axis" d="M470 330 V40" marker-end="url(#arrow)"/>
+  <path class="axis" d="M470 330 H880" marker-end="url(#arrow)"/>
+
+  <!-- ───────── 两条 F-a 图线：同截距、不同斜率 ───────── -->
+  <!-- 甲：斜率大（m甲 > m乙） -->
+  <path class="curve" d="M470 298 L845 112"/>
+  <!-- 乙：斜率小，但从同一个截距点出发 -->
+  <path class="curve" d="M470 298 L845 190"/>
+
+  <!-- ───────── 轴名与物体名 ───────── -->
+  <text class="axis-name" x="456" y="58" text-anchor="end">F</text>
+  <text class="axis-name" x="874" y="316" text-anchor="end">a</text>
+  <text class="axis-name" x="452" y="354" text-anchor="end">O</text>
+
+  <text class="body-label" x="852" y="118">甲</text>
+  <text class="body-label" x="852" y="195">乙</text>
+
+</svg>
+
+</body>
+</html>

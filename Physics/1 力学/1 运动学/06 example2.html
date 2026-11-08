@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>四种 x-t 图像</title>
+<style>
+  /* 图框口径：与 `Physics/1 力学/1 运动学/03 VelocityImage.html` 同一套。
+     · 页面**不上底色** —— iOS / visionOS 是玻璃主题，图要让窗口材质透出来。
+       自己糊一块实色底板（原来这里是 background:#000）会有两个后果：玻璃面板上留一块异色方块；
+       而且 Markdown 侧认出「作者画了底板」就不注入画布（见 MarkdownHtmlFigure.swift
+       `declaresOwnPageBackground`），里外两块底互相打架。
+     · **由高度定尺** —— 图框形状由图文档自己的 viewBox 比例给出（Markdown 侧读的就是这个比例，
+       要求落在 0.2–5 之间，超了会退化成固定 240px 高），svg 占满图框高度，
+       左右多出来的就是真空格。 */
+  body {
+    background-color: transparent;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    overflow: hidden;
+  }
+  svg {
+    height: 100%;
+    width: auto;
+    max-width: 100%;
+  }
+  .axis, .curve, .guide {
+    fill: none;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .axis  { stroke: #ffb900; stroke-width: 2.9; }
+  .curve { stroke: #0865ff; stroke-width: 3.3; }
+  .guide { stroke: #0865ff; stroke-width: 2; stroke-dasharray: 5 7; }
+  text {
+    font-family: Georgia, "Times New Roman", "Songti SC", serif;
+    fill: #ffb900;
+  }
+  .var    { font-size: 26px; font-style: italic; }
+  .origin { font-size: 26px; font-style: normal; text-anchor: middle; }
+  .tick   { font-size: 24px; font-style: italic; text-anchor: middle; }
+  .sub    { font-size: 16px; font-style: normal; }
+  .panel  { font-size: 34px; text-anchor: middle; }
+</style>
+</head>
+<body>
+
+<!-- 画布：viewBox 比例 = 1534 / 338 ≈ 4.54（落在 Markdown 侧认的 0.2–5 内，图框才拿得到比例）；
+     内容四周留约 18 个单位白边，A/B/C/D 与轴上的 x / t、O、t₁、t₂ 全都在框内。 -->
+<svg viewBox="12 9 1534 338" role="img"
+     aria-label="四幅 x-t 图像 A、B、C、D：A 为折线，B 为始终上升的曲线，C 为关于 t1 对称的抛物线拱，D 为 S 形曲线">
+  <defs>
+    <marker id="arrow" markerWidth="7" markerHeight="7" refX="5.5" refY="3.5"
+            orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L6,3.5 L0,7" fill="none" stroke="#ffb900" stroke-width="1.2"/>
+    </marker>
+
+    <!-- 统一坐标系：原点 (59,227)，横轴至 335，纵轴至 40 -->
+    <g id="axes">
+      <path class="axis" d="M59 227 V40" marker-end="url(#arrow)"/>
+      <path class="axis" d="M59 227 H335" marker-end="url(#arrow)"/>
+      <text class="var" x="75" y="52">x</text>
+      <text class="var" x="348" y="238">t</text>
+      <text class="origin" x="40" y="252">O</text>
+    </g>
+  </defs>
+
+  <!-- A：先匀速增加，再匀速减少（折线，顶点在 t₁） -->
+  <g id="A">
+    <use href="#axes"/>
+    <path class="curve" d="M59 227 L159 151 L259 227"/>
+    <path class="guide" d="M159 151 V227"/>
+    <text class="tick" x="159" y="257">t<tspan class="sub" dy="6">1</tspan></text>
+    <text class="tick" x="259" y="257">t<tspan class="sub" dy="6">2</tspan></text>
+    <text class="panel" x="197" y="320">A</text>
+  </g>
+
+  <!-- B：连续增加的曲线 -->
+  <g id="B" transform="translate(390 0)">
+    <use href="#axes"/>
+    <path class="curve"
+      d="M59 227
+         C69 202 91 185 119 174
+         C139 167 153 168 163 167
+         C183 164 206 153 226 139
+         C246 124 258 106 269 92"/>
+    <path class="guide" d="M159 167 V227"/>
+    <path class="guide" d="M269 92 V227"/>
+    <text class="tick" x="159" y="257">t<tspan class="sub" dy="6">1</tspan></text>
+    <text class="tick" x="269" y="257">t<tspan class="sub" dy="6">2</tspan></text>
+    <text class="panel" x="197" y="320">B</text>
+  </g>
+
+  <!-- C：关于 t₁ 对称的抛物线拱（顶点在 t₁ 正上方，左右镜像） -->
+  <g id="C" transform="translate(780 0)">
+    <use href="#axes"/>
+    <!-- 两端 (59,227)、(259,227) 关于 x=159 对称，顶点 (159,164) -->
+    <path class="curve" d="M59 227 Q159 101 259 227"/>
+    <path class="guide" d="M159 164 V227"/>
+    <text class="tick" x="159" y="257">t<tspan class="sub" dy="6">1</tspan></text>
+    <text class="tick" x="259" y="257">t<tspan class="sub" dy="6">2</tspan></text>
+    <text class="panel" x="197" y="320">C</text>
+  </g>
+
+  <!-- D：S 形增长曲线（凹向上转凹向下，t₂ 处速度为零） -->
+  <g id="D" transform="translate(1170 0)">
+    <use href="#axes"/>
+    <path class="curve"
+      d="M59 227
+         C91 224 122 207 143 182
+         C153 169 157 152 164 133
+         C176 103 196 80 221 69
+         C237 62 252 62 266 62"/>
+    <path class="guide" d="M159 147 V227"/>
+    <path class="guide" d="M266 62 V227"/>
+    <text class="tick" x="159" y="257">t<tspan class="sub" dy="6">1</tspan></text>
+    <text class="tick" x="266" y="257">t<tspan class="sub" dy="6">2</tspan></text>
+    <text class="panel" x="197" y="320">D</text>
+  </g>
+
+</svg>
+
+</body>
+</html>

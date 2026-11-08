@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>对绳的中点受力分析：两支绳张力 F_T 与恒力 F 的合成（θ 由 3L/10 与 L/2 定出）</title>
+<style>
+  /* 图框口径：与同目录 `01 example1.html`～`01 example5.html`、`01 example6-1.html`、
+     `11 example1-1.html`、`1 力学/1 运动学/09 example1.html` 同一套。
+     · 页面**不上底色** —— iOS / visionOS 是玻璃主题，图要让窗口材质透出来；自己在页面里糊一块
+       实色底板，Markdown 侧会认出「作者画了底板」而不再注入画布（MarkdownHtmlFigure.swift
+       `declaresOwnPageBackground`），里外两块底互相打架。题图原稿是黑底金线，**不照抄那个底色**，
+       只把线稿搬进本仓这套配色。
+     · **由比例定尺** —— 图框形状读的就是本文件 viewBox 的比例（须落在 0.2–5 之间）。
+       本题图是一件「两只球 + 一支向外的 F + 一个向左的合成菱形」的横长构图，
+       图元占 x = −15 → 553、y = 106 → 349（浏览器实测 getBBox：568.1 × 243.6），
+       故 viewBox 取 660 × 300（比例 = 2.2，与同目录 `01 example5.html` 的 2.26 同一档）：
+       x 从 −61 到 599（左右各留 46 / 45.9），y 从 78 到 378（上下各留 27.9 / 28.5）。
+       图元的形心 (269.1, 227.7) 与 viewBox 的中心 (269, 228) 只差 0.1 / 0.3，看起来是居中的。
+       想让图再小一点就继续加宽 viewBox（留白只写在 viewBox 里，不碰任何图元坐标），
+       注意别超过 5 的比例上限 —— 高 300 时 viewBox 宽最多 1500。
+     · 配色（三色分工，别再加第四种）：
+         两只小球 / 记号 m / 恒力 F 与它的箭头 ......... #075bff（同 `01 example6-1.html` 的
+                                                          「两只小球 / 拉力箭头 F」：题给的东西、
+                                                          可动件，一律深蓝，记号跟自己的图元同色）
+         两支绳张力 F_T 与它们合起来的菱形 ............ #00eaff（同 `01 example5.html` 的「s₁～s₅」、
+                                                          `01 example1.html` 的「a-m 图线」：青 = 由测量 /
+                                                          解析得出来的结果，不是题面给的装置。F_T 与
+                                                          「2F_T cos θ = F」这条合成关系都是解出来的）
+         两球连线虚线 / 3L/10 与 L/2 的尺寸线 / θ 的弧 / #ffb900（同 `01 example4.html` 的「夹角 θ 的
+         F 作用线在 O 左侧的延长（对称轴）..........        弧与 θ 记号」：几何标注与轴名同口径）
+       本图**没有**第二种金线用途，也没有第四种颜色：图上既没有别的量，也没有第二条待指认的轴。
+     · 字体：m、F、F_T、θ、L 是题面 / 解析里的记号，走 Georgia 斜体（与本仓 `.part-label` 一致）；
+       分数里的数字（3 / 10 / 1 / 2）走 Times New Roman 正体 —— Georgia 的数字是**旧式数字**
+       （3 4 5 7 9 带降部），写成 3/10 会看着掉到基线以下（同 `01 example5.html` 对 s₃ / s₄ 的处理）。
+     · 分式一律**手工摞**（分子 / 横线 / 分母三个图元），不用 `½` 或 `3/10` 这种斜排：本题的两个长度
+       是解析式 sin θ = (3L/10) / (L/2) 里的两个数，斜排会跟分数线上的除号读混。 */
+
+  body {
+    background-color: transparent;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    overflow: hidden;
+  }
+  svg {
+    height: 100%;
+    width: auto;
+    max-width: 100%;
+  }
+  /* 小球 / 恒力 F：题给装置与题给力的深蓝 */
+  .part {
+    fill: none;
+    stroke: #075bff;
+    stroke-width: 3.4;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  /* 绳张力 F_T 与合成菱形：解析得出的青色，与题给的蓝分开 */
+  .derived {
+    fill: none;
+    stroke: #00eaff;
+    stroke-width: 3.4;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  /* 合成菱形的辅助边与对角线：细一号、虚线，别跟两支真箭头抢 */
+  .derived-aid {
+    fill: none;
+    stroke: #00eaff;
+    stroke-width: 2.4;
+    stroke-dasharray: 9 7;
+    stroke-linecap: round;
+  }
+  /* 几何标注的实线（尺寸线、球心连线的延长）：最细 */
+  .geo {
+    fill: none;
+    stroke: #ffb900;
+    stroke-width: 2.2;
+    stroke-linecap: round;
+  }
+  /* 几何标注的虚线（两球连线、F 作用线的延长、球心水平引线） */
+  .geo-dashed {
+    fill: none;
+    stroke: #ffb900;
+    stroke-width: 2.2;
+    stroke-dasharray: 8 6;
+    stroke-linecap: round;
+  }
+  /* 夹角 θ 的弧：几何标注，与金线同口径 */
+  .angle-arc {
+    fill: none;
+    stroke: #ffb900;
+    stroke-width: 2.6;
+    stroke-linecap: round;
+  }
+  /* 记号 m、F：题面给的记号，与图元同色 */
+  .part-label {
+    fill: #075bff;
+    font-family: Georgia, "Times New Roman", serif;
+    font-style: italic;
+    font-size: 34px;
+  }
+  /* 记号 F_T：解析里的量，青色；下标 T 走正体、小一号（符号正体、变量斜体） */
+  .tension-label {
+    fill: #00eaff;
+    font-family: Georgia, "Times New Roman", serif;
+    font-style: italic;
+    font-size: 30px;
+  }
+  .tension-label .sub {
+    font-family: "Times New Roman", Georgia, serif;
+    font-style: normal;
+    font-size: 21px;
+  }
+  /* 记号 θ、尺寸里的 L：几何标注，金色斜体 */
+  .geo-label {
+    fill: #ffb900;
+    font-family: Georgia, "Times New Roman", serif;
+    font-style: italic;
+    font-size: 34px;
+  }
+  .dim-var {
+    fill: #ffb900;
+    font-family: Georgia, "Times New Roman", serif;
+    font-style: italic;
+    font-size: 26px;
+  }
+  /* 分式的分子 / 分母：数字走 Times 正体 */
+  .dim-num {
+    fill: #ffb900;
+    font-family: "Times New Roman", Georgia, serif;
+    font-style: normal;
+    font-size: 26px;
+  }
+</style>
+</head>
+<body>
+
+<!-- 配 `01 牛顿第二定律.md` 的「真题 6」（2022 全国乙卷第 2-15 题）**解析里的第二张图**：
+     `01 example6-1.html` 画的是题面那个装置（俯视、两球相距 3L/5 时的位形），本图画的是解析的第一步 ——
+     **对绳的中点 O 受力分析**，以及 θ 是怎么从 3L/10 与 L/2 这两个长度定出来的。
+
+     题意回顾：一对等长轻绳（合起来长 L）两端各连质量为 m 的小球，恒力 F 水平作用在绳的中点、与两球连线垂直；
+     两球相距 3L/5 时，加速度各多大（答案 a = 5F/8m）。
+
+     这张图只解一件事：绳中点质量为零 ⇒ 中点在三支力下平衡 ⇒ F = 2 F_T cos θ ⇒ F_T = 5F/8 ⇒ a = F_T/m。
+
+     几何口径（1 单位 ≈ 1 画面点；绳长 L 在图上取 300，与 `01 example6-1.html` 同一档）：
+       · 绳中点 O（= F 的作用点） ......... (330, 240)
+       · 上球 / 下球 圆心 .............. (210, 150) / (210, 330)，r = 15
+                                        **等大** —— 题给两球质量都是 m（同 example6-1 / example3 对
+                                        「质量相等」的处理）
+       · 绳的两段（同时就是两支 F_T 箭头） 自球面点 (222, 159) / (222, 321) 交于 O；方向 (±0.8, ±0.6)
+                                        的反对称，(330−222) : (240−159) = 108 : 81 = 4 : 3
+                                        ⇒ tan θ = 3/4、sin θ = 3/5、cos θ = 4/5，θ ≈ 36.87°
+       · 3L/10 ....................... 每球到 F 作用线（y = 240）的距离 = 330 − 240 = 90 = 3/10 × 300 ✓
+                                        尺寸线画在 x = 50，两端横杠对上「球心高度 y = 150」与「F 作用线
+                                        y = 240」；上端另有金虚线自球面外侧一路引到上端横杠（在 m 记号
+                                        前收住），免得读者不知道那根横杠量的是哪个高度
+       · L/2 ......................... 半绳 = 球心到 O = 150 = 1/2 × 300 ✓，记号写在靠近球的那一端，
+                                        免得跟写在靠近 O 的 F_T 记号叠字
+       · 恒力 F ...................... 自 O (330, 240) 水平向右到 (546, 240)，箭头尖端朝右；
+                                        记号 F 写在箭尖右下方 (540, 288) —— 与 6-1 同位置口径
+
+     **力的箭头是同一支标度的。** 135 单位 ≙ F_T = 5F/8 时：
+       · 两支 F_T 箭头各长 135（正好画到球面为止：半绳 150 − 球半径 15），方向沿绳指向两只球 ——
+         这就是「绳对中点 O 的拉力」的方向（力作用在 O 上，箭头自 O 向外画，头落在球的这一端，
+         与课本画结点的受力图同口径；**不是**「绳推球」，球上的力方向相反）；
+       · 恒力 F 箭头长 216 = 135 × 8/5 ✓（同一支标度）；
+       · 合成菱形的对角线 = 2 F_T cos θ = F 也长 216，与 F 的箭头**等长**、反向 ——
+         图上量一下就能读出「两支张力合起来正好抵住 F」，不必再标数值。
+       注意力的标度与长度的标度是**两回事**：半绳画 150 个单位，F_T 箭头画 135 个单位，
+       同一条线上两个数不相干，改图时别拿这两个数互相核对。
+       合成菱形只是作图辅助（两侧边 S₁→R、S₂→R 各等于另一支箭头平移过来，R = (114, 240)），
+       虚线细一号、颜色与真箭头同族，一眼能分出「哪两支是真力、哪两支是平移」。
+
+     图上没有画、也**不该**画的东西：
+       · 不画桌面 / 地面 / 斜线：与 6-1 同理，这是俯视图（视线垂直桌面），画一条主视棱会被读成侧视图，
+         以为重力朝下、球压在板上。俯视这件事交给 aria-label 与本注释交代。
+       · 不画两球各自的受力图（球只受一支沿绳的 F_T）与加速度箭头：本题解析要的是中点这一处平衡，
+         把球上的力也画上，图上就有两组共六支箭头，比值全糊了。
+       · 不写 θ 的数值、不写 F_T = 5F/8、不写 a = 5F/8m：数值是解出来的，落到图上就变成
+         「图里给的条件」（同 `01 example4.html` 不写 30° / 60° 的理由）。
+       · 不画 3L/5（两球间距）：那是 6-1 那张装置图上的量，本图只量「到 F 作用线的一半」，
+         两张图上同一个 90 各有各的用途，画在一起容易读成同一个量的两种标法。
+
+     判读用到的定量关系（写在这里方便以后改图时对账，图上不出现）：
+       · sin θ = (3L/10) / (L/2) = (90) / (150) = 3/5 ⇒ θ ≈ 36.87°，cos θ = 4/5
+       · 中点（质量为零）沿 F 方向：F = 2 F_T cos θ = 2 F_T · (4/5) ⇒ F_T = 5F/8
+       · 球只受绳的拉力（光滑水平面内没有第二个力），加速度沿绳指向中点：a = F_T/m = 5F/(8m) ⇒ A 正确
+       · 自洽核验：两球沿 F 方向的分加速度 a cos θ = (5F/8m)(4/5) = F/(2m)，
+         正好等于把两球当整体处理时的 F/(2m)；两段绳等长、两球等质量 ⇒ 图上的左右对称与「两球 a 相同」是同一件事。 -->
+
+<svg viewBox="-300 78 1200 300" xmlns="http://www.w3.org/2000/svg" role="img"
+     aria-label="俯视受力分析图：两只质量相同的小球各标 m，分居上下，一根轻绳在中间被恒力 F 拉成一个 V 形，绳的两半各标一支张力箭头 F 下标 T，方向沿绳指向两只小球；两支张力的平行四边形以虚线补齐，对角线水平向左、与向右的恒力 F 等长，表示 F 等于两张力沿 F 方向的分量之和；绳与 F 方向的夹角标为 θ，球心到 F 作用线的距离标为 3L/10，半绳标为 L/2。">
+
+  <defs>
+    <!-- 两支力各要一支箭头（θ 的弧不画箭头）：几何与 example6-1 / example1 同口径
+         （7×7、按 strokeWidth 缩放），描边跟各自箭头同色 -->
+    <marker id="arrowForce" markerWidth="7" markerHeight="7" refX="5.5" refY="3.5"
+            orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L6,3.5 L0,7" fill="none" stroke="#075bff" stroke-width="1.2"/>
+    </marker>
+    <marker id="arrowTension" markerWidth="7" markerHeight="7" refX="5.5" refY="3.5"
+            orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L6,3.5 L0,7" fill="none" stroke="#00eaff" stroke-width="1.2"/>
+    </marker>
+  </defs>
+
+  <!-- ═══════════════════ 几何：两球连线（与 F 严格垂直）═══════════════════ -->
+  <!-- 只在两球之间的空档里画（球面 165 / 315 各让开球半径），不穿进球里；
+       两球同在 x = 210 这条竖线上 ⇒ 连线与 F 垂直这件事一眼可读，不必加直角记号 -->
+  <path class="geo-dashed" d="M210 165 V315"/>
+
+  <!-- ═══════════════════ 几何：3L/10 的尺寸线 ═══════════════════ -->
+  <!-- 上端引线：自球面外侧一路拉到上端横杠（停在横杠右端 60，不跟横杠重叠），
+       说明「上端横杠量的是球心高度」；y = 150 这一路上没有别的线（绳段在 y ≥ 159、
+       菱形边在 y ≥ 159）—— 只在 m 记号 (158 → 188) 处收住，不进字里 -->
+  <path class="geo-dashed" d="M150 150 H60"/>
+  <!-- 尺寸线本体：x = 50，量 y = 150（球心高度）→ y = 240（F 作用线）的竖直距离 = 90 = 3L/10 -->
+  <path class="geo" d="M50 150 V240"/>
+  <!-- 两端横杠 -->
+  <path class="geo" d="M40 150 H60 M40 240 H60"/>
+  <!-- 分式 3/10 L：摞排在尺寸线左侧（线在 x = 50，记号右缘 41.7，留 8.3） -->
+  <text class="dim-num" x="0" y="187" text-anchor="middle">3</text>
+  <path class="geo" d="M-15 199 H15"/>
+  <text class="dim-num" x="0" y="229" text-anchor="middle">10</text>
+  <text class="dim-var" x="26" y="208">L</text>
+
+  <!-- ═══════════════════ 几何：F 作用线在 O 左侧的延长（对称轴）═══════════════════ -->
+  <!-- 自下端横杠的右端 (64) 到合成菱形的顶点 R (114)：一给 θ 的弧一个落脚处，二把 y = 240 这个高度
+       接到尺寸线上，三与 6-1 的对称轴同口径（那里是 A 左侧的一小段金虚线）。
+       再往右 (114 → 330) 就是菱形的对角线，改由青色虚线接力 —— 颜色在 R 处换手，
+       提醒读者「左边这段是几何，右手这段是合成出来的结果」 -->
+  <path class="geo-dashed" d="M64 240 H114"/>
+
+  <!-- ═══════════════════ 解析：两支张力的合成菱形 ═══════════════════ -->
+  <!-- 两侧边：把一支箭头平移到另一支的箭尾，R = S₁ + (O→S₂) = (114, 240)；
+       两条边各长 135，与真箭头等长，故菱形是斜的（不是正方形），顶角 2θ -->
+  <path class="derived-aid" d="M222 159 L114 240 L222 321"/>
+  <!-- 对角线：O → R，水平向左、长 216 = 2 · 135 · cos θ = 恒力 F 的长度 -->
+  <path class="derived-aid" d="M330 240 H114"/>
+
+  <!-- ═══════════════════ 几何：夹角 θ ═══════════════════ -->
+  <!-- 顶点 O (330,240)、r = 70：起点 (260,240) 落在对角线（F 的作用线）上，
+       终点 (274,198) 落在上段绳上，扫过 arctan(3/4) ≈ 36.87° -->
+  <path class="angle-arc" d="M260 240 A70 70 0 0 1 274 198"/>
+  <!-- θ 的字心落在「对角线 + 上段绳 + 弧」围成的空档里：取角平分线方向 (−0.949, −0.315)、
+       离顶点 ≈ 95（弧半径 70 之外），三条边都不压 —— 浏览器实测 bbox (230.6, 190.9, 18.7, 38.7)：
+       离上段绳 9.1、离 θ 的弧 11.3、离对角线（F 作用线）10.5、离两球连线 20.6。
+       楔形只有 36.87° 宽，字再往绳边挪就顶到绳子，再往下就压到 F 的作用线 -->
+  <!-- 上段绳外侧还挂着「L/2」与「F_T」两个记号：前者靠球那一端、最近处离绳 9.6，
+       后者靠 O 那一端、离绳 10.5 —— 沿绳分行，互不叠字（实测两两 bbox 无交） -->
+  <text class="geo-label" x="240" y="222" text-anchor="middle">θ</text>
+
+  <!-- ═══════════════════ 装置：两只小球（等大）═══════════════════ -->
+  <circle class="part" cx="210" cy="150" r="15"/>
+  <circle class="part" cx="210" cy="330" r="15"/>
+  <!-- 记号 m：写在各自球的左侧、竖直居中，与球同色；右端离球面留 7 单位 -->
+  <text class="part-label" x="188" y="162" text-anchor="end">m</text>
+  <text class="part-label" x="188" y="342" text-anchor="end">m</text>
+
+  <!-- ═══════════════════ 解析：两支绳张力 F_T ═══════════════════ -->
+  <!-- 自 O 出发沿上 / 下两段绳指向球面（135 = 半绳 150 − 球半径 15），箭头尖落在球面上：
+       这就是绳对 O 的拉力的方向。两支等长 ⇒ 图上左右对称 ⇒ 与「两球质量相等」对得上 -->
+  <path class="derived" d="M330 240 L222 159" marker-end="url(#arrowTension)"/>
+  <path class="derived" d="M330 240 L222 321" marker-end="url(#arrowTension)"/>
+  <!-- 记号 F_T 写在箭头靠 O 的这一段外侧（上支在绳上方、下支在绳下方），
+       与靠近球那一端的 L/2 记号分行，互不叠字 -->
+  <text class="tension-label" x="318" y="206">F<tspan class="sub" dy="7">T</tspan></text>
+  <text class="tension-label" x="318" y="286">F<tspan class="sub" dy="7">T</tspan></text>
+
+  <!-- ═══════════════════ 几何：半绳长 L/2 ═══════════════════ -->
+  <!-- 分式 ½L 摞排在上段绳靠球的一侧，与 F_T 记号拉开（水平空档 7.8、竖直差 22）；
+       纸上不给它画尺寸线 —— 它量的就是这段绳本身（S₁ → O，长 150 = L/2），
+       再画一条平行双线反而挡住绳。靠绳最近的是分母「2」（实测 9.6），分子与 L 各在 43 / 46 -->
+  <text class="dim-num" x="268" y="129" text-anchor="middle">1</text>
+  <path class="geo" d="M254 141 H282"/>
+  <text class="dim-num" x="268" y="171" text-anchor="middle">2</text>
+  <text class="dim-var" x="294" y="150">L</text>
+
+  <!-- ═══════════════════ 恒力 F：水平向右作用在绳的中点 ═══════════════════ -->
+  <!-- 长 216 = 135 × 8/5，与合成菱形的对角线等长 ⇒ 「两支张力的合力正好抵住 F」直接读得出来。
+       自 O 起画（题给「作用在轻绳的中点」，就从折点画起，不画成从某个球拉） -->
+  <path class="part" d="M330 240 H546" marker-end="url(#arrowForce)"/>
+  <text class="part-label" x="540" y="288" text-anchor="middle">F</text>
+
+</svg>
+
+</body>
+</html>

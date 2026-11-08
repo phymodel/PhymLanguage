@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>拉力做的功 W 与物体坐标 x 的关系图（两段折线，折点在 x = 2 m）</title>
+<style>
+  /* 图框口径：与同目录 `09 example1.html`、`09 example4-1.html`、`09 example4-2.html`、
+     `01 example1.html`～`01 example7.html`、`11 example1-1.html` 同一套。
+     · 页面**不上底色** —— iOS / visionOS 是玻璃主题，图要让窗口材质透出来；自己在页面里糊一块
+       实色底板，Markdown 侧会认出「作者画了底板」而不再注入画布（MarkdownHtmlFigure.swift
+       `declaresOwnPageBackground`），里外两块底互相打架。题图原稿（黑底金轴蓝线）**不照抄那个底色**，
+       只把线稿搬进本仓这套配色。
+     · **由比例定尺** —— 图框形状读的就是本文件 viewBox 的比例（须落在 0.2–5 之间）。
+       本图是一张单幅的 W-x 关系图，画幅天生偏方：图元实测 bbox = x 88 → 872、y 62 → 575
+       （784 × 513，比例 ≈ 1.53），与题图原稿的 1.50 基本一致。
+       viewBox = 20 20 920 600（x 从 20 到 940、y 从 20 到 620；左右各留 68 单位、上下各留
+       42 / 45 单位真空格）—— 图元只占画幅宽度的 784 / 920 ≈ 85%，整幅按 0.85 缩小显示。
+       想让图再小一点就继续加宽 viewBox（留白只写在 viewBox 里，不碰任何图元坐标），
+       注意别超过 5 的比例上限 —— 高 600 时 viewBox 宽最多 3000。
+     · 配色（两色分工，与同目录既有图同一支色号，别再加第三种）：
+         坐标轴 / 箭头 / 虚线网格 / 全部刻度与轴名 ................ #ffb900
+         W-x 关系折线 ............................................. #075bff
+       金 = 「题图给的框架」（轴、网格、刻度都是读图的标尺，不动），深蓝 = 「图像本身要走的那条线」。
+       本图唯一的判读对象就是那条蓝线（斜率 = 拉力 F），网格若也涂蓝，蓝线就埋进网格里读不出折点；
+       反过来把轴涂蓝、线涂金，读者会把轴当成「一条也是画出来的曲线」。
+     · 字体：W、x 是物理量，走 Georgia 斜体；单位 J、m 与 `/` 一律正体（Times New Roman）；
+       **轴上的数字刻度一律正体**（6 / 12 / 18 与 1 / 2 / 3 / 4 —— 数字不是变量，不跟着斜），
+       原点标的也是**数字 0**（不是字母 O，题图原稿就是 0），与其余刻度同一支 .tick、同一套字样；
+       全图的正体字统一落到 "Times New Roman" 兜底 Georgia。
+       **字号写在每个 <text> 的 font-size 属性上**（类里不写 font-size，否则 CSS 会盖掉属性）。 */
+  body {
+    background-color: transparent;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    overflow: hidden;
+  }
+  svg {
+    height: 100%;
+    width: auto;
+    max-width: 100%;
+  }
+  /* 两条坐标轴：本图最粗的一层「框架」—— 网格与折线都不得越过它们 */
+  .axis {
+    fill: none;
+    stroke: #ffb900;
+    stroke-width: 3;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  /* 虚线网格：细一号、长划，只当标尺用，不跟蓝线抢 */
+  .grid {
+    fill: none;
+    stroke: #ffb900;
+    stroke-width: 1.8;
+    stroke-dasharray: 8 8;
+    stroke-linecap: round;
+  }
+  /* W-x 折线：本图唯一的「数据」，最粗一层，折点处是硬拐角（stroke-linejoin: round 只去毛刺，不改角度） */
+  .curve {
+    fill: none;
+    stroke: #075bff;
+    stroke-width: 4;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  /* 刻度数字：全部金色，与各自的轴同色；**正体**（数字是读数，不是变量，不跟着 W / x 斜）。
+     原点那个 0 也是数字（**不是字母 O**），所以与其余刻度同一支类、同一套字样，不单开一支。 */
+  .tick {
+    fill: #ffb900;
+    font-family: "Times New Roman", Georgia, serif;
+    font-style: normal;
+  }
+  .var {
+    fill: #ffb900;
+    font-family: Georgia, "Times New Roman", serif;
+    font-style: italic;
+  }
+  /* 单位与除号：正体 */
+  .up {
+    font-family: "Times New Roman", Georgia, serif;
+    font-style: normal;
+  }
+</style>
+</head>
+<body>
+
+<!-- 配 `09 动能定理.md` 的「真题 6」（2023 全国新课标卷第 2-20 题，多选）：
+     质量 m = 1 kg 的物体在水平拉力作用下由静止开始沿 x 轴运动，拉力做的功 W 与坐标 x 的关系如图；
+     动摩擦因数 μ = 0.4，g 取 10 m/s²。A/B/C/D 四个选项分别要在 x = 1 m、x = 4 m、0~2 m、0~4 m
+     四段上读图取值 —— 本图就是那道题唯一的图，除了「轴 + 网格 + 一条折线」之外一律不加。
+
+     这张图要交代的唯一事实：
+       W-x 图的**斜率 = 拉力 F**（W = Fx ⇒ F = W/x，逐段看就是该段斜率），
+       折线在 x = 2 m 处**折了一次**：0~2 m 段更陡（F = 6 N），2~4 m 段更缓（F = 3 N）。
+       折点必须**严格落在 x = 2 m 那条竖直网格线与 W = 12 J 那条水平网格线的交点**上 ——
+       「拉力在 x = 2 m 处由 6 N 降为 3 N」这件事，全靠这个交点摆在那里才读得出来；
+       折点画偏一点，D 选项判的「速度最大在 x = 2 m」就从图上消失了。
+       同理，折线在 x = 1 m 处必须准确穿过 (1 m, 6 J) 这个网格交点（A 选项算 P = Fv 要用 W₁ = 6 J），
+       在 x = 4 m 处必须准确收在 (4 m, 18 J) 的网格角上（B 选项要用 W₄ = 18 J）。
+
+     几何口径（1 单位 ≈ 1 画面点）：
+       原点 0        (140, 520)
+       x 轴          自原点向右到 x = 860（箭头在 860），即原点右侧 720 单位
+       W 轴          自原点向上到 y = 70（箭头在 70），即原点上方 450 单位
+       ★ 标度（两轴各自独立，题图原稿也是这样，横纵标度不同不影响读斜率 = 力）：
+           横向 1 m  ↔ 155 单位：x = 1 / 2 / 3 / 4 m → 295 / 450 / 605 / 760
+           纵向 6 J  ↔ 135 单位：W = 6 / 12 / 18 J → 385 / 250 / 115
+         于是 W = Fx 的折线在屏幕上的斜率是
+           0~2 m 段（F = 6 N）：270 / 310 ≈ 0.87
+           2~4 m 段（F = 3 N）：135 / 310 ≈ 0.44
+         两段之比严格 2 : 1，与「6 N : 3 N」一 一对应 —— 这正是题图原稿那段「先陡后缓」的画法。
+         改题（换成别的 W-x 数据）就按这两个标度重算 4 条竖直 / 3 条水平网格的位置，
+         再把折线的端点与折点一起挪，别只挪折线。
+       虚线网格      竖直 4 条（x = 1 / 2 / 3 / 4 m），自 x 轴 y = 520 顶到 y = 115（W = 18 J 那条线）；
+                     水平 3 条（W = 6 / 12 / 18 J），自 W 轴 x = 140 拉到 x = 760（x = 4 m 那条线）。
+                     网格只铺到最后一格：折线在 (4 m, 18 J) 收笔，网格也在那里收，右上方留白，
+                     读者不会以为「图外还有一段」。
+       折线          140,520 → 450,250 → 760,115（两段直线，一个硬拐角）
+       刻度          竖轴 18 / 12 / 6 右端对齐在 x = 120（离轴 20）；横轴 1 / 2 / 3 / 4 居中对齐在
+                     y = 558（离轴 38）；原点 0 在 (120, 552)，右端对齐 —— 与题图原稿「数字都贴在轴外侧、
+                     不压轴线」同一口径，网格线因此不必被刻度打断，可以一路顶到轴上
+       轴名          W/J 在 (164, 96)（竖轴箭头右上方）；x/m 在 (845, 558)（横轴箭头下方、刻度 4 的右侧）
+
+     图上没有画、也**不该**画的东西：
+       · 摩擦力 F_f = 4 N、合外力、加速度：本题的链条是「读斜率 → 得拉力 → 减摩擦力 → 算合功」，
+         把 F_f 也画成一条线（哪怕只标一个数），这张图就从「W-x 关系图」变成了受力图，
+         而图中任何一条线的斜率都**不是**摩擦力。
+       · v、E_k、p 随时间或随 x 的曲线：它们都是解出来的量，画上去等于把选项答案写在图上。
+       · 斜率数值 6 N / 3 N、以及 W₁ = 6 J、W₂ = 12 J、W₄ = 18 J 这些中间结果：数值属解析，
+         图上只留 6 / 12 / 18 与 1 / 2 / 3 / 4 这两套刻度（它们本身就是题图给的条件）。
+       · 折点的「强调」（小圆点、竖直落线、括号）：题图原稿没有，蓝线在网格交点上的硬拐角
+         已经足够醒目；再加记号会让人以为那个点上有额外的物理事件。
+       · 「水平拉力」「μ = 0.4」等文字：属题干，图上一律不写。
+
+     判读用的定量关系（写在这里，方便以后改图时对账，图上不出现）：
+       · 0~2 m：F₁ = 12 J / 2 m = 6 N（屏幕斜率 0.87）；2~4 m：F₂ = (18 − 12) J / 2 m = 3 N（0.44）
+       · F_f = μmg = 0.4 × 1 × 10 = 4 N
+       · 0~1 m：W₁ = 6 J ⇒ ½mv₁² = 6 − 4 × 1 = 2 J ⇒ v₁ = 2 m/s ⇒ P = F₁v₁ = 6 × 2 = 12 W
+         （A 项说 6 W，错 —— 本图在 x = 1 m 处必须是 W = 6 J，否则整条链都对不上）
+       · 0~4 m：½mv₄² = 18 − 4 × 4 = 2 J ⇒ E_k4 = 2 J（B 对）
+       · 0~2 m：克服摩擦力做功 4 × 2 = 8 J（C 对）
+       · 合力：0~2 m 为 6 − 4 = 2 N（向上、加速），2~4 m 为 3 − 4 = −1 N（向下、减速）
+         ⇒ 速度与动量在 x = 2 m 处最大：
+           ½mv₂² = 12 − 4 × 2 = 4 J ⇒ v₂ = 2√2 m/s ⇒ p_max = 2√2 kg·m/s（D 说 2，错）
+       ⇒ 折点位置（x = 2 m）就是「合力变号处」，这是本图必须把折点画在 2 m 网格线上的物理原因。 -->
+
+<svg viewBox="-300 20 1600 600" xmlns="http://www.w3.org/2000/svg" role="img"
+     aria-label="拉力做的功 W 与物体坐标 x 的关系图：纵轴为 W，单位焦耳，刻度 6、12、18；横轴为 x，单位米，原点标 0、刻度 1、2、3、4。蓝色折线自原点出发，先陡后缓，在 2 米、12 焦耳处折一次，即 0 到 2 米段斜率较大、2 到 4 米段斜率较小，最后收在 4 米、18 焦耳处。金色虚线网格标出 1、2、3、4 米与 6、12、18 焦耳的各条线，折点正落在 2 米与 12 焦耳的网格交点上。">
+
+  <defs>
+    <!-- 轴箭头：与同目录既有图同口径（7×7、按 strokeWidth 缩放），本图只有坐标轴需要箭头 -->
+    <marker id="arrow" markerWidth="7" markerHeight="7" refX="5.5" refY="3.5"
+            orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L6,3.5 L0,7" fill="none" stroke="#ffb900" stroke-width="1.2"/>
+    </marker>
+  </defs>
+
+  <!-- ═══════════ 两条坐标轴（先画，网格与折线都压在它们之上） ═══════════ -->
+
+  <path class="axis" d="M140 520 V70" marker-end="url(#arrow)"/>
+  <path class="axis" d="M140 520 H860" marker-end="url(#arrow)"/>
+
+  <!-- ═══════════ 虚线网格：竖直 x = 1/2/3/4 m、水平 W = 6/12/18 J ═══════════ -->
+  <!-- 竖线自横轴顶到 W = 18 J 那条水平线，横线自纵轴拉到 x = 4 m 那条竖线：
+       网格与折线在 (4 m, 18 J) 同时收笔，右上方留白。 -->
+
+  <path class="grid" d="M295 520 V115 M450 520 V115 M605 520 V115 M760 520 V115"/>
+  <path class="grid" d="M140 385 H760 M140 250 H760 M140 115 H760"/>
+
+  <!-- ═══════════ W-x 折线：斜率 = 拉力，折点 (2 m, 12 J) 是合力变号处 ═══════════ -->
+
+  <path class="curve" d="M140 520 L450 250 L760 115"/>
+
+  <!-- ═══════════ 刻度与轴名：全部贴在轴外侧，不压轴线 ═══════════ -->
+
+  <text class="tick" x="120" y="124" font-size="26" text-anchor="end">18</text>
+  <text class="tick" x="120" y="259" font-size="26" text-anchor="end">12</text>
+  <text class="tick" x="120" y="394" font-size="26" text-anchor="end">6</text>
+  <text class="tick" x="120" y="552" font-size="26" text-anchor="end">0</text>
+
+  <text class="tick" x="295" y="558" font-size="26" text-anchor="middle">1</text>
+  <text class="tick" x="450" y="558" font-size="26" text-anchor="middle">2</text>
+  <text class="tick" x="605" y="558" font-size="26" text-anchor="middle">3</text>
+  <text class="tick" x="760" y="558" font-size="26" text-anchor="middle">4</text>
+
+  <text class="var" x="164" y="96" font-size="28" text-anchor="start">W<tspan class="up">/J</tspan></text>
+  <text class="var" x="845" y="558" font-size="28" text-anchor="middle">x<tspan class="up">/m</tspan></text>
+
+</svg>
+
+</body>
+</html>

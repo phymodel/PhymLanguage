@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>一维坐标系中的位移</title>
+<style>
+  /* 图框口径：与同目录 `VelocityFormulaImage.html`、`VelocityTimeFormulaImage.html`、
+     `Physics/5 原子物理/HCP_ca.html` 同一套。
+     · 页面**不上底色** —— iOS / visionOS 是玻璃主题，图要让窗口材质透出来。自己糊一块实色底板
+       会有两个后果：玻璃面板上留一块异色方块；而且 Markdown 侧一认出「作者画了底板」就不注入画布
+       （见 MarkdownHtmlFigure.swift `declaresOwnPageBackground`），里外两块底互相打架。
+     · **由高度定尺** —— 图框形状由图文档自己的 viewBox 比例给出（Markdown 侧读的就是这个比例，
+       要求落在 0.2–5 之间，超了会退化成固定 240px 高），svg 占满图框高度，左右多出来的就是真空格。
+       本图 viewBox = 1200 × 380 → 比例 3.16。
+     · 配色沿用同目录既有图：坐标轴 / 刻度 / 标注 #ffb900，位移（有向线段）与其端点 #0865ff；
+       `Δx`、`x` 这类**变量**走 Georgia 斜体，**数字 / 单位 / 运算符**（`.up`）走正体，
+       汉字另给字体栈（Georgia 没有汉字，会落到 PingFang SC / 雅黑；不把汉字塞进斜体元素里，
+       免得被浏览器伪斜体拉歪）。 */
+  body {
+    background-color: transparent;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    overflow: hidden;
+  }
+  svg {
+    height: 100%;
+    width: auto;
+    max-width: 100%;
+  }
+  .axis {
+    fill: none;
+    stroke: #ffb900;
+    stroke-width: 2.2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .guide {
+    fill: none;
+    stroke: #ffb900;
+    stroke-width: 1.4;
+    stroke-dasharray: 7 7;
+    stroke-linecap: round;
+  }
+  .disp {
+    fill: none;
+    stroke: #0865ff;
+    stroke-width: 3.2;
+    stroke-linecap: round;
+  }
+  .point {
+    fill: #0865ff;
+  }
+  .label {
+    fill: #ffb900;
+    font-family: Georgia, "Times New Roman", serif;
+    font-style: italic;
+    font-size: 27px;
+  }
+  /* 公式里只有**变量**斜体；数字、单位（m）与运算符都用正体 —— 对应
+     `02 位移公式.md` 里 `$x_2 - x_1 = 2 - 10 = -8\text{ m}$` 的 `\text{ m}` 那一路。
+     必须排在 `.label` 之后：同为一个类选择器，靠后的一条胜出（放在前面会被 `.label` 压掉）。 */
+  .up {
+    font-style: normal;
+  }
+  /* 刻度值是**正体**（数字不倾斜）—— 斜体留给 Δx、x₁ 这类数学记号。
+     ⚠️ 字体必须是「等高数字」（lining figures）：Georgia 用的是**旧式数字**（old-style / text
+     figures）—— 0 1 2 只有 x 高度，6 8 带升部顶得更高，3 4 5 7 9 带降部戳到基线以下。
+     13 个刻度值的基线其实完全一致（都写 y = 346），但在数轴这种「靠数字顶端对齐来读数」的
+     地方，Georgia 会让 3 4 5 7 9 看着往下掉、6 8 看着往上翘，即所谓「1 到 12 不在一条水平线上」。
+     Georgia **没有** lnum 特性，`font-variant-numeric: lining-nums` 对它无效，只能换字体；
+     Times New Roman 的数字是等高的，所以把它排在 Georgia 前面（Georgia 仍留作回退）。
+     同一个坑对公式里的 2 m − 10 m = −8 m 也成立（见 `.up`）。 */
+  .tick-num {
+    fill: #ffb900;
+    font-family: "Times New Roman", Georgia, serif;
+    font-style: normal;
+    font-size: 22px;
+  }
+  .tick-num-key {
+    fill: #0865ff;
+    font-family: "Times New Roman", Georgia, serif;
+    font-style: normal;
+    font-size: 22px;
+  }
+  .cn {
+    fill: #ffb900;
+    font-family: -apple-system, "PingFang SC", "Heiti SC", "Microsoft YaHei", sans-serif;
+    font-size: 24px;
+  }
+</style>
+</head>
+<body>
+
+<!-- 配 `02 位移公式.md` 的「题目 1-1」：一维坐标系里物体从 x₁ = 10 m 运动到 x₂ = 2 m，求 Δx。
+     一维数轴的取尺：x(m) = 120 + 70·m  ——  120 是原点 O 的像素位，1 m = 70 个单位。
+       · x₁ = 10 m → 820 ；x₂ = 2 m → 260 ；1 m 的间隔在图上就是 70，读数靠刻度而不是靠估。
+     自上而下四层（都在 1200 × 380 的画布里，四周留白 45 / 44 以上）：
+       y = 44   标题（caption，一句话说明这张图在讲什么）
+       y = 100  Δx = x₂ − x₁ = 2 m − 10 m = −8 m（写在位移箭头正上方）
+       y = 134  位移的有向线段：820 → 260，箭头落在 260 端 —— **指向 x 轴负方向**
+       y = 170  大小 / 方向的文字注（位移是矢量，光有个数字不够）
+       y = 134→288  两条虚线引线：把箭头两端对到轴上的两个点（收在刻度线顶端）
+       y = 248  两个位置的名称（写在引线两侧，不与引线叠字）
+       y = 300  数轴本体（轴线；**刻度线只在轴线之上** y = 288→300，不穿过轴线；刻度值在 y = 346）
+     箭头两端刻意画在「x₁ 与 x₂ 的正上方」，引线一落就是两个端点，不给读者留「从哪儿到哪儿」的歧义。 -->
+<svg viewBox="0 0 1200 380" role="img"
+     aria-label="一维坐标系中的位移：数轴以米为单位、正方向向右，初位置位于 x 一等于 10 米处、末位置位于 x 二等于 2 米处；由初位置指向末位置的有向线段表示位移，长度对应 8 米，方向沿 x 轴负方向，位移等于末位置减初位置，即 2 米减 10 米等于负 8 米">
+  <defs>
+    <marker id="arrowOrange" markerWidth="7" markerHeight="7" refX="5.5" refY="3.5" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L6,3.5 L0,7" fill="none" stroke="#ffb900" stroke-width="1.2"/>
+    </marker>
+    <marker id="arrowBlue" markerWidth="7" markerHeight="7" refX="5.5" refY="3.5" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L6,3.5 L0,7" fill="none" stroke="#0865ff" stroke-width="1.2"/>
+    </marker>
+  </defs>
+
+  <!-- 标题 -->
+  <text class="cn" x="540" y="44" text-anchor="middle">位移是从初位置指向末位置的有向线段</text>
+
+  <!-- 位移公式：写在箭头正上方，读数与线段一一对应 -->
+  <text class="label" x="540" y="100" text-anchor="middle">Δx<tspan class="up"> = </tspan>x<tspan class="up" dy="7" font-size="19">2</tspan><tspan class="up" dy="-7"> − </tspan>x<tspan class="up" dy="7" font-size="19">1</tspan><tspan class="up" dy="-7"> = 2 m − 10 m = −8 m</tspan></text>
+
+  <!-- 位移的有向线段：从 x₁(10 m) 指向 x₂(2 m)，箭头落在左端 = 沿 x 轴负方向 -->
+  <path class="disp" d="M820 134 H260" marker-end="url(#arrowBlue)"/>
+
+  <!-- 矢量还差「方向」这一半 -->
+  <text class="cn" x="540" y="170" text-anchor="middle">大小 8 m，方向沿 x 轴负方向</text>
+
+  <!-- 引线：把有向线段的两端对到数轴上的两个位置 -->
+  <path class="guide" d="M820 134 V288"/>
+  <path class="guide" d="M260 134 V288"/>
+
+  <!-- 两个位置的名称：写在引线外侧，谁也不压谁 -->
+  <text class="cn" x="238" y="248" text-anchor="end">末位置 x<tspan dy="6" font-size="17">2</tspan><tspan dy="-6"> = 2 m</tspan></text>
+  <text class="cn" x="842" y="248">初位置 x<tspan dy="6" font-size="17">1</tspan><tspan dy="-6"> = 10 m</tspan></text>
+
+  <!-- 数轴：0 → 12 m 每 1 m 一刻度（120 + 70·m）。
+       刻度线只长在轴线**之上**（y = 288 → 300）：轴线本身是一根干净的直线，刻度不穿透它，
+       下半截也不会伸向 y = 346 的刻度值（十字刻度会把数轴切成一格一格）。 -->
+  <path class="axis" d="M120 288V300M190 288V300M260 288V300M330 288V300M400 288V300M470 288V300M540 288V300M610 288V300M680 288V300M750 288V300M820 288V300M890 288V300M960 288V300"/>
+  <path class="axis" d="M45 300 H1145" marker-end="url(#arrowOrange)"/>
+  <!-- 轴名与单位：写在轴箭头**下方**（右端对齐箭头尖端）—— 教科书口径，别吊在箭头上方 -->
+  <text class="label" x="1145" y="346" text-anchor="end">x<tspan class="up"> /m</tspan></text>
+  <text class="label" x="108" y="346" text-anchor="end">O</text>
+  <text class="tick-num" text-anchor="middle">
+    <tspan x="120" y="346">0</tspan>
+    <tspan x="190" y="346">1</tspan>
+    <tspan class="tick-num-key" x="260" y="346">2</tspan>
+    <tspan x="330" y="346">3</tspan>
+    <tspan x="400" y="346">4</tspan>
+    <tspan x="470" y="346">5</tspan>
+    <tspan x="540" y="346">6</tspan>
+    <tspan x="610" y="346">7</tspan>
+    <tspan x="680" y="346">8</tspan>
+    <tspan x="750" y="346">9</tspan>
+    <tspan class="tick-num-key" x="820" y="346">10</tspan>
+    <tspan x="890" y="346">11</tspan>
+    <tspan x="960" y="346">12</tspan>
+  </text>
+
+  <!-- 两个位置点：画在最后，压住引线与刻度，读数点一眼可见 -->
+  <circle class="point" cx="820" cy="300" r="9"/>
+  <circle class="point" cx="260" cy="300" r="9"/>
+</svg>
+
+</body>
+</html>

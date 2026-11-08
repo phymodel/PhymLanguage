@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>对重物受力分析：绳 P 的拉力 T_P、绳 Q 的拉力 T_Q 与重力 mg 的正交分解</title>
+<style>
+  /* 图框口径：与同目录 `09 example4-1.html`、`09 example1.html`、`01 example1.html`～`01 example7.html`、
+     `11 example1-1.html` 同一套。
+     · 页面**不上底色** —— iOS / visionOS 是玻璃主题，图要让窗口材质透出来；自己在页面里糊一块
+       实色底板，Markdown 侧会认出「作者画了底板」而不再注入画布（MarkdownHtmlFigure.swift
+       `declaresOwnPageBackground`），里外两块底互相打架。题图原稿（黑底蓝线）**不照抄那个底色**，
+       只把线稿搬进本仓这套配色。
+     · **由比例定尺** —— 图框形状读的就是本文件 viewBox 的比例（须落在 0.2–5 之间）。
+       本题是一张「三支真实的力 + 四个正交分量 + 两条参考轴」的**受力图**，七支箭头都从同一个
+       公共作用点 C (500, 420) 散出去，图元从左上角的 T_P 斜伸到右下角的 T_Q，画幅接近方形：
+       浏览器实测图元 bbox = x 297.8 → 700、y 170 → 580（402 × 410，比例 ≈ 0.98），
+       viewBox = 222 125 555 500（x 从 222 到 777、y 从 125 到 625；左右各留 76 / 77、
+       上下各留 45 单位真空格）—— 图元只占画幅宽度的 402 / 555 ≈ 72%、高度的 410 / 500 ≈ 82%，
+       整幅按 0.72 缩小显示，玻璃面板里不至于顶满。想让图再小一点就继续加宽 viewBox
+       （留白只写在 viewBox 里，不碰任何图元坐标），注意别超过 5 的比例上限 ——
+       高 500 时 viewBox 宽最多 2500。
+       注意 bbox 的左右两端、上下两端都是**两条参考轴的端点**（300 / 700、170 / 580）撑出来的：
+       轴的端点要比最长的分量箭头再探出 20 单位，否则读者看不出这两条虚线是「轴」而不是某一支箭头。
+     · 配色（三色分工，别再加第四种）：
+         三支**真实的力**（T_P / T_Q / mg）........................ #075bff
+         四个**正交分量**（T_Pcosα / T_Psinα / T_Qsinβ / T_Qcosβ）.. #00eaff
+         两条参考轴（竖直 / 水平虚线）、α 与 β 的弧与记号 ......... #ffb900
+       这条分工与 `01 example6-2.html` 同一口径：**深蓝 = 题给的、真正作用在物体上的力**，
+       **青 = 解析里分解出来的量**（分量不是题面给的东西，是解出来的），
+       **金 = 纯几何标注**（轴、弧、角名）。于是「哪几支是力、哪几支是分解」一眼可分 ——
+       本图的判读点正是「三个力投影到两条轴上」，把分量画成和力同色，读者会把四支分量
+       当成四个独立的力，写出四元方程。
+       反过来的错法：把分量涂成蓝 —— 图上出现「七支力」，与「缓慢 ⇒ 合力为零」自相矛盾；
+       把参考轴涂成青 —— 轴和分量糊成一片，看不出哪条是「方向」哪条是「投影」。
+     · 字体：T、m、g、α、β 是题面 / 解析里的记号，走 Georgia / Times New Roman 斜体（与本仓 `.sym` 一致）；
+       `cos`、`sin` 是函数名，走正体（与 LaTeX `\cos`、`\sin` 同口径）；下标 P、Q 也走正体、小一号
+       （符号正体、变量斜体，同 `01 example6-2.html` 的 `.tension-label .sub`）。
+       字号写在每个 <text> 的 font-size 属性上，类里不写 font-size（否则 CSS 会盖掉属性）；
+       只有 .sub 例外 —— 下标要小一号（24px），那一档写在类里。
+       希腊字母 α、β 用 Georgia 打头、Times New Roman 兜底 —— 两者都有希腊字形，不会掉字。 */
+
+  body {
+    background-color: transparent;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    overflow: hidden;
+  }
+  svg {
+    height: 100%;
+    width: auto;
+    max-width: 100%;
+  }
+  /* 两条参考轴：最细、虚线，只交代「竖直 / 水平」这两个方向，不与任何力争锋 */
+  .axis {
+    fill: none;
+    stroke: #ffb900;
+    stroke-width: 2.2;
+    stroke-dasharray: 10 8;
+    stroke-linecap: round;
+  }
+  /* 三支真实的力：粗一号，是本图唯一「真正作用在重物上」的东西 */
+  .force {
+    fill: none;
+    stroke: #075bff;
+    stroke-width: 4.2;
+    stroke-linecap: round;
+  }
+  /* 四个正交分量：细一号，是投影出来的量，不抢真力的分量 */
+  .comp {
+    fill: none;
+    stroke: #00eaff;
+    stroke-width: 3.2;
+    stroke-linecap: round;
+  }
+  /* 与 mg 同线叠加的那一支（T_Qcosβ）：加宽到 7.0，让青色在蓝色 mg 箭杆两侧各露出 1.4 单位 ——
+     两支同向、同起点的箭头才都读得出来；仍用同一支青色，不是第四种颜色。
+     它的箭头用单独的 marker（`arrowCompUnder`）：markerUnits 按 strokeWidth 缩放，
+     杆加宽后必须把 marker 按 3.2 / 7 反比缩小，箭头尖才与其余三支一般大。 */
+  .comp-under {
+    stroke-width: 7;
+  }
+  /* 夹角弧：几何标注，与轴同口径 */
+  .angle-arc {
+    fill: none;
+    stroke: #ffb900;
+    stroke-width: 2.8;
+    stroke-linecap: round;
+  }
+  /* 记号：斜体衬线；下标与函数名各自覆盖成小一号正体 */
+  .force-label {
+    fill: #075bff;
+    font-family: Georgia, "Times New Roman", serif;
+    font-style: italic;
+  }
+  .comp-label {
+    fill: #00eaff;
+    font-family: Georgia, "Times New Roman", serif;
+    font-style: italic;
+  }
+  .angle-label {
+    fill: #ffb900;
+    font-family: Georgia, "Times New Roman", serif;
+    font-style: italic;
+  }
+  .sub {
+    font-family: "Times New Roman", Georgia, serif;
+    font-style: normal;
+    font-size: 24px;
+  }
+  .fn {
+    font-family: "Times New Roman", Georgia, serif;
+    font-style: normal;
+  }
+</style>
+</head>
+<body>
+
+<!-- 配 `09 动能定理.md` 的「真题 4」（2024 全国新课标卷第 3-24 题）**解析里的第二张图**：
+     `09 example4-1.html` 画的是题面那个姿态（两条绳与竖直方向各成 α、β），本图画的是解析的第一步 ——
+     「对重物受力分析，如图」：把三支真实的力（T_P、T_Q、mg）正交分解到**竖直 / 水平**两条轴上，
+     第 (1) 问的两个方程就是从这张图上一眼读出来的。
+
+     题意回顾：重物 m = 42 kg 被两根绳拉着**缓慢竖直下降**，P 绳与竖直方向成 α = 37°、Q 绳与竖直方向成 β = 53°。
+     求 T_P、T_Q（第 (2) 问是拉力做的总功，用动能定理另算，与本图无关）。
+
+     ★ 这张图为什么能成立（图上不写，写在这里）：**缓慢** ⇒ 重物加速度为零 ⇒ 三力平衡。
+       于是把 T_P、T_Q 各自分解成「沿绳所在方向的两个直角边」——
+         水平：T_P sinα 向左，T_Q sinβ 向右，二者等大反向  ⇒  T_P sinα = T_Q sinβ
+         竖直：T_P cosα 向上，mg 与 T_Q cosβ 都向下          ⇒  T_P cosα = T_Q cosβ + mg
+       两式联立即解析里的 T_P = 1200 N、T_Q = 900 N。
+
+     几何口径（1 单位 ≈ 1 画面点）：
+       公共作用点 C  (500, 420) —— 三支力、四个分量**七支箭头都从这里起画**（受力分析取的是同一个作用点）。
+                     图上不画重物本体：`09 example4-1.html` 已经把金块画过了，本图是「对重物受力分析」，
+                     再画一块金块会把七支箭头的起点挡住，读者反而找不到公共作用点。
+       ★ 力的标度：**1 单位 = 4 N**，四个分量与三支力用的是**同一支标度** —— 长度比就是力的大小比：
+           T_P   1200 N → 300 单位      T_Q    900 N → 225 单位      mg     420 N → 105 单位
+           T_Pcosα 960 N → 240 单位     T_Psinα 720 N → 180 单位
+           T_Qsinβ 720 N → 180 单位     T_Qcosβ 540 N → 135 单位
+         于是图上直接量得出两条结论：**左右两支水平分量等长（180 = 180）**、
+         **T_Pcosα（240）正好等于 mg（105）+ T_Qcosβ（135）** —— 前一条是两支水平箭头等长摆出来的，
+         后一条要靠同一支标度把竖直轴上那两支**同向叠加**的长度加起来（短 105、长 135、和 240，
+         与向上那支 T_Pcosα 的 240 对上）。
+         改了 m、g 或两个角，就得按新数重算这七支箭头的长度（比例关系：l = F / 4）。
+       ★ 取角：题面给的是 sin37° = 0.6，本图按 3-4-5 直角三角形的精确取向画（36.87° / 53.13°，
+         与 `09 example4-1.html` 直接画的 37° / 53° 差 0.3°，肉眼不可辨），好处是分量的长度
+         **严格**等于力的长度乘 sin / cos，尖端也对得上矩形的角：
+           T_P 方向 (−sinα, −cosα) = (−0.6, −0.8) → 尖端 (320, 180)
+                 = T_Pcosα 尖端 (500, 180) 与 T_Psinα 尖端 (320, 420) 张开的那个矩形的对角 ✓ 严格闭合
+           T_Q 方向 (+sinβ, +cosβ) = (+0.8, +0.6) → 尖端 (680, 555)
+                 = T_Qsinβ 尖端 (680, 420) 与 T_Qcosβ 尖端 (500, 555) 张开的那个矩形的对角 ✓ 严格闭合
+         ⇒ 两支斜箭头各自与它的两条直角边张成一个**严格闭合**的矩形（边长就是 F·sin、F·cos）。
+           本图仍**不画**虚线的矩形闭合边：四个分量本身就是那四条边，再描一遍只是重复；
+           而 T_Q 一侧要补的那两条虚线（(680,420)→(680,555)、(500,555)→(680,555)）还会在右下角
+           多出一个 L 形，与 T_Q 的箭头尖挤在一起，读起来像第四支力。
+       ★ mg 与 T_Qcosβ **同向同轴**（都沿竖直方向向下、都从 C 起画），本图让它们**在同一条竖直线上叠加**，
+         靠**图层**分开而不是靠位置分开：
+           先画 T_Qcosβ（青、杆加宽到 7.0、长）.... C → (500, 555)，135 单位 = 540 N
+           后画 mg（蓝、杆 4.2、短）............... C → (500, 525)，105 单位 = 420 N，压在它上面
+         ⇒ 0 → 525 这一段：蓝的 mg 压在青的上面，青的从两侧各露出 1.4 单位（像一条衬底），
+           读者看到的是「两支箭头同起点、同方向、一短一长」，而不是一支；
+           525 → 555 这 30 单位：mg 已经收尾，青的杆身与**它自己的箭头尖**完整露出来。
+           两个箭头尖（蓝的在 525、青的在 555）都在图上，长度差 30 单位 = 120 N 也可量。
+         ★ 为什么给这一支加宽（`class="comp comp-under"`、stroke 7.0，箭头换 `arrowCompUnder`）：
+           若与其余三支一样宽（3.2），0 → 525 全被 mg 的杆（4.2）盖住，只剩 525 → 555 那 30 单位，
+           读者会把 T_Qcosβ 当成长 30 的一小截；加宽到 7.0 才让「它也在轴上、也长 135」读得出来。
+           箭头必须换成按 3.2 / 7 反比缩小的 marker —— markerUnits 随 strokeWidth 缩放，不换就大三倍。
+         ★ 为什么不做成「首尾相接的接力」（青的从 525 起画到 660）：那样竖直向下的总量会读成
+           「从 C 一路到 660」，而题面的竖直平衡是**两支各有各的起点 C**（T_Pcosα = mg + T_Qcosβ）；
+           位置一挪，两支力就不再共点。
+         ★ 也不能左右错开画：那是制图上的「并列」，会让人以为竖直分量不在竖直轴上，
+           而且往右错 40 单位就撞上 T_Q 自己的杆身（右下 36.87°）。
+       α 的弧 圆心 C、半径 48：自「竖直向上」(500, 372) 转到 T_P 方向 (471.2, 381.6)，扫过 36.87°
+       β 的弧 圆心 C、半径 48：自「竖直向下」(500, 468) 转到 T_Q 方向 (538.4, 448.8)，扫过 53.13°
+         ★ 两段弧的起点都落在竖直轴上（α 起点在 T_Pcosα 的杆身上、β 起点在 mg 的杆身上）——
+           这正确：角度本来就是从「竖直方向」量起的，弧必须从那根轴上起笔（弧端点压在杆身上不算压线）。
+         ★ 半径取 48（同门 `01 example6-2.html` 那种「顶点 + 弧」的图取 70，是因为那里只有一支 F 要量；
+           本图 C 点周围挤着七支箭头与九个记号，弧一大就顶到 T_Q 的杆身与 mg、β 两个记号）。
+           弧再小到 ~30 以下就退化成一点，读者认不出是角；48 是「整段落在 C 附近空档里、
+           又不与两支斜箭头相交」的那个值。
+       记号位置（9 个都用浏览器实测 getBBox 调过；改字号或挪箭头请重测 —— 每个记号到最近的那条线
+       都不低于 13 单位，小于 10 单位就读成压在线上）：
+           T_P (315, 266) ......... T_P 箭头的外侧（左下），实测离箭杆 23.2
+           T_Q (669, 476) ......... T_Q 箭头的外侧（右上），实测离最近的水平轴 25.0
+           T_Pcosα (520, 250) ..... 竖直轴上段的右侧，离轴 20.0
+           T_Psinα (370, 386) ..... 水平轴左段的**上方**，离轴 19.8（写在下方会撞 mg 的记号）
+           T_Qsinβ (612, 386) ..... 水平轴右段的上方，离轴 19.8
+           mg (482, 470) .......... mg 箭头的**左侧**，离轴 18.0（右侧那条竖带上压着 β 的弧与 T_Q 的杆身）
+           T_Qcosβ (482, 545) ..... 同一条竖直线的**中下段**左侧，离轴 18.0（到那条加宽到 7.0 的
+                                    青色衬底边 14.5）—— 与 mg 的记号同一列（右缘都在 x = 482）、
+                                    上下分开 75，读者顺着这一列把「一支短、一支长」对上两支箭头
+           α (470, 320) ........... T_P 与竖直轴之间的角平分线附近，离两线 23 / 20、离弧 ≥ 50
+           β (546, 509) ........... T_Q 与竖直轴之间，离两线 13.1 / 46、离弧 ≥ 25
+         ★ 九个记号里最紧的是 β（13.1）：β 的夹角只有 53°、又被 T_Q 的杆身与 β 的弧夹在中间，
+           再往杆身挪就压线、再往后挪就撞 mg 的记号 —— 要改这一带，先改 β 的字号（34 → 30）。
+
+     图上没有画、也**不该**画的东西：
+       · 重物本体、绳子、两人、楼墙与窗台：`09 example4-1.html` 已画全；本题受力分析只需要
+         「三支力 + 两条轴」，画上装置会把七支箭头埋进线稿里。
+       · 速度箭头的方向与大小：题面说的是「缓慢」，v ≈ 0；画一支速度箭头就自相矛盾。
+       · 数值 37°、53°、m = 42 kg、g = 10 m/s²，以及答案 1200 N / 900 N：数值属题面与解答，
+         图上只留符号；写上去改一版就要两处一起改，而且读者会照着图上数字反推过程。
+       · T_P 与 T_Q 的合力、以及「合力为零」的闭合三角形：本题要的是**两个方向上的两个方程**，
+         画合成三角形会把「正交分解」这条思路换成「合成」，与解析的写法不一致。
+
+     判读用的定量关系（写在这里方便以后改图时对账，图上不出现）：
+       · 水平：T_P sin37° = T_Q sin53°  ⇒  0.6 T_P = 0.8 T_Q  ⇒  T_P = 4T_Q/3
+       · 竖直：T_P cos37° = T_Q cos53° + mg  ⇒  0.8 T_P = 0.6 T_Q + 420
+       · 联立 ⇒ T_Q = 900 N、T_P = 1200 N ✓（图上 300 : 225 = 4 : 3，正是 1200 : 900）
+       · 自洽核验：左右水平分量 720 N = 720 N ✓；竖向上 960 N = 下 540 + 420 = 960 N ✓
+       · 判读方向：α < β ⇒ P 绳更陡 ⇒ T_P > T_Q（1200 > 900）。图上若把 T_P 画得比 T_Q 还平，就是画反了。 -->
+
+<svg viewBox="-300 125 1600 500" xmlns="http://www.w3.org/2000/svg" role="img"
+     aria-label="受力分析图：重物在公共作用点 C 受三支真实的力——绳 P 的拉力 T 下标 P 沿左上方、绳 Q 的拉力 T 下标 Q 沿右下方、重力 mg 竖直向下。再把 T 下标 P 与 T 下标 Q 正交分解：T 下标 P 乘以余弦 α 竖直向上、T 下标 P 乘以正弦 α 水平向左、T 下标 Q 乘以正弦 β 水平向右；T 下标 Q 乘以余弦 β 也竖直向下，与重力 mg 从同一点出发、同在一条竖直线上叠加，比 mg 长，箭头尖露在 mg 的箭头尖之下。竖直与水平两条虚线为参考轴，α 是 T 下标 P 与竖直向上方向的夹角，β 是 T 下标 Q 与竖直向下方向的夹角。左右两支水平分量等长，表示两绳拉力的水平分量平衡；竖直向下的两支（重力与 T 下标 Q 余弦 β）相加，与竖直向上的 T 下标 P 余弦 α 一样长，表示竖直方向平衡。">
+
+  <defs>
+    <!-- 每支箭头各要一支箭头（7×7、按 strokeWidth 缩放），描边跟各自箭头同色 -->
+    <marker id="arrowForce" markerWidth="7" markerHeight="7" refX="5.5" refY="3.5"
+            orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L6,3.5 L0,7" fill="none" stroke="#075bff" stroke-width="1.2"/>
+    </marker>
+    <marker id="arrowComp" markerWidth="7" markerHeight="7" refX="5.5" refY="3.5"
+            orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L6,3.5 L0,7" fill="none" stroke="#00eaff" stroke-width="1.2"/>
+    </marker>
+    <!-- 加宽杆（stroke 7）那支的箭头：按 3.2 / 7 反比缩小，屏幕上的箭头尖与上面的等大 -->
+    <marker id="arrowCompUnder" markerWidth="3.2" markerHeight="3.2" refX="2.51" refY="1.6"
+            orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L2.74,1.6 L0,3.2" fill="none" stroke="#00eaff" stroke-width="0.55"/>
+    </marker>
+  </defs>
+
+  <!-- ═══════════ 参考轴：竖直 / 水平（先画，被箭头压住） ═══════════ -->
+
+  <path class="axis" d="M300 420 H700"/>
+  <path class="axis" d="M500 170 V580"/>
+
+  <!-- ═══════════ 四个正交分量：与真力同一支标度（1 单位 = 4 N） ═══════════ -->
+
+  <!-- T_P cosα：960 N → 240，沿竖直轴向上 -->
+  <path class="comp" d="M500 420 V180" marker-end="url(#arrowComp)"/>
+  <!-- T_P sinα：720 N → 180，沿水平轴向左 -->
+  <path class="comp" d="M500 420 H320" marker-end="url(#arrowComp)"/>
+  <!-- T_Q sinβ：720 N → 180，沿水平轴向右（与左支等长 ⇒ 水平分量平衡） -->
+  <path class="comp" d="M500 420 H680" marker-end="url(#arrowComp)"/>
+  <!-- T_Q cosβ：540 N → 135，竖直向下；与 mg **同一条竖直线、同一个起点 C**，先画（压在 mg 的图层之下），
+       杆加宽到 7.0（class="comp comp-under"），好让青色在蓝色 mg 箭杆两侧露出来 —— 否则 0 → 525
+       这 105 个单位全被 mg 盖住，读者会把 T_Qcosβ 误读成「525 → 555 那 30 个单位的一小截」。 -->
+  <path class="comp comp-under" d="M500 420 V555" marker-end="url(#arrowCompUnder)"/>
+
+  <!-- ═══════════ 三支真实的力：自公共作用点 C 出发 ═══════════ -->
+
+  <!-- T_P：1200 N → 300，沿 (−0.6, −0.8)，与竖直向上成 α -->
+  <path class="force" d="M500 420 L320 180" marker-end="url(#arrowForce)"/>
+  <!-- T_Q：900 N → 225，沿 (+0.8, +0.6)，与竖直向下成 β -->
+  <path class="force" d="M500 420 L680 555" marker-end="url(#arrowForce)"/>
+  <!-- mg：420 N → 105，竖直向下，留在轴上 -->
+  <path class="force" d="M500 420 V525" marker-end="url(#arrowForce)"/>
+
+  <!-- ═══════════ 夹角弧：α 量在上半（竖直向上 ↔ T_P），β 量在下半（竖直向下 ↔ T_Q） ═══════════ -->
+
+  <path class="angle-arc" d="M500 372 A48 48 0 0 0 471.2 381.6"/>
+  <path class="angle-arc" d="M500 468 A48 48 0 0 0 538.4 448.8"/>
+
+  <!-- ═══════════ 记号：力（深蓝）、分量（青）、角（金），各自与自己那一层同色 ═══════════ -->
+
+  <text class="force-label" x="315" y="246" font-size="34" text-anchor="middle">T<tspan class="sub" dy="9">P</tspan></text>
+  <text class="force-label" x="669" y="496" font-size="34" text-anchor="middle">T<tspan class="sub" dy="9">Q</tspan></text>
+  <text class="force-label" x="482" y="470" font-size="34" text-anchor="end">mg</text>
+
+  <text class="comp-label" x="520" y="250" font-size="32" text-anchor="start">T<tspan class="sub" dy="9">P</tspan><tspan class="fn" dy="-9" dx="4">cos</tspan><tspan dx="6">α</tspan></text>
+  <text class="comp-label" x="370" y="386" font-size="32" text-anchor="middle">T<tspan class="sub" dy="9">P</tspan><tspan class="fn" dy="-9" dx="4">sin</tspan><tspan dx="6">α</tspan></text>
+  <text class="comp-label" x="612" y="386" font-size="32" text-anchor="middle">T<tspan class="sub" dy="9">Q</tspan><tspan class="fn" dy="-9" dx="4">sin</tspan><tspan dx="6">β</tspan></text>
+  <text class="comp-label" x="482" y="545" font-size="32" text-anchor="end">T<tspan class="sub" dy="9">Q</tspan><tspan class="fn" dy="-9" dx="4">cos</tspan><tspan dx="6">β</tspan></text>
+
+  <text class="angle-label" x="470" y="320" font-size="34" text-anchor="middle">α</text>
+  <text class="angle-label" x="546" y="509" font-size="34" text-anchor="middle">β</text>
+
+</svg>
+
+</body>
+</html>

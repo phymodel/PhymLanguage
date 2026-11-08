@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>闯关游戏：每 8 m 一个关卡</title>
+<style>
+  /* 图框口径：与同目录 `06 example2.html`、`05 VelocityTime.html` 同一套。
+     · 页面**不上底色** —— iOS / visionOS 是玻璃主题，图要让窗口材质透出来。自己糊一块实色底板
+       会有两个后果：玻璃面板上留一块异色方块；而且 Markdown 侧一认出「作者画了底板」就不注入画布
+       （见 MarkdownHtmlFigure.swift `declaresOwnPageBackground`），里外两块底互相打架。
+     · **由高度定尺** —— 图框形状由图文档自己的 viewBox 比例给出（Markdown 侧读的就是这个比例，
+       要求落在 0.2–5 之间，超了会退化成固定 240px 高），svg 占满图框高度，左右多出来的就是真空格。
+       本图 viewBox = 2040 × 420 → 比例约 4.86。
+       画幅**故意比图元宽出很多**：帧宽取文档流宽度、帧高 = 帧宽 ÷ 比例，所以把 viewBox 左右各放出
+       460 单位真空格（图元仍占 x = 40 → 1160），图元就按 1200/2040 ≈ 0.59 缩小显示。
+       这片留白的上限由「比例 ≤ 5」卡住：横向要再加宽，就得同时把高度放大（否则比例越界退化成 240px 高），
+       所以这里也给了上下各 59 单位余量 —— 想整体再小一档，把 x/y 两侧一起等量放大即可，别只加宽。
+     · 字号按「图元缩到帧宽 55%」后仍要读得清来定：关卡名与 8 m 都取 44。
+     · 配色：直通道（两条平行线）用 #ffb900（同坐标轴口径）；关卡、尺寸线、关卡名与 8 m 标注
+       用 #0865ff（同图线 / 运动体口径）。
+     · 汉字另给一套字体栈（Georgia 没有汉字，必须落到 PingFang SC / 雅黑）。 */
+  body {
+    background-color: transparent;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    overflow: hidden;
+  }
+  svg {
+    height: 100%;
+    width: auto;
+    max-width: 100%;
+  }
+  .track, .gate, .dim {
+    fill: none;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .track { stroke: #ffb900; stroke-width: 4.2; }   /* 直通道的两条平行边 */
+  .gate  { stroke: #0865ff; stroke-width: 4.2; }   /* 关卡（竖直门线） */
+  .dim   { stroke: #0865ff; stroke-width: 3.4; }   /* 8 m 尺寸线 */
+  text {
+    font-family: -apple-system, "PingFang SC", "Heiti SC", "Microsoft YaHei", sans-serif;
+    fill: #0865ff;
+    text-anchor: middle;
+  }
+  .gate-name { font-size: 44px; }
+  .len       { font-size: 44px; }
+</style>
+</head>
+<body>
+
+<!-- 配 `06 位移时间关系式.md` 的「真题 5」（2015 江苏）：闯关游戏的笔直通道，
+     每隔 8 m 一个关卡，各关卡同步放行 5 s / 关闭 2 s。
+
+     几何口径（8 m 对应 225 个用户单位，四段等长，改比例就与「每隔 8 m」打架）：
+       画布       x = -420 → 1620、y = -48 → 372（图元只占 x = 40 → 1160、y = 11 → 313，
+                  左右各留 460、上下各留 59 的真空格，把整幅图缩到帧宽的约 55% 显示；
+                  横向要再加宽就必须同时加高，否则比例越过 5 会退化成固定 240px 高）
+       关卡竖线   x = 150, 375, 600, 825, 1050；y = 100 → 212（上下各穿出通道边线一截）
+       直通道     y = 152 与 y = 172 两条平行线（通道宽 20），x = 40 → 1160，两端穿出首末关卡
+       尺寸线     钩顶 y = 234、横线 y = 252、圆角 14，四段各自成一段括号，端钩停在关卡竖线正下方，
+                  故相邻两段的端钩在中间关卡处各自上翘、合成一个「∨」，与题图一致
+       8 m 标注  基线 y = 298，居中于每段（相邻两关卡的中点） -->
+<svg viewBox="-420 -48 2040 420" role="img"
+     aria-label="闯关游戏示意图：笔直通道上依次设有关卡 1 到关卡 5，相邻两关卡相距 8 米">
+
+  <!-- ═══════════ 直通道：两条平行边线，两端穿出首末关卡 ═══════════ -->
+  <path class="track" d="M40 152 H1160"/>
+  <path class="track" d="M40 172 H1160"/>
+
+  <!-- ═══════════ 关卡竖线 + 关卡名 ═══════════ -->
+  <path class="gate" d="M150 100 V212"/>
+  <path class="gate" d="M375 100 V212"/>
+  <path class="gate" d="M600 100 V212"/>
+  <path class="gate" d="M825 100 V212"/>
+  <path class="gate" d="M1050 100 V212"/>
+
+  <text class="gate-name" x="150"  y="58">关卡1</text>
+  <text class="gate-name" x="375"  y="58">关卡2</text>
+  <text class="gate-name" x="600"  y="58">关卡3</text>
+  <text class="gate-name" x="825"  y="58">关卡4</text>
+  <text class="gate-name" x="1050" y="58">关卡5</text>
+
+  <!-- ═══════════ 间距 8 m：四段尺寸括号 + 标注 ═══════════ -->
+  <!-- 段 1：关卡1 → 关卡2 -->
+  <path class="dim" d="M150 234 V238 Q150 252 164 252 H361 Q375 252 375 238 V234"/>
+  <text class="len" x="262.5" y="298">8 m</text>
+
+  <!-- 段 2：关卡2 → 关卡3 -->
+  <path class="dim" d="M375 234 V238 Q375 252 389 252 H586 Q600 252 600 238 V234"/>
+  <text class="len" x="487.5" y="298">8 m</text>
+
+  <!-- 段 3：关卡3 → 关卡4 -->
+  <path class="dim" d="M600 234 V238 Q600 252 614 252 H811 Q825 252 825 238 V234"/>
+  <text class="len" x="712.5" y="298">8 m</text>
+
+  <!-- 段 4：关卡4 → 关卡5 -->
+  <path class="dim" d="M825 234 V238 Q825 252 839 252 H1036 Q1050 252 1050 238 V234"/>
+  <text class="len" x="937.5" y="298">8 m</text>
+
+</svg>
+
+</body>
+</html>

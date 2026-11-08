@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>甲、乙两球的 v-t 图象（竖直上抛，相隔 2 s 抛出）</title>
+<style>
+  /* 图框口径：与同目录 `05 VelocityTime.html`、`02 DisplacementImage.html`、`06 example2.html` 同一套。
+     · 页面**不上底色** —— iOS / visionOS 是玻璃主题，图要让窗口材质透出来。自己糊一块实色底板
+       （题图原稿是黑底）会有两个后果：玻璃面板上留一块异色方块；而且 Markdown 侧一认出
+       「作者画了底板」就不注入画布（见 MarkdownHtmlFigure.swift `declaresOwnPageBackground`），
+       里外两块底互相打架。
+     · **由高度定尺** —— 图框形状由图文档自己的 viewBox 比例给出（Markdown 侧读的就是这个比例，
+       要求落在 0.2–5 之间，超了会退化成固定 240px 高），svg 占满图框高度，左右多出来的就是真空格。
+       本图 viewBox = 1540 × 420 → 比例约 3.67（与同目录 `06 example6.html` 同一口径）。
+       画幅**故意比图元宽出很多**：帧宽取文档流宽度、帧高 = 帧宽 ÷ 比例，所以把 viewBox 左右各放出
+       380 单位真空格（原画布仍是 x = 0 → 780，图元占 x = 40 → 742，居中不动），图元就按
+       780 / 1540 ≈ 0.51 缩小显示，左右各留 380 单位空白 —— 想让图再小一点就继续加宽 viewBox
+       （如 x = −575、宽 1930，比例 4.60，注意别超过 5 的比例上限），只动 viewBox 的 x 与宽，
+       不碰图内任何坐标。
+     · 配色：坐标轴 / 刻度值 / 轴名 #ffb900（与同目录既有图一致）；虚线网格 #075bff、
+       图线与甲 / 乙二字 #00eaff —— 这一档取 `Physics/1 力学/3 动力学/11 example1-1.html`
+       的 v-t 图口径。网格**不能**和图线同色：本题两条线既互相平行、又恰好与网格斜向同调，
+       同色就糊成一片，看不出「两条平行线差 2 s」这件事。
+     · 数字一律走 Times New Roman（等高数字）：Georgia 是旧式数字，30 / 20 / 10 里的 3、2、0
+       高度各不相同，读数时数字会看着不在一条水平线上；斜体只留给 v、t、O 这些数学记号。 */
+  body {
+    background-color: transparent;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    overflow: hidden;
+  }
+  svg {
+    height: 100%;
+    width: auto;
+    max-width: 100%;
+  }
+  .axis {
+    fill: none;
+    stroke: #ffb900;
+    stroke-width: 2.6;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .grid {
+    fill: none;
+    stroke: #075bff;
+    stroke-width: 2;
+    stroke-dasharray: 8 8;
+    stroke-linecap: round;
+  }
+  .curve {
+    fill: none;
+    stroke: #00eaff;
+    stroke-width: 3.4;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  /* 轴名：变量 v / t / O 走 Georgia 斜体 */
+  .axis-name {
+    fill: #ffb900;
+    font-family: Georgia, "Times New Roman", serif;
+    font-style: italic;
+    font-size: 26px;
+  }
+  /* 公式里只有**变量**斜体；数字、单位（m、s）与运算符都用正体 —— 必须排在 `.axis-name`
+     之后：同为类选择器，靠后的一条胜出（放前面会被压掉）。 */
+  .up {
+    font-style: normal;
+  }
+  /* 刻度值 / 网格读数：正体、等高数字。
+     ⚠️ 这里**不写** text-anchor —— CSS 的优先级高于元素上的表现属性（text-anchor="end"），
+     一旦在类里写死 middle，v 轴那几个右对齐的读数就会被拉回居中、右端越过去压住竖轴
+     （实测量过：写死 middle 时「30」的 bbox 是 71..97，正好横跨 x = 96 的竖轴）。
+     对齐方式一律交给各 <text> 自己的属性。 */
+  .tick-num {
+    fill: #ffb900;
+    font-family: "Times New Roman", Georgia, serif;
+    font-style: normal;
+    font-size: 26px;
+  }
+  /* 「甲」「乙」是题面给的球名，不是变量，走汉字字体栈并保持正体 */
+  .ball {
+    fill: #00eaff;
+    font-family: -apple-system, "PingFang SC", "Heiti SC", "Microsoft YaHei", sans-serif;
+    font-size: 30px;
+    text-anchor: middle;
+  }
+</style>
+</head>
+<body>
+
+<!-- 配 `09 自由落体三公式.md` 的「真题 1」（2013 全国大纲版第 2-19 题）：
+     甲、乙两球以同样的初速度先后竖直向上抛出（相隔 2 s），抛出点高度不同；图示两条 v-t 直线。
+
+     几何口径（t 向右、v 向上；1 s = 96 单位，10 m·s⁻¹ = 72 单位）：
+       · 原点 O            (96, 271)          t 轴向右（px = 96 + 96·t），v 轴向上（py = 271 − 7.2·v）
+       · 网格              竖线 t = 1…5（px = 192 / 288 / 384 / 480 / 576），横线 v = 30 / 20 / 10 / −10
+                           （py = 55 / 127 / 199 / 343），即每小格 1 s × 10 m·s⁻¹；v = 0 那一行就是 t 轴本身，
+                           所以不另画虚线
+       · 直线甲            (0, 30) → (4, −10)，即 (96, 55) → (480, 343)
+       · 直线乙            (2, 30) → (6, −10)，即 (288, 55) → (672, 343)
+     两条线的物理含义（读图即可核对题面）：v = 30 − 10t 与 v = 30 − 10(t − 2) ——
+       斜率都等于 −10 m·s⁻² = −g，所以两线**平行**；乙整体比甲右移 2 s，所以「晚 2 s 抛出」。
+       甲在 t = 3 s 到最高点（v = 0）并在 t = 6 s 回到抛出点，乙在 t = 5 s 到最高点、t = 8 s 回抛出点；
+       图只画到 v = −10 那一行为止（题图如此），落不到地面是因为两球抛出点高度不同、题面没给。
+       t = 2 s：甲已升到 v = 10（梯形面积 40 m），乙才刚要出发（v = 30、位移 0）→ A 错；
+       t = 4 s：甲「3 s 上升 45 m + 1 s 下落 5 m」= 40 m，乙「2 s 上升」= 40 m → B 对。
+     竖轴末尾 y = 343 与网格底线齐平；t 轴左端伸到 x = 40（越过竖轴一截），与题图一致。
+     甲 / 乙二字写在各直线下端的正下方（480, 378）、（672, 378），不压线、也不与 t 轴刻度挤在一起。 -->
+<svg viewBox="-380 0 1540 420" xmlns="http://www.w3.org/2000/svg" role="img"
+     aria-label="速度时间图象：纵轴是速度 v，单位米每秒，横轴是时间 t，单位秒；虚线网格每小格代表 1 秒和 10 米每秒。甲球从 t 等于 0、v 等于 30 米每秒出发，图线是一条斜率为负 10 米每二次方秒的直线，到 t 等于 4 秒时 v 等于负 10 米每秒，在 t 等于 3 秒时到达最高点；乙球的图线与甲的图线平行，从 t 等于 2 秒、v 等于 30 米每秒出发，到 t 等于 6 秒时 v 等于负 10 米每秒，在 t 等于 5 秒时到达最高点。">
+
+  <defs>
+    <!-- 坐标轴箭头：与同目录既有图同口径（7×7、按 strokeWidth 缩放） -->
+    <marker id="arrow" markerWidth="7" markerHeight="7" refX="5.5" refY="3.5"
+            orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L6,3.5 L0,7" fill="none" stroke="#ffb900" stroke-width="1.2"/>
+    </marker>
+  </defs>
+
+  <!-- ═══════════ 虚线网格：竖线 t = 1…5，横线 v = 30 / 20 / 10 / −10 ═══════════ -->
+  <path class="grid" d="M192 55 V343 M288 55 V343 M384 55 V343 M480 55 V343 M576 55 V343"/>
+  <path class="grid" d="M96 55 H672 M96 127 H672 M96 199 H672 M96 343 H672"/>
+
+  <!-- ═══════════ 坐标轴（画在网格之上，保持竖轴、t 轴是干净实线） ═══════════ -->
+  <path class="axis" d="M96 343 V30" marker-end="url(#arrow)"/>
+  <path class="axis" d="M40 271 H742" marker-end="url(#arrow)"/>
+  <text class="axis-name" x="108" y="44">v<tspan class="up"> / (m·s</tspan><tspan class="up" dy="-10" font-size="17">−1</tspan><tspan class="up" dy="10">)</tspan></text>
+  <text class="axis-name" x="742" y="246" text-anchor="end">t<tspan class="up"> / s</tspan></text>
+  <text class="axis-name" x="84" y="298" text-anchor="end">O</text>
+
+  <!-- ═══════════ 两根轴上的读数：v 轴刻度值右对齐在轴左侧，t 轴刻度值居中在网格线正下方 ═══════════ -->
+  <text class="tick-num" x="84" y="64" text-anchor="end">30</text>
+  <text class="tick-num" x="84" y="136" text-anchor="end">20</text>
+  <text class="tick-num" x="84" y="208" text-anchor="end">10</text>
+  <text class="tick-num" x="84" y="352" text-anchor="end">−10</text>
+  <text class="tick-num" text-anchor="middle">
+    <tspan x="192" y="300">1</tspan>
+    <tspan x="288" y="300">2</tspan>
+    <tspan x="384" y="300">3</tspan>
+    <tspan x="480" y="300">4</tspan>
+    <tspan x="576" y="300">5</tspan>
+  </text>
+
+  <!-- ═══════════ 两条平行图线：同初速、同加速度，乙整体右移 2 s ═══════════ -->
+  <!-- 甲：t = 0 抛，v = 30 − 10t，(3 s 最高点) → t = 4 s 时 v = −10 -->
+  <path class="curve" d="M96 55 L480 343"/>
+  <!-- 乙：t = 2 s 抛，v = 30 − 10(t − 2)，(5 s 最高点) → t = 6 s 时 v = −10 -->
+  <path class="curve" d="M288 55 L672 343"/>
+
+  <!-- 球名写在各直线下端正下方：谁是谁一落就在线的尽头，不靠颜色猜 -->
+  <text class="ball" x="480" y="378">甲</text>
+  <text class="ball" x="672" y="378">乙</text>
+
+</svg>
+
+</body>
+</html>
