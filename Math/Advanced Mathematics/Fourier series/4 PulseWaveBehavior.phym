@@ -140,7 +140,7 @@ Behavior()
         text: "返回傅立叶级数。"
     }
     OpenScene(3){
-        scene: "1 傅立叶级数.md"
+        scene: "0 FourierSeries.md"
         duration: 0
     }
 }

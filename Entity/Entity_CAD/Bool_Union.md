@@ -1,6 +1,6 @@
 # UNION
 
-Boolean union: merges two existing CAD entities and takes the combined volume of both. Both operands must be defined earlier in the same `commands` array.
+并集布尔：把两个已存在的 CAD 实体合并，取两者体积之和。两个操作数都必须在同一个 `commands` 数组里更早定义过。
 
 > `DEF name = UNION entity1 entity2`
 

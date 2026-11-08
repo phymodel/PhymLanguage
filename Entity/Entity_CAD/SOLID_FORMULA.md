@@ -1,12 +1,12 @@
 # SOLID_FORMULA
 
-Generates a solid directly from an implicit 3D surface equation `f(x,y,z)=0`. The isosurface is meshed using marching cubes. The optional `domainHalfSize` (default 0.5) and `resolution` (default 30) control mesh bounds and grid density. The keyword `INSIDE` inverts the fill to mesh the interior of the surface.
+直接由隐式 3D 曲面方程 `f(x,y,z)=0` 生成实体。等值面用 marching cubes 网格化。可选的 `domainHalfSize`（默认 0.5）与 `resolution`（默认 30）控制网格范围与格点密度。关键字 `INSIDE` 反转填充方向，改为网格化曲面的内部。
 
 > `DEF name = SOLID_FORMULA x,y,z equation [domainHalfSize] [resolution] [INSIDE]`
 
-The last example (a `skybox` from inside a sphere) takes its texture from `./black-and-white.png` next to this document: `.material(imagePath: "…")` resolves **relative to the directory of the current `.md` scene**, so the image travels with the document — no image host, no CORS, works offline. This is the **only** texture channel: the remote `imageURL:` form has been removed (a remote texture needs CORS on the Web and is often unreachable anyway — ship the image with the document instead), and writing it now reports an error instead of being silently ignored.
+最后一个例子（从球内部看的 `skybox`）贴图取自本文档旁边的 `./black-and-white.png`：`.material(imagePath: "…")` **相对当前 `.md` 场景所在目录**解析，所以图片跟着文档一起走 —— 不需要图床、不涉及 CORS、离线也能用。这是**唯一**的贴图通道：远端 `imageURL:` 写法已删除（远端贴图在 Web 上需要 CORS、而且常常根本连不上 —— 把图片和文档一起发布才是正路），现在写它会直接报错，而不是被静默忽略。
 
-`INSIDE` surfaces are only visible **from inside**, so the skybox must enclose the viewer: this one is 3 m in radius, which leaves both the headset scene (origin) and the Web editor's camera (eye height 1.7 m, 2 m out) inside it. A 1 m sphere would sit below that camera's view cone and look like nothing rendered at all.
+`INSIDE` 曲面**只能从内部**看见，所以天空盒必须把观察者包在里面：这个球半径 3 m，头显场景（原点）与 Web 编辑器的相机（眼高 1.7 m、外移 2 m）都落在球内。半径 1 m 的球会落在那个相机视锥的下方，看起来就像什么也没渲染。
 
 ![black-and-white](./black-and-white.png)
 

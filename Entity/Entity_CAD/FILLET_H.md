@@ -1,6 +1,6 @@
 # FILLET_H
 
-Rounds the horizontal edges (edges parallel to the extrusion direction) of an extruded solid. Applied after `EXT`, `EXT_Bezier`, or `EXT_BSpline`. The radius must be a positive number.
+把拉伸实体的水平边（与拉伸方向平行的边）倒圆。接在 `EXT`、`EXT_Bezier` 或 `EXT_BSpline` 之后使用。半径必须是正数。
 
 > `... EXT h FILLET_H r`
 

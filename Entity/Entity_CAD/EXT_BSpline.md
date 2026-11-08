@@ -1,6 +1,6 @@
 # EXT_BSpline
 
-Extrudes a 2D profile along a B-spline curve defined by a sequence of control points. Use with path-based primitives (`PATH_FORMULA`, `PATH_FORMULA_XY`, `PATH`) to create swept solids. Control points are given as `(x,y,z)` triplets. `DEG` sets the B-spline degree (default 3). `SEG` sets the segment count along the curve; `FILLET` optionally rounds the resulting edges.
+沿一条由一串控制点定义的 B 样条曲线拉伸 2D 轮廓。与基于路径的图元（`PATH_FORMULA`、`PATH_FORMULA_XY`、`PATH`）配合，可以做出扫掠实体。控制点写成 `(x,y,z)` 三元组。`DEG` 决定 B 样条次数（默认 3）。`SEG` 决定沿曲线的分段数；`FILLET` 可选，把生成的边倒圆。
 
 > `... EXT_BSpline (x1,y1,z1),(x2,y2,z2),... SEG N [DEG D] [FILLET r]`
 

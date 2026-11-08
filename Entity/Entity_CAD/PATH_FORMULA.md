@@ -1,6 +1,6 @@
 # PATH_FORMULA
 
-Creates a 2D profile from an implicit plane equation `f(x,y)=0`, then extrudes it along the profile normal to form a solid. The first three numbers `x,y,z` specify the base position; the next token (`X`, `Y`, or `Z`) sets the normal direction of the profile plane. The `equation` defines the 2D shape contour (e.g. `(x-0)^2+(y-0)^2=0.4^2` for a circle). The `domainHalfSize` controls the sampling bounds around the origin. The optional `SECTOR [start,end]` restricts the profile to an angular sector in degrees. `EXT h` drives the extrusion height, with optional `FILLET`, `FILLET_H`, and `FILLET_V` for edge rounding.
+用隐式平面方程 `f(x,y)=0` 创建 2D 轮廓，再沿轮廓法线拉伸成实体。最前面三个数 `x,y,z` 给出基点；紧接的记号（`X`、`Y` 或 `Z`）定下轮廓平面的法线方向。`equation` 定义 2D 形状的轮廓（例如圆是 `(x-0)^2+(y-0)^2=0.4^2`）。`domainHalfSize` 控制原点周围的采样范围。可选的 `SECTOR [start,end]` 把轮廓限制在一个角度扇区（度）内。`EXT h` 决定拉伸高度，还可选 `FILLET`、`FILLET_H`、`FILLET_V` 做边缘倒圆。
 
 > `DEF name = PATH_FORMULA x,y,z NORMAL equation domainHalfSize [SECTOR [start,end]] EXT h [FILLET r] [FILLET_H r] [FILLET_V r]`
 

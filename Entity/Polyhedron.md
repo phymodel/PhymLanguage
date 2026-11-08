@@ -1,14 +1,14 @@
 # Polyhedron
 
-The five Platonic solids, all accessed through the single `Polyhedron()` entry point. Select the variant via `.mesh(polyhedron:)`:
+五种正多面体，统一由 `Polyhedron()` 这一个入口进入。用 `.mesh(polyhedron:)` 选出具体是哪一种：
 
-| `polyhedron` | Solid |
+| `polyhedron` | 立体 |
 |--------------|-------|
-| `.tetrahedron` | Tetrahedron (4 faces) |
-| `.hexahedron` | Hexahedron / Cube (6 faces) |
-| `.octahedron` | Octahedron (8 faces) |
-| `.dodecahedron` | Dodecahedron (12 faces) |
-| `.icosahedron` | Icosahedron (20 faces) |
+| `.tetrahedron` | 正四面体（4 面） |
+| `.hexahedron` | 正六面体 / 立方体（6 面） |
+| `.octahedron` | 正八面体（8 面） |
+| `.dodecahedron` | 正十二面体（12 面） |
+| `.icosahedron` | 正二十面体（20 面） |
 
 ```phymodel
 

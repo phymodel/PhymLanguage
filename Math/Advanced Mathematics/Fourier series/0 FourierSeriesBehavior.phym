@@ -16,7 +16,7 @@ Behavior()
         text: "锯齿波的傅立叶级数展开。"
     }
     OpenScene(3){
-        scene: "2 锯齿波.md",
+        scene: "1 SawtoothWave.md",
         duration: 0
     }
 }
@@ -39,7 +39,7 @@ Behavior()
         text: "方波的傅立叶级数展开。"
     }
     OpenScene(3){
-        scene: "3 方波.md",
+        scene: "2 SquareWave.md",
         duration: 0
     }
 }
@@ -62,7 +62,7 @@ Behavior()
         text: "三角波的傅立叶级数展开。"
     }
     OpenScene(3){
-        scene: "4 三角波.md",
+        scene: "3 TriangleWave.md",
         duration: 0
     }
 }
@@ -85,7 +85,7 @@ Behavior()
         text: "脉冲波的傅立叶级数展开。"
     }
     OpenScene(3){
-        scene: "5 脉冲波.md",
+        scene: "4 PulseWave.md",
         duration: 0
     }
 }

@@ -1,6 +1,6 @@
 # PATH_FORMULA_XY
 
-Creates a 2D profile from parametric equations `x(t)` and `y(t)`, then extrudes or sweeps it along a path. Unlike `PATH_FORMULA` which uses an implicit equation `f(x,y)=0`, this uses explicit parametric functions of `t`. The `domainHalfSize` controls the sampling range and `segCount` sets the number of segments.
+用参数方程 `x(t)` 与 `y(t)` 创建 2D 轮廓，再沿路径拉伸或扫掠。与使用隐式方程 `f(x,y)=0` 的 `PATH_FORMULA` 不同，这里用的是 `t` 的显式参数函数。`domainHalfSize` 控制采样范围，`segCount` 决定分段数。
 
 > `DEF name = PATH_FORMULA_XY x,y,z NORMAL x_expr y_expr domainHalfSize segCount EXT h [FILLET r]`
 > `DEF name = PATH_FORMULA_XY x,y,z NORMAL x_expr y_expr domainHalfSize segCount EXT_Bezier ... SEG N [FILLET r]`

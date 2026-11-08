@@ -1,8 +1,8 @@
 # Tree
 
-Generates a procedural 3D tree mesh. `growthProgress` controls the growth stage from sapling (0.0) to fully grown (1.0). When bound to a Slider, `growthProgress` typically maps from a draggable sphere's local Y coordinate (e.g. `sphere.y - 1.2 + 0.15` to normalise into the 0…1 range). The sphere's local Y lives in the same coordinate space as its `.position` and `dragRangeY`.
+生成一棵程序化的 3D 树。`growthProgress` 控制从树苗（0.0）到长成（1.0）的生长阶段。绑到 Slider 上时，`growthProgress` 通常取自一颗可拖动球体的局部 Y 坐标（例如 `sphere.y - 1.2 + 0.15`，把值归一到 0…1）。球体的局部 Y 与它的 `.position`、`dragRangeY` 在同一个坐标空间里。
 
-> Note: The Tree() type does not support dynamic. On iOS: tap to grab, tap again to release; device-attitude displacement is projected locally and constrained by `dragAxes` / `dragRangeY`.
+> 说明：Tree() 类型不支持 dynamic。iOS 上：点一下抓取、再点一下放开；设备姿态位移会投影到局部坐标，并受 `dragAxes` / `dragRangeY` 约束。
 
 ```phymodel
 

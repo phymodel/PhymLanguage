@@ -1,6 +1,6 @@
 # SUBTRACT
 
-Boolean subtraction: subtracts the volume of the second entity from the first. Both operands must be defined earlier in the same `commands` array. The keyword `SUBTRACTION` is equivalent.
+减法布尔：从第一个实体的体积里减掉第二个实体的体积。两个操作数都必须在同一个 `commands` 数组里更早定义过。关键字 `SUBTRACTION` 等价。
 
 > `DEF name = SUBTRACT entity1 entity2`
 

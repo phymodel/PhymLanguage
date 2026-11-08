@@ -1,6 +1,6 @@
 # INTERSECT
 
-Boolean intersection: retains the common volume of two existing CAD entities and discards the rest. Both operands must be defined earlier in the same `commands` array. The keyword `INTERSECTION` is equivalent.
+交集布尔：保留两个已存在 CAD 实体的公共体积，其余丢掉。两个操作数都必须在同一个 `commands` 数组里更早定义过。关键字 `INTERSECTION` 等价。
 
 > `DEF name = INTERSECT entity1 entity2`
 

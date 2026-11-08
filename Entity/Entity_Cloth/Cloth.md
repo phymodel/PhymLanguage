@@ -1,6 +1,6 @@
 # Cloth
 
-> Note: The Cloth() type does not support dynamic.
+> 说明：Cloth() 类型不支持 dynamic。
 
 ```phymodel
 

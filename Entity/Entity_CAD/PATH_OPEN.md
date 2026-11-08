@@ -1,6 +1,6 @@
 # PATH_OPEN
 
-Creates an open polyline profile from a sequence of points, then revolves it around an axis to form a solid of revolution. Unlike `PATH` which produces a closed polygon and extrudes linearly, `PATH_OPEN` expects an open chain of `x,y` pairs and uses `REV` with a rotation axis and angle (in degrees).
+从一串点创建开放折线轮廓，再绕轴旋转成回转体。与 `PATH`（闭合多边形 + 直线拉伸）不同，`PATH_OPEN` 要的是 `x,y` 对的开放链，配 `REV` 的旋转轴与角度（度）。
 
 > `DEF name = PATH_OPEN x,y,z NORMAL x1,y1 x2,y2 ... REV axis angle [SEG n]`
 

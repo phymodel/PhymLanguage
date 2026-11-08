@@ -1,16 +1,16 @@
 # HeightMap
 
-Generates a height-mapped terrain mesh from one or more procedural waveform commands. Each `commands:` entry is a waveform layer that modulates the mesh surface:
+用一条或多条程序化波形命令生成高度图地形网格。每条 `commands:` 项都是一层调制网格表面的波形：
 
-| Command | Effect |
+| 命令 | 效果 |
 |---------|--------|
-| `"WATER"` | Water-like rippling wave pattern |
-| `"SINE"` | Single sine-wave elevation |
-| `"TERRAIN"` | Fractal terrain-like pattern |
+| `"WATER"` | 水面似的波纹图案 |
+| `"SINE"` | 单层正弦起伏 |
+| `"TERRAIN"` | 分形地形图案 |
 
-Stacking `"SINE"` entries produces multi-octave sine waves. `size:` controls the horizontal extent (width, depth), `thickness:` sets the base slab depth below the lowest point, and `resolution:` defines the sampling grid density (higher values produce finer detail).
+叠加多条 `"SINE"` 就得到多倍频正弦。`size:` 控制水平范围（宽、深），`thickness:` 设定最低点以下的底板厚度，`resolution:` 定义采样网格密度（越大越细）。
 
-> Note: The HeightMap() type does not support dynamic.
+> 说明：HeightMap() 类型不支持 dynamic。
 
 ```phymodel
 

@@ -1,15 +1,15 @@
 # LatexPath
 
-In `Latex()`'s `.mesh`, choose either `text` or `textPath`. `textPath` renders the body text of a heading section from the current or a specified `.md` file (Markdown + LaTeX, excluding phymodel code blocks) as a 3D plane.
+在 `Latex()` 的 `.mesh` 里，`text` 与 `textPath` 二选一。`textPath` 把当前或指定 `.md` 文件里某一节标题下的正文（Markdown + LaTeX，不含 phymodel 代码块）渲染成一块 3D 平面。
 
-Path format: file path + `#` + heading hierarchy (top-down, separated by `#`).
+路径格式：文件路径 + `#` + 标题层级（自上而下，用 `#` 分隔）。
 
-| Notation | Meaning |
+| 记号 | 含义 |
 |------|------|
-| `时刻与时间间隔` | Heading within the current scene file |
-| `时间间隔公式#时刻与时间间隔` | Multi-level heading in the current file (`# 时间间隔公式` → `## 时刻与时间间隔`) |
-| `./01.1 时间间隔公式#时间间隔公式#时刻与时间间隔` | File relative to the current `.md` directory + heading |
-| `../../Physics/1 力学/1 运动学/01.1 时间间隔公式#时间间隔公式#时刻与时间间隔` | Document library root-relative path + heading |
+| `时刻与时间间隔` | 当前场景文件里的某个标题 |
+| `时间间隔公式#时刻与时间间隔` | 当前文件里的多级标题（`# 时间间隔公式` → `## 时刻与时间间隔`） |
+| `./01 时间间隔公式#时间间隔公式#时刻与时间间隔` | 相对当前 `.md` 目录的文件 + 标题 |
+| `../../Physics/1 力学/1 运动学/01 时间间隔公式#时间间隔公式#时刻与时间间隔` | 相对文档库根的路径 + 标题 |
 
 ```phymodel
 

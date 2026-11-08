@@ -1,12 +1,12 @@
 # Latex
 
-`Latex()` renders Markdown + LaTeX content as a 3D planar texture (supports HTML formatting, e.g., `<center>`, `<span style="font-size: …">`).
+`Latex()` 把 Markdown + LaTeX 内容渲染成 3D 平面贴图（支持 HTML 排版，例如 `<center>`、`<span style="font-size: …">`）。
 
-Choose one of two content sources for `.mesh`:
-- `text: "…"` — inline Markdown + LaTeX directly, content wrapped in paired `¥¥` fences (see example);
-- `textPath: "…"` — reference the body text of a heading section from the current or a specified `.md` file, see [LatexPath](LatexPath.md).
+`.mesh` 的内容来源二选一：
+- `text: "…"` —— 直接写 Markdown + LaTeX，内容用成对的 `¥¥` 围起来（见示例）；
+- `textPath: "…"` —— 引用当前或指定 `.md` 文件里某一节标题下的正文，见 [LatexPath](LatexPath.md)。
 
-`width:` controls the plane width.
+`width:` 控制平面宽度。
 
 ```phymodel
 

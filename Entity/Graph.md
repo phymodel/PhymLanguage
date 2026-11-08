@@ -1,8 +1,8 @@
 # Graph
 
-Generates a 3D parametric curve (Lissajous figure) from the coordinate expressions `x:`, `y:`, `z:` sampled over the parameter interval `t:`. The curve is meshed as a tube; the optional `radius` controls its thickness. A Lissajous figure results when the x/y components are sinusoidal with integer frequency ratios — here x = 20cos(3t), y = 20cos(4t + pi/2), z = 20sin(3t) trace a closed 3D knot-like curve over t ∈ [0, 2π].
+用坐标表达式 `x:`、`y:`、`z:` 在参数区间 `t:` 上采样，生成一条 3D 参数曲线（利萨茹图形）。曲线按管状网格化；可选的 `radius` 控制粗细。当 x/y 分量是整数频率比的正弦时，结果就是利萨茹图形 —— 这里的 x = 20cos(3t)、y = 20cos(4t + pi/2)、z = 20sin(3t)，在 t ∈ [0, 2π] 上描出一条闭合的、绳结般的三维曲线。
 
-> Note: The Graph() type does not support dynamic.
+> 说明：Graph() 类型不支持 dynamic。
 > `Graph().mesh(x: String, y: String, z: String, t: String, radius: Float?)`
 
 ```phymodel

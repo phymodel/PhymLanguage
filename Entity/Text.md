@@ -1,10 +1,10 @@
 # Text
 
-Extrudes 2D text into a 3D mesh. The glyphs themselves are **solid**: the strokes have real thickness (the side walls are visible), they cast shadows and take part in collisions — this is not a flat card with letters painted on it.
+把 2D 文字挤出成 3D 网格。字形本身是**实体**的：笔画有真实厚度（能看见侧壁），会投影、也参与碰撞 —— 不是一张画了字的平卡片。
 
 `.mesh(text:extrusionDepth:fontSize:font:alignment:)`
 
-| Parameter | Type | Default | Meaning |
+| 参数 | 类型 | 默认 | 含义 |
 |---|---|---|---|
 | `text` | String | — | 文字内容 |
 | `extrusionDepth` | Float | `0.01` | 笔画厚度（字形沿 +Z 挤出的深度） |
@@ -12,7 +12,7 @@ Extrudes 2D text into a 3D mesh. The glyphs themselves are **solid**: the stroke
 | `font` | String | `Times New Roman` | 字体名；`"Times New Roman Italic"` 这类「族名 + 字型后缀」写法同样有效 |
 | `alignment` | TextAlignment | `.center` | 锚点：`.leading` / `.center` / `.trailing` |
 
-`alignment` decides which point of the text's bounding box `.position` lands on: the box's **min** (`.leading`), its **center** (`.center`, default) or its **max** (`.trailing`). It applies to all three axes — with `.leading` the left edge, the bottom edge and the front face (z = 0) of the ink all sit on `.position`.
+`alignment` 决定文字包围盒的哪一点落在 `.position` 上：盒子的 **min**（`.leading`）、**中心**（`.center`，默认）还是 **max**（`.trailing`）。三个轴同时生效 —— 用 `.leading` 时，字的左边缘、下边缘与正面（z = 0）都贴住 `.position`。
 
 > Note: `font` 由运行平台解析。设备没装该字体（如 Linux 上的 `Times New Roman`），或字体里没有该字形（用西文字体写中文），都会由平台回退到同类字体 —— 字宽因此可能有细微差别。
 
