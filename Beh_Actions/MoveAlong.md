@@ -4,33 +4,33 @@
 
 ## Purpose
 
-Moves target entities along a named `Graph()` parametric curve over the specified duration. The `path` parameter references a `Graph()` entity's name; its parametric expressions (`x:`/`y:`/`z:`, time variable `t`) are reused as the motion trajectory.
+让目标实体在指定的 `duration` 内沿一条命名的 `Graph()` 参数曲线移动。`path` 引用某个 `Graph()` 实体的名字；它的参数表达式（`x:`/`y:`/`z:`，时间变量 `t`）被复用为运动轨迹。
 
 ## Parameters
 
-| Parameter | Type | Required | Default | Description |
+| 参数 | 类型 | 必填 | 默认 | 说明 |
 |---|---|---|---|---|
-| objects | [String] | ✅ | — | Target entity name array |
-| path | String | ✅ | — | Name of a `Graph()` entity whose curve serves as the trajectory |
-| tStart | Float | ❌ | Graph's t-start | Start of the parameter interval; supports expressions like `2*pi`, `pi/2` |
-| tEnd | Float | ❌ | Graph's t-end (or 8) | End of the parameter interval |
-| alignPath | Bool | ❌ | false | If true, entity faces the tangent direction of the path |
-| clockwise | Bool | ❌ | false | If true, travels from `tEnd` to `tStart` (reversed) |
-| iterations | Float | ❌ | 1.0 | Number of full traversals of `[tStart, tEnd]` within `duration`; supports fractional values |
-| duration | Float | ❌ | 0 | Total animation duration (seconds); 0 = instantaneous |
+| objects | [String] | ✅ | — | 目标实体名数组 |
+| path | String | ✅ | — | 作为轨迹的 `Graph()` 实体名 |
+| tStart | Float | ❌ | Graph 的 t 起点 | 参数区间起点；支持 `2*pi`、`pi/2` 这类表达式 |
+| tEnd | Float | ❌ | Graph 的 t 终点（或 8） | 参数区间终点 |
+| alignPath | Bool | ❌ | false | 为 true 时实体朝向路径的切线方向 |
+| clockwise | Bool | ❌ | false | 为 true 时从 `tEnd` 走到 `tStart`（反向） |
+| iterations | Float | ❌ | 1.0 | `duration` 内完整走完 `[tStart, tEnd]` 的遍数；支持小数 |
+| duration | Float | ❌ | 0 | 动画总时长（秒）；0 = 瞬时 |
 
 ## Constraints
 
-- Only affects **ModelEntity** instances.
-- `tStart` / `tEnd` follow the same expression rules as `Graph().mesh(..., t: "[a,b]")`. Omitted values fall back to the Graph's declared `t` range, then to the global default `[0, 8]`.
-- During animation the target entity temporarily switches to `.kinematic`; it reverts to `.dynamic` afterward (same behavior as `Orbit` / `Spin`).
-- The referenced `Graph()` entity is a trajectory template only — **do not** assign `.physic(...)` to it.
-- Moving entities can use `.trail(...)` to leave a particle or line trail; the trail automatically activates during `MoveAlong` and stops extending when the action finishes (existing trail fades according to `lifeSpan`).
-- `.trail(...)` parameters: `style` (`.particles` / `.line`), `lifeSpan` (seconds), `size` (particle size or line radius), `color` (RGB array), `opacity`.
+- 只影响 **ModelEntity** 实例。
+- `tStart` / `tEnd` 遵循与 `Graph().mesh(..., t: "[a,b]")` 相同的表达式规则。省略时先回退到 Graph 声明的 `t` 区间，再回退到全局默认 `[0, 8]`。
+- 动画期间目标实体临时切成 `.kinematic`，结束后恢复 `.dynamic`（与 `Orbit` / `Spin` 一致）。
+- 被引用的 `Graph()` 实体只是轨迹模板 —— **不要**给它写 `.physic(...)`。
+- 会动的实体可以用 `.trail(...)` 拖出粒子或线条轨迹；`MoveAlong` 期间轨迹自动启用，动作结束就不再延伸（已有轨迹按 `lifeSpan` 淡出）。
+- `.trail(...)` 参数：`style`（`.particles` / `.line`）、`lifeSpan`（秒）、`size`（粒子大小或线半径）、`color`（RGB 数组）、`opacity`。
 
 ## Example
 
-### Entities
+### 实体
 
 ```phymodel
 
@@ -52,7 +52,7 @@ CAD()
 
 ```
 
-### Trigger System
+### 触发系统
 
 ```phymodel
 

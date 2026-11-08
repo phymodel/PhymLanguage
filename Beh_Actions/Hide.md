@@ -4,25 +4,25 @@
 
 ## Purpose
 
-Hides target entities with an optional exit animation. Hidden entities are invisible and non-interactive until shown again via `Show`.
+把目标实体隐藏起来，可选退场动画。隐藏期间不可见、不可交互，直到被 `Show` 重新显示。
 
 ## Parameters
 
-| Parameter | Type | Required | Default | Description |
+| 参数 | 类型 | 必填 | 默认 | 说明 |
 |---|---|---|---|---|
-| objects | [String] | ✅ | — | Target entity name array |
+| objects | [String] | ✅ | — | 目标实体名数组 |
 | motionType | enum | ❌ | .scale | `.none` `.moveToLeft` `.moveToRight` `.moveToFront` `.moveToRear` `.moveToAbove` `.moveToBelow` `.pop` `.scale` `.scaleUp` |
-| duration | Float | ❌ | 1.0 | Animation duration (seconds) |
+| duration | Float | ❌ | 1.0 | 动画时长（秒） |
 
 ## Constraints
 
-- Only affects **ModelEntity** instances (both CAD- and Text-generated entities are supported).
-- Hidden entities are removed from hit-testing; they cannot receive `Tap`/`Slider` triggers until `Show` is called.
-- An entity that is already hidden will still play the exit animation if `motionType` is not `.none`.
+- 只影响 **ModelEntity** 实例（CAD 与 Text 生成的实体都支持）。
+- 隐藏的实体会从命中检测里移除；在 `Show` 之前收不到 `Tap` / `Slider` 触发。
+- 已经隐藏的实体，只要 `motionType` 不是 `.none`，退场动画照样播。
 
 ## Example
 
-### Entities
+### 实体
 
 ```phymodel
 
@@ -37,7 +37,7 @@ CAD()
 
 ```
 
-### Trigger System
+### 触发系统
 
 ```phymodel
 

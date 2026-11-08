@@ -4,26 +4,26 @@
 
 ## Purpose
 
-Uses text-to-speech (TTS) to read `text` aloud from the position of the target entity. Within the same `Behavior` chain, subsequent actions wait until TTS finishes; a new `Speak` interrupts the current speech.
+用语音合成（TTS）从目标实体的位置朗读 `text`。在同一个 `Behavior` 链里，后续动作会等 TTS 说完；新的 `Speak` 会打断当前这一句。
 
 ## Parameters
 
-| Parameter | Type | Required | Default | Description |
+| 参数 | 类型 | 必填 | 默认 | 说明 |
 |---|---|---|---|---|
-| object | String | ✅ | — | Target entity name (single entity; audio emanates from its position) |
-| volume | Float | ❌ | system default | Playback volume (0.0–1.0) |
-| text | String | ❌ | — | Text to be spoken via TTS |
+| object | String | ✅ | — | 目标实体名（单个实体；声音从它的位置发出） |
+| volume | Float | ❌ | 系统默认 | 播放音量（0.0–1.0） |
+| text | String | ❌ | — | 要朗读的文本 |
 
 ## Constraints
 
-- Only affects **ModelEntity** instances.
-- Within the same `Behavior` chain, actions after `Speak` automatically wait for the speech to finish — no need to pad with `Wait`.
-- A new `Speak` in the same chain interrupts any currently playing TTS and starts the new text immediately; use `Wait` only for extra silence between speeches.
-- Speech is positional: it emanates from the target entity's location.
+- 只影响 **ModelEntity** 实例。
+- 在同一个 `Behavior` 链里，`Speak` 之后的动作会自动等它说完 —— 不需要用 `Wait` 去补。
+- 同一条链里新的 `Speak` 会打断正在播的 TTS 并立刻开始新文本；`Wait` 只用来在两段话之间额外留白。
+- 说话是有方位的：从目标实体的位置发出。
 
 ## Example
 
-### Entities
+### 实体
 
 ```phymodel
 
@@ -38,7 +38,7 @@ CAD()
 
 ```
 
-### Trigger System
+### 触发系统
 
 ```phymodel
 

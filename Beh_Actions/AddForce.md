@@ -4,26 +4,26 @@
 
 ## Purpose
 
-Applies a force (unit: N, along the force vector direction) to target entities, causing continuous acceleration for the specified duration.
+对目标实体施加一个力（单位 N，沿力矢量方向），在给定时长内产生持续加速度。
 
 ## Parameters
 
-| Parameter | Type | Required | Default | Description |
+| 参数 | 类型 | 必填 | 默认 | 说明 |
 |---|---|---|---|---|
-| objects | [String] | ✅ | — | Target entity name array |
-| force | [Float×3] | ❌ | [0,0,0] | Force vector [x, y, z] in N |
-| atPosition | [Float×3] | ❌ | [0,0,0] | Point of application in world coordinates; off-center produces torque |
-| relativeTo | String | ❌ | "nil" | Reference frame for force vector: `"nil"` = world; entity name = local frame |
+| objects | [String] | ✅ | — | 目标实体名数组 |
+| force | [Float×3] | ❌ | [0,0,0] | 力矢量 [x, y, z]，单位 N |
+| atPosition | [Float×3] | ❌ | [0,0,0] | 作用点（世界坐标）；偏离质心会产生力矩 |
+| relativeTo | String | ❌ | "nil" | 力矢量的参考系：`"nil"` = 世界系；实体名 = 该实体的局部系 |
 
 ## Constraints
 
-- Only affects **ModelEntity** instances (both CAD- and Text-generated entities are supported).
-- Target entities should use `.physic(mode:)` **`.dynamic`**, otherwise the force will not produce motion.
-- When `relativeTo` references a missing entity, falls back to world coordinates (warning level).
+- 只影响 **ModelEntity** 实例（CAD 与 Text 生成的实体都支持）。
+- 目标实体应当用 `.physic(mode:)` 的 **`.dynamic`**，否则力不会产生运动。
+- `relativeTo` 引用了不存在的实体时，回退到世界坐标（警告级别）。
 
 ## Example
 
-### Entities
+### 实体
 
 ```phymodel
 
@@ -38,7 +38,7 @@ CAD()
 
 ```
 
-### Trigger System
+### 触发系统
 
 ```phymodel
 

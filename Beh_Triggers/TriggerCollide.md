@@ -4,25 +4,25 @@
 
 ## Purpose
 
-Fires the associated `.actions` when any entity in `objects` physically collides with any entity in `collisionWith`. Both sides must be `.dynamic` to participate in the physics simulation collision detection.
+`objects` 中任一实体与 `collisionWith` 中任一实体发生物理碰撞时，触发这里挂载的 `.actions`。两侧都必须是 `.dynamic`，才会参与物理仿真的碰撞检测。
 
 ## Parameters
 
-| Parameter | Type | Required | Default | Description |
+| 参数 | 类型 | 必填 | 默认 | 说明 |
 |---|---|---|---|---|
-| objects | [String] | ✅ | — | Primary entity name array (the "subject" of the collision) |
-| collisionWith | [String] | ✅ | — | Target entity name array (the "object" to collide with) |
+| objects | [String] | ✅ | — | 主实体名数组（碰撞的「主语」） |
+| collisionWith | [String] | ✅ | — | 目标实体名数组（被撞的「宾语」） |
 
 ## Constraints
 
-- Only **ModelEntity** instances participate (CAD, Text, etc. with `.physic(mode:)`).
-- Both `objects` entities and `collisionWith` entities must use `.physic(mode: .dynamic)` — kinematic or static entities do not generate collision events.
-- Collision matching is **bidirectional**: entityA in `objects` colliding with entityB in `collisionWith` fires the same trigger as entityB in `objects` colliding with entityA in `collisionWith`.
-- Each collision pair (`entityA` ↔ `entityB`) fires the trigger exactly once per contact-began event; the actions chain runs from the start on each new collision.
+- 只有 **ModelEntity** 实例参与（带 `.physic(mode:)` 的 CAD、Text 等）。
+- `objects` 与 `collisionWith` 里的实体都必须用 `.physic(mode: .dynamic)` —— kinematic 或 static 实体不产生碰撞事件。
+- 碰撞匹配是**双向**的：`objects` 里的 entityA 撞上 `collisionWith` 里的 entityB，与 entityB 在 `objects`、entityA 在 `collisionWith` 时触发的是同一个触发器。
+- 每一对碰撞（`entityA` ↔ `entityB`）在每个「开始接触」事件上只触发一次；每出现一次新的碰撞，动作链都从头上重跑。
 
 ## Example
 
-### Entities
+### 实体
 
 ```phymodel
 
@@ -55,7 +55,7 @@ CAD()
 
 ```
 
-### Trigger System
+### 触发系统
 
 ```phymodel
 

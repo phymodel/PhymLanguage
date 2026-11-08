@@ -4,24 +4,24 @@
 
 ## Purpose
 
-Pauses the `Behavior` action chain for the specified duration before continuing to the next action.
+让 `Behavior` 的动作链暂停指定时长，再继续下一个动作。
 
 ## Parameters
 
-| Parameter | Type | Required | Default | Description |
+| 参数 | 类型 | 必填 | 默认 | 说明 |
 |---|---|---|---|---|
-| duration | Float | ❌ | 0 | Wait duration (seconds) |
+| duration | Float | ❌ | 0 | 等待时长（秒） |
 
 ## Constraints
 
-- `Wait` does not affect any entity — it only introduces a delay in the action sequence.
-- `duration: 0` effectively skips the action (no-op).
-- Using `Wait` between `Speak` actions is unnecessary (TTS auto-waits); use `Wait` only for extra silence padding.
-- `Wait` runs concurrently with any ongoing animation from the previous action; it does not interrupt or pause animations.
+- `Wait` 不影响任何实体 —— 它只是在动作序列里插入一段延时。
+- `duration: 0` 等于跳过这个动作（空操作）。
+- 在两个 `Speak` 之间不需要 `Wait`（TTS 会自动等）；`Wait` 只用来额外留白。
+- `Wait` 与上一个动作正在进行的动画并发运行；它不会打断或暂停动画。
 
 ## Example
 
-### Entities
+### 实体
 
 ```phymodel
 
@@ -36,7 +36,7 @@ CAD()
 
 ```
 
-### Trigger System
+### 触发系统
 
 ```phymodel
 

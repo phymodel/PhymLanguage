@@ -4,25 +4,25 @@
 
 ## Purpose
 
-Plays background music from a remote audio URL. Unlike `PlaySound`, this is ambient audio not tied to any specific entity.
+从远端音频 URL 播放背景音乐。与 `PlaySound` 不同，这是不挂在任何实体上的环境音。
 
 ## Parameters
 
-| Parameter | Type | Required | Default | Description |
+| 参数 | 类型 | 必填 | 默认 | 说明 |
 |---|---|---|---|---|
-| volume | Float | ❌ | system default | Playback volume (0.0–1.0) |
-| url | String | ❌ | — | Remote audio URL (mp3, wav, etc.); nil stops current music |
-| duration | Float | ❌ | 0 | Playback duration in seconds; 0 = play until end or stopped |
+| volume | Float | ❌ | 系统默认 | 播放音量（0.0–1.0） |
+| url | String | ❌ | — | 远端音频 URL（mp3、wav 等）；nil 表示停掉当前音乐 |
+| duration | Float | ❌ | 0 | 播放时长（秒）；0 = 一直播到结束或被停止 |
 
 ## Constraints
 
-- `url` must be a reachable remote HTTP(S) URL; local file paths are not supported.
-- Calling `PlayMusic` with a new `url` replaces any currently playing music.
-- `PlaySound` and `PlayMusic` can play simultaneously (they use separate audio channels).
+- `url` 必须是可访问的远端 HTTP(S) 地址；不支持本地文件路径。
+- 用新的 `url` 调用 `PlayMusic` 会替换掉当前正在播的音乐。
+- `PlaySound` 与 `PlayMusic` 可以同时播放（两者用各自的音频通道）。
 
 ## Example
 
-### Entities
+### 实体
 
 ```phymodel
 
@@ -37,7 +37,7 @@ CAD()
 
 ```
 
-### Trigger System
+### 触发系统
 
 ```phymodel
 

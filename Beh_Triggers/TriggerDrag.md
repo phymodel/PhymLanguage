@@ -4,33 +4,33 @@
 
 ## Purpose
 
-Grab any entity listed in `objects` with your hand, carry it around, and fire the associated `.actions` **once** when it reaches any entity listed in `target`. This is the "carry it to the right place" trigger.
+用手抓起 `objects` 中的任一实体，带着它走，走到 `target` 中任一实体处时**触发一次**这里挂载的 `.actions`。这是「把它送到该去的地方」这一类触发器。
 
-`Drag` and `Slider` share the same grab/clamp declaration (`Drag = Slider − output + target`): both name the entity in `objects` and both accept `dragAxes` / `dragRange*`. The only difference is what counts as "done" — `Slider` streams the dragged position into actions, `Drag` reports the arrival instead.
+`Drag` 与 `Slider` 共用同一套抓取 / 夹紧声明（`Drag = Slider − output + target`）：两者都用 `objects` 点名实体，都接受 `dragAxes` / `dragRange*`。唯一的区别是「什么算完成」—— `Slider` 把拖动位置流给动作，`Drag` 报告的是「到位」。
 
 ## Parameters
 
-| Parameter | Type | Required | Default | Description |
+| 参数 | 类型 | 必填 | 默认 | 说明 |
 |---|---|---|---|---|
-| objects | [String] | ✅ | — | Entity names that can be grabbed and carried |
-| target | [String] | ❌ | — | Arrival targets: fires once when the carried entity comes within tolerance of any one of them |
-| dragAxes | [String] | ❌ | all three axes | Restricts dragging to the listed axes (`["y"]`, `["x","z"]`, …) |
-| dragRangeX / dragRangeY / dragRangeZ | [Float, Float] | ❌ | unlimited | Clamps the dragged position along each axis (DSL local coordinates, same space as `.position`) |
-| dragRangeR | [Float, Float] | ❌ | unlimited | Clamps the radial distance from the drag start point |
+| objects | [String] | ✅ | — | 可被抓取并携带的实体名 |
+| target | [String] | ❌ | — | 到达目标：被携带的实体进入其中任意一个的公差范围时触发一次 |
+| dragAxes | [String] | ❌ | 三个轴全开 | 限制只能沿列出的轴拖动（`["y"]`、`["x","z"]` …） |
+| dragRangeX / dragRangeY / dragRangeZ | [Float, Float] | ❌ | 不限制 | 逐轴夹紧拖动位置（DSL 局部坐标，与 `.position` 同一个空间） |
+| dragRangeR | [Float, Float] | ❌ | 不限制 | 以拖动起点为圆心，夹紧径向距离 |
 
 ## Constraints
 
-- Grabbing is declared **by this trigger**: the entity must be named in `Drag(){ objects: […] }`. There is no entity-level interaction switch — `.gesture(...)` has been removed (writing it is an error), and an entity no grab-capable trigger names cannot be dragged at all.
-- **Release stops the entity.** `Drag` does not keep the release velocity — releasing lets it drop where it is. Only `Throw` keeps it (contract D2, see `Docs/TriggerContract.md`).
-- **Arrival is edge-triggered**: it fires once when the entity enters the tolerance, and re-arms after it leaves, so you can carry the same object in again for another report.
-- Arrival tolerance is currently a fixed **0.15 m** to the target's origin (not configurable yet; a `tolerance:` parameter is a pending item — see `Docs/TriggerContract.md` §3).
-- Omitting `target` is legal but makes `Drag` behave like a `Slider` without position output: the entity can be dragged, and nothing is reported.
-- The same entity may be named by several grab-capable triggers (`Slider` / `Drag` / `Throw`); the clamp fields are then merged field by field, and **conflicting values are a parse error** rather than a silent last-one-wins.
-- Platform: on visionOS, pinch and move your hand to drag; on iOS, **press and hold to grab and release to let go** (the carried entity follows the device while your finger is down — a quick tap is not a grab, it only feeds `Tap` triggers, so a light touch never reports an arrival); on the web build, press (mouse / finger) and drag while the pointer is captured — the carried entity follows the pointer on a camera-facing plane, so a small object can be carried all the way to a target that is farther away than its own silhouette.
+- 抓取**由这个触发器声明**：实体必须被写进 `Drag(){ objects: […] }`。没有实体级的交互开关 —— `.gesture(...)` 已删除（写了会报错），没有被任何「可抓取」触发器点名的实体根本拖不动。
+- **松手即停。** `Drag` 不保留松手速度 —— 松手就让它在原地落下。只有 `Throw` 会保留（契约 D2，见 `Docs/TriggerContract.md`）。
+- **到位是边沿触发**：实体进入公差范围时触发一次，离开之后重新武装，所以可以反复把同一个物体搬回来再报一次。
+- 到位公差目前固定为到目标原点的 **0.15 m**（还不能配置；`tolerance:` 参数是待办项，见 `Docs/TriggerContract.md` §3）。
+- 不写 `target` 是合法的，但这时 `Drag` 就退化成「不带位置输出的 `Slider`」：实体能拖，什么也不报。
+- 同一个实体可以被多个「可抓取」触发器点名（`Slider` / `Drag` / `Throw`）；这时夹紧字段会逐字段合并，**值冲突是解析错误**，不会静默地「后者覆盖前者」。
+- 平台差异：visionOS 上捏合并移动手即拖动；iOS 上**按住抓取、松手放开**（手指按下期间实体跟着设备走 —— 轻点不算抓取，轻点只喂给 `Tap`，所以轻触永远不会报「到位」）；Web 端按住（鼠标 / 手指）拖动，指针期间被捕获 —— 被带的实体在朝向相机的平面上跟着指针走，所以小物体也能一路拖到比它自身轮廓更远的目标上。
 
 ## Example
 
-### Entities
+### 实体
 
 ```phymodel
 
@@ -54,7 +54,7 @@ CAD()
 
 ```
 
-### Trigger System 
+### 触发系统
 
 ```phymodel
 

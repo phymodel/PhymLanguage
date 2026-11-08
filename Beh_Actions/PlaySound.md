@@ -4,26 +4,26 @@
 
 ## Purpose
 
-Plays a spatial audio clip from a remote URL, attached to the specified entities. The sound is positional — it emanates from the entity's location in the 3D scene.
+从远端 URL 播放一段空间音频，挂在指定实体上。声音是有方位的 —— 从实体在 3D 场景里的位置发出。
 
 ## Parameters
 
-| Parameter | Type | Required | Default | Description |
+| 参数 | 类型 | 必填 | 默认 | 说明 |
 |---|---|---|---|---|
-| objects | [String] | ✅ | — | Target entity name array (sound sources) |
-| volume | Float | ❌ | system default | Playback volume (0.0–1.0) |
-| url | String | ❌ | — | Remote audio URL (mp3, wav, etc.) |
-| duration | Float | ❌ | 0 | Playback duration in seconds; 0 = play until end |
+| objects | [String] | ✅ | — | 目标实体名数组（声源） |
+| volume | Float | ❌ | 系统默认 | 播放音量（0.0–1.0） |
+| url | String | ❌ | — | 远端音频 URL（mp3、wav 等） |
+| duration | Float | ❌ | 0 | 播放时长（秒）；0 = 一直播到结束 |
 
 ## Constraints
 
-- Only affects **ModelEntity** instances.
-- `url` must be a reachable remote HTTP(S) URL; local file paths are not supported.
-- `PlaySound` and `PlayMusic` can play simultaneously (they use separate audio channels).
+- 只影响 **ModelEntity** 实例。
+- `url` 必须是可访问的远端 HTTP(S) 地址；不支持本地文件路径。
+- `PlaySound` 与 `PlayMusic` 可以同时播放（两者用各自的音频通道）。
 
 ## Example
 
-### Entities
+### 实体
 
 ```phymodel
 
@@ -38,7 +38,7 @@ CAD()
 
 ```
 
-### Trigger System
+### 触发系统
 
 ```phymodel
 

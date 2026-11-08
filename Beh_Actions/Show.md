@@ -4,25 +4,25 @@
 
 ## Purpose
 
-Shows previously hidden entities with an optional entrance animation. Restores visibility and interactivity (hit-testing) for the target entities.
+把之前隐藏的实体显示出来，可选入场动画。恢复目标实体的可见性与交互（命中检测）。
 
 ## Parameters
 
-| Parameter | Type | Required | Default | Description |
+| 参数 | 类型 | 必填 | 默认 | 说明 |
 |---|---|---|---|---|
-| objects | [String] | ✅ | — | Target entity name array |
+| objects | [String] | ✅ | — | 目标实体名数组 |
 | motionType | enum | ❌ | .pop | `.none` `.moveToLeft` `.moveToRight` `.moveToFront` `.moveToRear` `.moveToAbove` `.moveToBelow` `.pop` `.scale` `.scaleBig` |
-| duration | Float | ❌ | 1.0 | Animation duration (seconds) |
+| duration | Float | ❌ | 1.0 | 动画时长（秒） |
 
 ## Constraints
 
-- Only affects **ModelEntity** instances (both CAD- and Text-generated entities are supported).
-- If the entity is already visible, the entrance animation still plays.
-- Entities created with `.isEnabled(false)` start hidden and must be shown via `Show`.
+- 只影响 **ModelEntity** 实例（CAD 与 Text 生成的实体都支持）。
+- 实体本来就是可见的，入场动画照样播。
+- 用 `.isEnabled(false)` 创建的实体一开始是隐藏的，必须用 `Show` 显示。
 
 ## Example
 
-### Entities
+### 实体
 
 ```phymodel
 
@@ -47,7 +47,7 @@ CAD()
 
 ```
 
-### Trigger System
+### 触发系统
 
 ```phymodel
 

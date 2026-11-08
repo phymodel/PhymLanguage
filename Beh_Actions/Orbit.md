@@ -4,31 +4,31 @@
 
 ## Purpose
 
-Makes target entities revolve around a specified `center` entity in a circular motion over the given duration.
+让目标实体在给定 `duration` 内绕 `center` 实体做圆周运动。
 
 ## Parameters
 
-| Parameter | Type | Required | Default | Description |
+| 参数 | 类型 | 必填 | 默认 | 说明 |
 |---|---|---|---|---|
-| objects | [String] | ✅ | — | Target entity name array |
-| center | String | ✅ | — | Name of the entity to orbit around |
-| angle | Float | ❌ | 0 | Initial tangent angle in degrees (0–360) controlling the starting direction |
-| alignPath | Bool | ❌ | false | If true, entity faces the tangent direction of the orbit |
-| clockwise | Bool | ❌ | false | If true, orbits clockwise instead of counter-clockwise |
-| revolutions | Float | ❌ | 1.0 | Number of full revolutions within `duration`; supports fractional values |
-| duration | Float | ❌ | 0 | Total animation duration (seconds); 0 = instantaneous |
+| objects | [String] | ✅ | — | 目标实体名数组 |
+| center | String | ✅ | — | 绕哪个实体转 |
+| angle | Float | ❌ | 0 | 初始切线角（度，0–360），决定起始方向 |
+| alignPath | Bool | ❌ | false | 为 true 时实体朝向轨道的切线方向 |
+| clockwise | Bool | ❌ | false | 为 true 时顺时针转，否则逆时针 |
+| revolutions | Float | ❌ | 1.0 | `duration` 内转的整圈数；支持小数 |
+| duration | Float | ❌ | 0 | 动画总时长（秒）；0 = 瞬时 |
 
 ## Constraints
 
-- Only affects **ModelEntity** instances.
-- During animation the target entity temporarily switches to `.kinematic`; it reverts to `.dynamic` afterward (same behavior as `MoveAlong` / `Spin`).
-- The `center` entity must exist in the scene; otherwise the action is skipped with a warning.
-- Moving entities can use `.trail(...)` to leave a particle or line trail; the trail automatically activates during `Orbit` and stops extending when the action finishes (existing trail fades according to `lifeSpan`).
-- `.trail(...)` parameters: `style` (`.particles` / `.line`), `lifeSpan` (seconds), `size` (particle size or line radius), `color` (RGB array), `opacity`.
+- 只影响 **ModelEntity** 实例。
+- 动画期间目标实体临时切成 `.kinematic`，结束后恢复 `.dynamic`（与 `MoveAlong` / `Spin` 一致）。
+- `center` 实体必须存在于场景里，否则这个动作会被跳过并给出警告。
+- 会动的实体可以用 `.trail(...)` 拖出一条粒子或线条轨迹；`Orbit` 期间轨迹自动启用，动作结束就不再延伸（已有轨迹按 `lifeSpan` 淡出）。
+- `.trail(...)` 参数：`style`（`.particles` / `.line`）、`lifeSpan`（秒）、`size`（粒子大小或线半径）、`color`（RGB 数组）、`opacity`。
 
 ## Example
 
-### Entities
+### 实体
 
 ```phymodel
 
@@ -52,7 +52,7 @@ CAD()
 
 ```
 
-### Trigger System
+### 触发系统
 
 ```phymodel
 

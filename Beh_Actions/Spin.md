@@ -4,27 +4,27 @@
 
 ## Purpose
 
-Rotates target entities around a specified local axis for a given number of iterations over the duration.
+让目标实体在 `duration` 内绕指定的局部轴转给定圈数。
 
 ## Parameters
 
-| Parameter | Type | Required | Default | Description |
+| 参数 | 类型 | 必填 | 默认 | 说明 |
 |---|---|---|---|---|
-| objects | [String] | ✅ | — | Target entity name array |
-| iterations | Float | ❌ | 1.0 | Number of full 360° rotations within `duration`; supports fractional values |
-| clockwise | Bool | ❌ | false | If true, spins clockwise instead of counter-clockwise |
-| axis | enum | ❌ | .yaw | Rotation axis: `.pitch` (X) `.yaw` (Y) `.roll` (Z) |
-| duration | Float | ❌ | 0 | Total animation duration (seconds); 0 = instantaneous |
+| objects | [String] | ✅ | — | 目标实体名数组 |
+| iterations | Float | ❌ | 1.0 | `duration` 内转满 360° 的圈数；支持小数 |
+| clockwise | Bool | ❌ | false | 为 true 时顺时针转，否则逆时针 |
+| axis | enum | ❌ | .yaw | 旋转轴：`.pitch`（X）`.yaw`（Y）`.roll`（Z） |
+| duration | Float | ❌ | 0 | 动画总时长（秒）；0 = 瞬时 |
 
 ## Constraints
 
-- Only affects **ModelEntity** instances.
-- During animation the target entity temporarily switches to `.kinematic`; it reverts to `.dynamic` afterward (same behavior as `MoveAlong` / `Orbit`).
-- The rotation axis is in the entity's **local** coordinate frame.
+- 只影响 **ModelEntity** 实例。
+- 动画期间目标实体临时切成 `.kinematic`，结束后恢复 `.dynamic`（与 `MoveAlong` / `Orbit` 一致）。
+- 旋转轴在实体的**局部**坐标系里。
 
 ## Example
 
-### Entities
+### 实体
 
 ```phymodel
 
@@ -39,7 +39,7 @@ CAD()
 
 ```
 
-### Trigger System
+### 触发系统
 
 ```phymodel
 

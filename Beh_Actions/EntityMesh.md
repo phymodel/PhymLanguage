@@ -4,34 +4,34 @@
 
 ## Purpose
 
-Updates a target entity's mesh at runtime — either a `Graph()` parametric curve (`x`/`y`/`z`/`t`) or a `Tree()` growth progress (`growthProgress`). Supports animated interpolation when bindings or `growthProgress` use interval syntax with `duration > 0`.
+运行时更新目标实体的网格 —— 要么是 `Graph()` 参数曲线（`x`/`y`/`z`/`t`），要么是 `Tree()` 的生长进度（`growthProgress`）。当绑定或 `growthProgress` 用区间写法且 `duration > 0` 时，带插值动画。
 
 ## Parameters
 
-| Parameter | Type | Required | Default | Description |
+| 参数 | 类型 | 必填 | 默认 | 说明 |
 |---|---|---|---|---|
-| objects | String or [String] | ✅ | — | Target entity name(s) |
-| x | String | ❌ | inherit | Parametric x expression (Graph) |
-| y | String | ❌ | inherit | Parametric y expression (Graph) |
-| z | String | ❌ | inherit | Parametric z expression (Graph) |
-| t | String | ❌ | inherit | t interval, e.g. `"[0, 2*pi]"` (Graph) |
-| radius | Float | ❌ | inherit | Tube / line radius |
-| growthProgress | String | ❌ | inherit | Tree growth value `"0…1"` or interval `"[0, 1]"` |
-| duration | Float | ❌ | 0 | When >0 and bindings / growthProgress use interval syntax, animates interpolation over duration (seconds) |
-| *bindings* | String | ❌ | — | Any extra key–value pairs become dynamic variables (e.g. `phase: "sphere.x * pi"`) |
+| objects | String 或 [String] | ✅ | — | 目标实体名（可多个） |
+| x | String | ❌ | 继承 | 参数 x 表达式（Graph） |
+| y | String | ❌ | 继承 | 参数 y 表达式（Graph） |
+| z | String | ❌ | 继承 | 参数 z 表达式（Graph） |
+| t | String | ❌ | 继承 | t 区间，例如 `"[0, 2*pi]"`（Graph） |
+| radius | Float | ❌ | 继承 | 管 / 线半径 |
+| growthProgress | String | ❌ | 继承 | Tree 的生长值 `"0…1"` 或区间 `"[0, 1]"` |
+| duration | Float | ❌ | 0 | 大于 0、且绑定 / growthProgress 用区间写法时，在 duration（秒）内插值做动画 |
+| *bindings* | String | ❌ | — | 任意额外键值对都会变成动态变量（例如 `phase: "sphere.x * pi"`） |
 
 ## Constraints
 
-- Only affects **ModelEntity** instances — `Graph()` and `Tree()` entities are supported.
-- Omitted `x`/`y`/`z`/`t`/`radius`/`growthProgress` inherit from the target entity's current mesh. If a Graph entity has no `x`/`y`/`z` and none are provided, the action is a no-op.
-- If the target entity has a `TreeComponent`, `growthProgress` is used; otherwise `x`/`y`/`z`/`t` apply.
-- Binding values support interval syntax (e.g. `"[2*pi, 0]"`) — with `duration > 0` the value interpolates from start to end over the duration.
-- Bindings can reference other entity positions via `EntityName.x` / `.y` / `.z` (commonly paired with `Slider` trigger).
-- Unlike `MoveAlong`, `EntityMesh` alters the curve shape itself and does not move the entity.
+- 只影响 **ModelEntity** 实例 —— 支持 `Graph()` 与 `Tree()` 实体。
+- 省略的 `x`/`y`/`z`/`t`/`radius`/`growthProgress` 从目标实体当前的网格继承。若 Graph 实体自己没有 `x`/`y`/`z`、这里也没给，这个动作就是空操作。
+- 目标实体带 `TreeComponent` 时用 `growthProgress`；否则用 `x`/`y`/`z`/`t`。
+- 绑定的值支持区间写法（例如 `"[2*pi, 0]"`）—— `duration > 0` 时，值在时长内从起点插值到终点。
+- 绑定可以用 `EntityName.x` / `.y` / `.z` 引用别的实体的位置（常见搭配是 `Slider` 触发器）。
+- 与 `MoveAlong` 不同，`EntityMesh` 改的是曲线本身，不会移动实体。
 
 ## Example
 
-### Entities
+### 实体
 
 ```phymodel
 
@@ -67,7 +67,7 @@ CAD()
 
 ```
 
-### Trigger System — Tap (animate bindings with interval)
+### 触发系统 —— Tap（用区间给绑定做动画）
 
 ```phymodel
 
@@ -119,7 +119,7 @@ Behavior()
 
 ```
 
-### Trigger System — Slider (bindings referencing another entity)
+### 触发系统 —— Slider（绑定引用另一个实体）
 
 ```phymodel
 

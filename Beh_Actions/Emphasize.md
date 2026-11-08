@@ -4,23 +4,23 @@
 
 ## Purpose
 
-Plays a single emphasis animation (pulse, bounce, blink, etc.) on target entities to draw the user's attention.
+在目标实体上播放一次强调动画（脉冲、弹跳、闪烁等），把用户的注意力引过去。
 
 ## Parameters
 
-| Parameter | Type | Required | Default | Description |
+| 参数 | 类型 | 必填 | 默认 | 说明 |
 |---|---|---|---|---|
-| objects | [String] | ✅ | — | Target entity name array |
+| objects | [String] | ✅ | — | 目标实体名数组 |
 | motionType | enum | ❌ | .pop | `.pop` `.blink` `.bounce` `.flip` `.float` `.jiggle` `.pulse` `.spin` |
-| duration | Float | ❌ | 1.0 | Animation duration (seconds) |
+| duration | Float | ❌ | 1.0 | 动画时长（秒） |
 
 ## Constraints
 
-- Only affects **ModelEntity** instances (both Text- and CAD-generated entities are supported).
+- 只影响 **ModelEntity** 实例（Text 与 CAD 生成的实体都支持）。
 
 ## Example
 
-### Entities
+### 实体
 
 ```phymodel
 
@@ -33,7 +33,7 @@ Text()
 
 ```
 
-### Trigger System
+### 触发系统
 
 ```phymodel
 

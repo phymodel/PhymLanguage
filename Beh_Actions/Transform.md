@@ -4,22 +4,22 @@
 
 ## Purpose
 
-Applies a combination of scale, rotation, and/or translation to target entities, with optional easing and animation over a duration.
+对目标实体组合施加缩放、旋转与（或）平移，可选缓动，并在 `duration` 内做成动画。
 
 ## Parameters
 
-| Parameter | Type | Required | Default | Description |
+| 参数 | 类型 | 必填 | 默认 | 说明 |
 |---|---|---|---|---|
-| objects | [String] | ✅ | — | Target entity names. Accepts a range spec `"Prefix[0..4]"` (expands to one action per instance) and the legacy single-target spelling `object: "Name"` |
-| scale | [Float×3] | ❌ | nil | Target scale `[sx, sy, sz]`; when omitted the target scale is **1** (see Semantics) |
-| rotation(angle:axis:) | (Float, [Float×3]) | ❌ | nil | Rotation by `angle` (degrees) around `axis` `[x, y, z]`; when omitted the target rotation is **identity** |
-| translation | [Float×3] | ❌ | nil | Target position `[x, y, z]` in world units — **absolute target, not an offset**; when omitted it is **(0, 0, 0)** |
-| easeType | enum | ❌ | .easeOut | `.none` `.easeOut` `.easeIn` `.easeInOut`. Currently parsed but **not consumed** by the runtime (the timing function is fixed to `.easeInOut`) |
-| duration | Float | ❌ | 1.0 | Animation duration (seconds); 0 = apply immediately, no animation |
+| objects | [String] | ✅ | — | 目标实体名。接受范围写法 `"Prefix[0..4]"`（展开成每个实例一个动作）与旧的单目标写法 `object: "Name"` |
+| scale | [Float×3] | ❌ | nil | 目标缩放 `[sx, sy, sz]`；省略时目标缩放为 **1**（见「语义」） |
+| rotation(angle:axis:) | (Float, [Float×3]) | ❌ | nil | 绕 `axis` `[x, y, z]` 转 `angle` 度；省略时目标旋转为**单位旋转** |
+| translation | [Float×3] | ❌ | nil | 目标位置 `[x, y, z]`（世界单位）—— **绝对目标，不是偏移**；省略时为 **(0, 0, 0)** |
+| easeType | enum | ❌ | .easeOut | `.none` `.easeOut` `.easeIn` `.easeInOut`。目前只解析、运行时**尚未消费**（计时函数固定为 `.easeInOut`） |
+| duration | Float | ❌ | 1.0 | 动画时长（秒）；0 = 立即生效、不做动画 |
 
-## Target ranges and per-instance `index` (new)
+## 目标范围与逐实例 `index`（新）
 
-`objects` accepts a range spec, so a whole family of instances can be driven by one block:
+`objects` 接受范围写法，一个块就能驱动一族实例：
 
 ```phymodel
 Transform(1){
@@ -29,29 +29,29 @@ Transform(1){
 }
 ```
 
-- `"PulseSphere[0..4]"` expands to `PulseSphere0 … PulseSphere4`; every expanded action keeps the block `id`, so the instances run **in parallel**, exactly as if the blocks had been written out one by one.
-- `index` (alias `i`) is the instance index inside that range, usable in `scale:`, `translation:` and `rotation(angle:axis:)`.
-- Components are full math expressions (`pi`, `2*pi`, `+ - * /`, ternary, `%`), evaluated by the same engine as `Graph().mesh(...)` and `MoveAlong`'s `tStart` / `tEnd`.
-- A plain name (no `[a..b]`) may also use expressions; its `index` is 0.
-- A malformed range (`"Node[0-2]"`) or an expression that cannot be evaluated is reported as a parse error and the action is dropped — it never silently falls back to `(0, 0, 0)`.
-- `objects` / `object` may be written with several names (`objects: ["a", "b"]`); each becomes its own action.
+- `"PulseSphere[0..4]"` 展开成 `PulseSphere0 … PulseSphere4`；展开出来的每个动作都保留块 id，所以这些实例**并行**执行，跟一块块手写出来完全一样。
+- `index`（别名 `i`）是该范围内的实例下标，可用在 `scale:`、`translation:` 与 `rotation(angle:axis:)` 里。
+- 每个分量都是完整的数学表达式（`pi`、`2*pi`、`+ - * /`、三目、`%`），由与 `Graph().mesh(...)`、`MoveAlong` 的 `tStart` / `tEnd` 同一个求值引擎计算。
+- 普通名字（没有 `[a..b]`）也可以用表达式；它的 `index` 是 0。
+- 范围写法不合法（`"Node[0-2]"`）或表达式求不出值，会报解析错误并丢掉这个动作 —— 绝不会静默退化成 `(0, 0, 0)`。
+- `objects` / `object` 可以写多个名字（`objects: ["a", "b"]`）；每个各自成为一个动作。
 
-## Semantics of `translation` / `duration`
+## `translation` / `duration` 的语义
 
-- `duration == 0`: the entity's transform is **overwritten** — `translation` is the absolute pose and every field you did not supply is reset (scale → 1, rotation → identity, translation → `(0, 0, 0)`).
-- `duration > 0`: animates from the pose at action start to that absolute target; unspecified fields still resolve to the defaults above.
-- Consequence: `translation` is a **target position**, not a delta. A “reset to the initial pose” block therefore has to repeat the declared `.position(...)` values (or mirror their expression, e.g. `-0.5 + index * 0.1/pi`).
+- `duration == 0`：实体的变换被**整体覆盖** —— `translation` 是绝对位姿，你没给的字段全部复位（缩放 → 1、旋转 → 单位旋转、平移 → `(0, 0, 0)`）。
+- `duration > 0`：从动作开始那一刻的位姿动画到这个绝对目标；没给的字段同样解析成上面的默认值。
+- 由此带来的后果：`translation` 是**目标位置**，不是增量。所以「复位到初始位姿」的块必须把声明的 `.position(...)` 数值再写一遍（或写成它们的对称表达式，例如 `-0.5 + index * 0.1/pi`）。
 
 ## Constraints
 
-- Only affects **ModelEntity** instances (all entity types supported: CAD, Text, Graph, Tree, HeightMap, etc.).
-- At least one of `scale`, `rotation`, or `translation` should be provided; an action with all nil is a no-op.
-- Rotation uses the angle–axis representation: `rotation(angle: -90, axis: [1, 0, 0])` rotates -90° around the X axis.
-- `Transform` does not switch the entity to `.kinematic` — physics continue to apply during the animation.
+- 只影响 **ModelEntity** 实例（各种实体类型都支持：CAD、Text、Graph、Tree、HeightMap 等）。
+- `scale`、`rotation`、`translation` 至少要给一个；三者都为 nil 的动作是空操作。
+- 旋转用角–轴表示：`rotation(angle: -90, axis: [1, 0, 0])` 即绕 X 轴转 -90°。
+- `Transform` 不会把实体切换成 `.kinematic` —— 动画期间物理照常生效。
 
 ## Example
 
-### Entities
+### 实体
 
 ```phymodel
 
@@ -64,7 +64,7 @@ HeightMap()
 
 ```
 
-### Trigger System
+### 触发系统
 
 ```phymodel
 

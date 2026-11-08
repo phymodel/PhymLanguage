@@ -4,26 +4,26 @@
 
 ## Purpose
 
-Orients target entities so that a specified face points toward the active camera. When `duration > 0`, the rotation is animated smoothly.
+让目标实体转到指定的一面朝向当前相机。`duration > 0` 时旋转平滑过渡。
 
 ## Parameters
 
-| Parameter | Type | Required | Default | Description |
+| 参数 | 类型 | 必填 | 默认 | 说明 |
 |---|---|---|---|---|
-| objects | [String] | ✅ | — | Target entity name array |
-| facingDirection | enum | ❌ | .front | Face to point at camera: `.front` `.back` `.left` `.right` `.top` `.bottom` |
-| rotationEuler | enum | ❌ | .free | Constrained rotation axis: `.free` `.pitch` `.yaw` `.roll` |
-| duration | Float | ❌ | 0 | Rotation animation duration (seconds); 0 = instantaneous |
+| objects | [String] | ✅ | — | 目标实体名数组 |
+| facingDirection | enum | ❌ | .front | 朝向相机的面：`.front` `.back` `.left` `.right` `.top` `.bottom` |
+| rotationEuler | enum | ❌ | .free | 受限的旋转轴：`.free` `.pitch` `.yaw` `.roll` |
+| duration | Float | ❌ | 0 | 旋转动画时长（秒）；0 = 瞬时 |
 
 ## Constraints
 
-- Only affects **ModelEntity** instances (both CAD- and Text-generated entities are supported).
-- With `rotationEuler` set to `.pitch`/`.yaw`/`.roll`, the look-at rotation is projected onto that single axis; the face may not fully point at the camera.
-- An entity engaged in a physics simulation (`.dynamic`) will have its orientation overridden during the animation and revert to physics afterward.
+- 只影响 **ModelEntity** 实例（CAD 与 Text 生成的实体都支持）。
+- 把 `rotationEuler` 设成 `.pitch`/`.yaw`/`.roll` 时，朝向旋转会投影到那一个轴上；那一个面可能并不会完全对准相机。
+- 正在参与物理仿真的实体（`.dynamic`）在动画期间朝向被接管，动画结束后交回物理。
 
 ## Example
 
-### Entities
+### 实体
 
 ```phymodel
 
@@ -38,7 +38,7 @@ CAD()
 
 ```
 
-### Trigger System
+### 触发系统
 
 ```phymodel
 

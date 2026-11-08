@@ -4,26 +4,26 @@
 
 ## Purpose
 
-Fires the associated `.actions` when the user taps on any entity listed in `objects`. This is the primary interaction trigger for touch-based 3D content.
+当用户点按 `objects` 中任一实体时，触发这里挂载的 `.actions`。这是触屏 3D 内容最主要的交互触发器。
 
 ## Parameters
 
-| Parameter | Type | Required | Default | Description |
+| 参数 | 类型 | 必填 | 默认 | 说明 |
 |---|---|---|---|---|
-| objects | [String] | ✅ | — | Target entity name array; tapping any one of them fires the trigger |
+| objects | [String] | ✅ | — | 目标实体名数组；点到其中任意一个即触发 |
 
 ## Constraints
 
-- Only **ModelEntity** instances are hittable (both CAD- and Text-generated entities are supported).
-- Tapping is declared **by triggers**: the entity must be named in `Tap(){ objects: […] }` — that is the only place interaction is declared, since the entity-level `.gesture(...)` modifier has been **removed** (writing it is an error). An entity no `Tap` behavior names is pure decoration: it receives no taps, so a stray tap can never fire the wrong behavior.
-- Hidden entities (via `Hide`) are removed from hit-testing and cannot receive taps until `Show` is called.
-- A **tap is not a grab** on any platform: on iOS, a light tap (shorter than 0.25 s and moving the entity less than 1 cm) only fires `Tap` triggers and never counts as releasing a `Slider` / `Drag` / `Throw` grab — so an entity named by both `Tap` and `Throw` will not report a "throw" when you merely tap it. Press and hold that same entity and the `Throw` path takes over instead.
-- A single `Behavior` can contain only one `Tap` trigger block — multiple taps on the same entity require separate `Behavior` definitions.
-- Each tap fires the full `.actions` chain from the start, even if a previous invocation is still running.
+- 只有 **ModelEntity** 实例可被命中（CAD 与 Text 生成的实体都支持）。
+- 点按是**由触发器声明**的：实体必须被写进 `Tap(){ objects: […] }` —— 这是声明交互的唯一位置，实体级的 `.gesture(...)` 修饰符已**删除**（写了会报错）。没有被任何 `Tap` 点名的实体就是纯装饰：它收不到点按，所以误点也永远不会触发错误的行为。
+- 被 `Hide` 隐藏的实体会从命中检测里移除，在 `Show` 之前收不到点按。
+- 任何平台上**点按都不等于抓取**：在 iOS 上轻点一下（短于 0.25 s、且实体位移小于 1 cm）只触发 `Tap`，绝不算松开 `Slider` / `Drag` / `Throw` 的抓取 —— 所以同时被 `Tap` 与 `Throw` 点名的实体，轻轻一点不会报「抛出」。按住同一个实体待够时间，接管的就是 `Throw` 那条路。
+- 一个 `Behavior` 只能包含一个 `Tap` 触发块 —— 同一个实体上的多次点按要用多个 `Behavior` 定义。
+- 每次点按都把整条 `.actions` 从头上重跑一遍，即使上一次调用还在执行。
 
 ## Example
 
-### Entities
+### 实体
 
 ```phymodel
 
@@ -56,7 +56,7 @@ CAD()
 
 ```
 
-### Multiple Tap Triggers
+### 多个 Tap 触发器
 
 ```phymodel
 

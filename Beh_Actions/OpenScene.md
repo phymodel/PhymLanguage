@@ -4,25 +4,25 @@
 
 ## Purpose
 
-Navigates from the current scene to another `.md` scene file within the document library. The path is resolved relative to the current scene's `.md` file.
+从当前场景跳到文档库里另一个 `.md` 场景文件。路径相对当前场景的 `.md` 解析。
 
 ## Parameters
 
-| Parameter | Type | Required | Default | Description |
+| 参数 | 类型 | 必填 | 默认 | 说明 |
 |---|---|---|---|---|
-| scene | String | ✅ | — | Relative path to the target `.md` scene (supports `../`, `./`, and same-directory filenames) |
-| duration | Float | ❌ | 0 | Delay before navigation (seconds); 0 = immediately when the action is reached |
+| scene | String | ✅ | — | 目标 `.md` 场景的相对路径（支持 `../`、`./` 与同目录文件名） |
+| duration | Float | ❌ | 0 | 跳转前的延时（秒）；0 = 执行到这一步就立刻跳 |
 
 ## Constraints
 
-- The resolved path must be inside the document library and have a `.md` extension; otherwise the action is skipped with a warning.
-- This is unrelated to `MoveAlong`'s `path` parameter (which references a `Graph` entity name).
-- Does not require `objects`.
-- When used in the same `Behavior` chain with `Speak`, `OpenScene` will wait for `Speak` to finish (or be interrupted by another `Speak`); add a `Wait` action for extra padding.
+- 解析出的路径必须在文档库内、且扩展名是 `.md`；否则这个动作被跳过并给出警告。
+- 与 `MoveAlong` 的 `path` 参数（那个引用的是 `Graph` 实体名）无关。
+- 不需要 `objects`。
+- 与 `Speak` 写在同一条 `Behavior` 链里时，`OpenScene` 会等 `Speak` 说完（或被新的 `Speak` 打断）；需要额外留白就加一个 `Wait`。
 
 ## Example
 
-### Entities
+### 实体
 
 ```phymodel
 
@@ -37,7 +37,7 @@ CAD()
 
 ```
 
-### Trigger System
+### 触发系统
 
 ```phymodel
 

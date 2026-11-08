@@ -4,42 +4,42 @@
 
 ## Purpose
 
-Grab any entity listed in `objects`, move it, and **let go with velocity** — this is the only trigger that keeps the release speed (a real throw). Optionally declare `through` to detect the thrown entity passing through a ring/frame (a basketball hoop, a target ring), and fire the `.actions` on the hit.
+抓起 `objects` 中任一实体、把它带出去，然后**带着速度松手** —— 这是唯一保留松手速度的触发器（真正的抛出）。可选地用 `through` 检测被抛出的实体穿过一个环 / 框（篮筐、靶环），穿过时触发 `.actions`。
 
-Two-stage event:
+两段式事件：
 
-- `through` empty → the `.actions` run **on release** ("thrown").
-- `through` non-empty → the `.actions` run **on the pass-through**, not on release, so a miss stays silent.
+- `through` 为空 → `.actions` 在**松手时**执行（「抛出去了」）。
+- `through` 非空 → `.actions` 在**穿过时**执行，不在松手时执行，所以没穿过去就什么也不报。
 
 ## Parameters
 
-| Parameter | Type | Required | Default | Description |
+| 参数 | 类型 | 必填 | 默认 | 说明 |
 |---|---|---|---|---|
-| objects | [String] | ✅ | — | Entity names that can be grabbed and thrown |
-| through | [String] | ❌ | — | Pass-through targets; the actions fire when the thrown entity crosses the target's hole |
-| dragAxes | [String] | ❌ | all three axes | Restricts dragging before the release (e.g. only let it be lifted upward) |
-| dragRangeX / dragRangeY / dragRangeZ | [Float, Float] | ❌ | unlimited | Clamps the dragged position along each axis (DSL local coordinates) |
-| dragRangeR | [Float, Float] | ❌ | unlimited | Clamps the radial distance from the drag start point |
+| objects | [String] | ✅ | — | 可被抓取并抛出的实体名 |
+| through | [String] | ❌ | — | 穿过的目标；被抛出的实体穿过目标的孔时触发动作 |
+| dragAxes | [String] | ❌ | 三个轴全开 | 限制松手前的拖动（例如只允许往上抬） |
+| dragRangeX / dragRangeY / dragRangeZ | [Float, Float] | ❌ | 不限制 | 逐轴夹紧拖动位置（DSL 局部坐标） |
+| dragRangeR | [Float, Float] | ❌ | 不限制 | 以拖动起点为圆心，夹紧径向距离 |
 
 ## Constraints
 
-- Throwing is declared **by this trigger** — the entity must be named in `Throw(){ objects: […] }` (no entity-level switch; `.gesture(...)` has been removed).
-- **Only `Throw` keeps the release velocity.** `Slider` / `Drag` stop the entity where you let go (contract D2). The release velocity is sampled from the entity's position delta, clamped to ±5 m/s and scaled by 1.2; the angular velocity is currently random (configurable `speedScale` / `spin` are pending — see `Docs/TriggerContract.md` §3).
-- The thrown entity must be `.physic(mode: .dynamic)` — the release velocity is applied as a physics motion, so a `.kinematic` entity simply stops when you let go.
-- A `through` target **must use `.physic(mode: .static)` or `.physic(mode: .kinematic)`** so it keeps an exact triangle-mesh collider. A `.dynamic` target degenerates to a convex hull, which **seals the hole** and the entity can never pass through.
-- The hole axis is derived from the target's **local bounding box**: the thinnest axis is the hole axis, and the hole's lateral extent is the largest half-extent of the other two axes. A ring generated in the XZ plane therefore has a vertical hole axis, and rotating the target rotates the hole with it.
-- The hit test is geometric: the segment "previous frame position → current frame position" is intersected with the hole plane, and the intersection must fall inside the lateral extent. This is tunnel-proof at high speed and does not rely on collision events.
-- A real "throw" needs a release speed of at least **0.5 m/s**; slower than that counts as placing the object and no pass-through is judged.
-- One throw settles each target **at most once**: the session ends on hit, after a 5 s timeout, or once the entity has come to rest.
-- The pass-through is judged in flight; a ball that is merely carried through the ring by hand does not count.
-- Platform: on visionOS, pinch and fling your hand. On iOS, **press and hold to grab and release to throw**: the entity follows the device while your finger is down, and the release velocity is sampled frame by frame from its position delta, per-axis clamped to ±5 m/s and scaled by 1.2 with a random spin (the same constants as visionOS), so a `through` target **is** judged on iOS (contract D5). A quick tap is not a grab — it only feeds `Tap` triggers, so tapping a throwable never counts as a release. The web build **can** throw: the release velocity is sampled from the carried entity's position delta over the last ~0.15 s of pointer movement, per-axis clamped to ±5 m/s, scaled by 1.2 and given a random spin (the same constants as visionOS), so a `through` target is judged there — a slow, deliberate placement stays a put (< 0.5 m/s, no session), and one throw settles each target at most once (5 s timeout, or once the entity comes to rest). On any platform the thrown entity must be in the physics layer (`.physic(mode: .dynamic)`); otherwise there is no body to receive the velocity and it simply stops where you let go.
+- 抛出**由这个触发器声明** —— 实体必须被写进 `Throw(){ objects: […] }`（没有实体级开关；`.gesture(...)` 已删除）。
+- **只有 `Throw` 保留松手速度。** `Slider` / `Drag` 都在你松手的位置把实体停住（契约 D2）。松手速度由实体的位置差分采样，逐轴夹到 ±5 m/s 并乘 1.2；角速度目前是随机值（可配置的 `speedScale` / `spin` 是待办项 —— 见 `Docs/TriggerContract.md` §3）。
+- 被抛出的实体必须是 `.physic(mode: .dynamic)` —— 松手速度是以物理运动方式施加的，`.kinematic` 实体松手就停。
+- `through` 目标**必须用 `.physic(mode: .static)` 或 `.physic(mode: .kinematic)`**，这样它才保有精确的三角网格碰撞体。`.dynamic` 目标会退化成凸包，**把孔封死**，实体永远穿不过去。
+- 孔轴由目标的**局部包围盒**推出：最薄的那个轴就是孔轴，孔的横向范围是另外两个轴里较大的半长。所以在 XZ 平面上生成的环，孔轴是竖直的；旋转目标，孔跟着一起转。
+- 命中检测是几何的：把「上一帧位置 → 当前帧位置」这条线段与孔平面求交，交点必须落在横向范围内。这在高速下也不会穿模，且不依赖碰撞事件。
+- 真正的「抛出」需要至少 **0.5 m/s** 的松手速度；更慢就算「放下去」，不判穿过。
+- 一次抛出对每个目标**最多结算一次**：命中即结束，或 5 s 超时结束，或实体静止后结束。
+- 穿过是在飞行中判定的；用手把球「拿着穿过」环不算。
+- 平台差异：visionOS 上捏合后甩手。iOS 上**按住抓取、松手抛出**：手指按下期间实体跟着设备走，松手速度按帧从它的位置差分采样，逐轴夹到 ±5 m/s 后乘 1.2 并给一个随机自旋（与 visionOS 同一组常数），所以在 iOS 上 `through` 目标**是**会被判定的（契约 D5）。轻点不是抓取 —— 它只喂给 `Tap`，所以点一下可抛物体永远不会被当成松手。Web 端**可以**抛：松手速度取自被带实体在指针移动最后约 0.15 s 的位置差分，逐轴夹到 ±5 m/s，乘 1.2 并给随机自旋（与 visionOS 同一组常数），所以那里也判 `through` —— 慢慢地、刻意地放下去仍然是「放」（< 0.5 m/s，不开局），而一次抛出对每个目标最多结算一次（5 s 超时，或实体静止）。任何平台上被抛出的实体都必须在物理层（`.physic(mode: .dynamic)`）；否则没有刚体接收速度，它只会在你松手的地方停下。
 
 ## Example
 
-- sphere: $(x/0.1)^2+(y/0.1)^2+(z/0.1)^2-1=0$
-- torus: $(x^2+z^2+y^2+0.15^2-0.05^2)^2-4*0.15^2*(x^2+z^2)=0$
+- 球：$(x/0.1)^2+(y/0.1)^2+(z/0.1)^2-1=0$
+- 环面：$(x^2+z^2+y^2+0.15^2-0.05^2)^2-4*0.15^2*(x^2+z^2)=0$
 
-### Entities
+### 实体
 
 ```phymodel
 
@@ -63,7 +63,7 @@ CAD()
 
 ```
 
-### Trigger System 
+### 触发系统
 
 ```phymodel
 

@@ -4,25 +4,25 @@
 
 ## Purpose
 
-Fires the associated `.actions` when the camera moves within `distance` meters of any entity listed in `objects`. Continuously re-evaluates as the camera moves — the trigger fires once per proximity entry event.
+相机进入 `objects` 中任一实体 `distance` 米范围内时，触发这里挂载的 `.actions`。相机移动时持续重新求值 —— 每次「进入近距」只触发一次。
 
 ## Parameters
 
-| Parameter | Type | Required | Default | Description |
+| 参数 | 类型 | 必填 | 默认 | 说明 |
 |---|---|---|---|---|
-| objects | [String] | ✅ | — | Target entity name array; approaching any one of them fires the trigger |
-| distance | Float | ❌ | 1.0 | Proximity threshold in meters; trigger fires when camera–entity distance ≤ this value |
+| objects | [String] | ✅ | — | 目标实体名数组；靠近其中任意一个即触发 |
+| distance | Float | ❌ | 1.0 | 近距阈值（米）；相机与实体的距离 ≤ 该值时触发 |
 
 ## Constraints
 
-- Only **ModelEntity** instances are evaluated for proximity.
-- Proximity is measured from the active camera to the entity's origin/pivot point.
-- The trigger fires on **entry** — the camera crossing from outside to inside the threshold. Re-fires on re-entry after the camera moves back outside the threshold.
-- Hidden entities are still evaluated for proximity (unlike `Tap`, which requires visibility).
+- 只有 **ModelEntity** 实例参与近距判定。
+- 距离从当前相机量到实体的原点 / 枢轴点。
+- 只在**进入**时触发 —— 相机从阈值外穿到阈值内。相机退回阈值外之后再进入会重新触发。
+- 隐藏的实体依然参与近距判定（这一点与 `Tap` 不同，后者要求可见）。
 
 ## Example
 
-### Entities
+### 实体
 
 ```phymodel
 
@@ -55,7 +55,7 @@ CAD()
 
 ```
 
-### Multiple Proximity Triggers
+### 多个 Proximity 触发器
 
 ```phymodel
 
